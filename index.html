@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>발췌 문구 이미지 생성기</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700&family=Nanum+Myeongjo:wght@400;700&family=Nanum+Gothic:wght@400;700&display=swap');
-        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
-        @import url('https://fonts.googleapis.com/earlyaccess/kopubbatang.css');
+         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400&family=Noto+Sans+KR:wght@100;300;400&family=Nanum+Myeongjo:wght@400;700&family=Nanum+Gothic:wght@400;700&display=swap');
+            @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
+            @import url('https://fonts.googleapis.com/earlyaccess/kopubbatang.css');
         
         * {
             margin: 0;
@@ -389,6 +389,40 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+        
+        .footer {
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border);
+            padding: 30px 20px;
+            margin-top: 40px;
+            text-align: center;
+        }
+        
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .footer-title {
+            font-size: 0.95em;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        
+        .footer-text {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+        
+        .footer-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 20px auto;
+            max-width: 400px;
+        }
     </style>
 </head>
 <body>
@@ -602,6 +636,21 @@
         </div>
     </div>
     
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-title">📖 발췌 문구 생성기</div>
+            <p class="footer-text">
+                본 사이트는 어떠한 개인정보도 수집하지 않습니다.<br>
+                모든 작업은 귀하의 브라우저에서만 이루어집니다.
+            </p>
+            <div class="footer-divider"></div>
+            <p class="footer-text">
+                생성된 이미지의 사용에 대한 책임은 사용자에게 있습니다.<br>
+                플랫폼 로고는 각 플랫폼의 상표이며, 사용 시 해당 플랫폼의 가이드라인을 준수해 주세요.
+            </p>
+        </div>
+    </footer>
+    
     <script>
         // 색상 팔레트
         const backgrounds = [
@@ -618,16 +667,16 @@
         
         // 플랫폼 로고 URL (여기에 실제 이미지 URL을 넣으세요)
         const platformLogos = {
-            bloom: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/bloom.jpg',
-            carat: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/carat.png',
-            caveDuck: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/Caveduck.jpg',  
-    	   dokiChat: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/dokichat.jpg',
-            inkChat: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/inkchat.jpg',
-            zeta: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/zeta.jpg',
-            luvDuv: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/LoveyDovey.jpg',
-            melting: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/melting.jpg',
-            pulse: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/pulse.jpg',
-            ropanAI: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/rofan.png'
+            bloom: 'BLOOM_LOGO_URL_HERE',
+            carat: 'CARAT_LOGO_URL_HERE',
+            caveDuck: 'CAVEDUCK_LOGO_URL_HERE',
+            dokiChat: 'DOKICHAT_LOGO_URL_HERE',
+            inkChat: 'INKCHAT_LOGO_URL_HERE',
+            zeta: 'ZETA_LOGO_URL_HERE',
+            luvDuv: 'LUVDUV_LOGO_URL_HERE',
+            melting: 'MELTING_LOGO_URL_HERE',
+            pulse: 'PULSE_LOGO_URL_HERE',
+            ropanAI: 'ROPANAI_LOGO_URL_HERE'
         };
         
         let selectedBackground = -1;
@@ -757,7 +806,7 @@
             else x = width - padding;
             
             // 발췌 문구 그리기
-            ctx.font = `600 ${fontSize}px "${font}"`;
+            ctx.font = `300 ${fontSize}px "${font}"`;
             const maxWidth = width - (padding * 2);
             const lineHeight = fontSize * lineHeightMultiplier;
             let lines = [];
@@ -838,17 +887,21 @@
             
             // 작가명과 제목
             ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`;
-            ctx.font = `400 35px "Nanum Gothic"`;
+            ctx.font = `300 38px "Nanum Gothic"`; 
             ctx.textAlign = align === 'justify' ? 'left' : align;
             
             const bottomY = height - 130;
             let bottomX = align === 'justify' ? padding : x;
             if (author && title) {
-                ctx.fillText(`— ${author}, 《${title}》`, bottomX, bottomY);
+                ctx.fillText(`${author} | `, bottomX, bottomY);
+                const authorWidth = ctx.measureText(`${author} | `).width;
+                ctx.font = `600 38px "Nanum Gothic"`; 
+                ctx.fillText(`${title}`, bottomX + authorWidth, bottomY);
             } else if (author) {
-                ctx.fillText(`— ${author}`, bottomX, bottomY);
+                ctx.fillText(`${author}`, bottomX, bottomY);
             } else if (title) {
-                ctx.fillText(`《${title}》`, bottomX, bottomY);
+                ctx.font = `600 38px "Nanum Gothic"`; 
+                ctx.fillText(`${title}`, bottomX, bottomY);
             }
             
             // 플랫폼 로고 그리기
