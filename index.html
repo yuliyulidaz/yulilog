@@ -339,6 +339,8 @@
         #canvas {
             width: 100%;
             height: auto;
+            max-height: calc(100vh - 200px);
+            object-fit: contain;
             border-radius: 12px;
             display: block;
             box-shadow: var(--card-shadow-hover);
@@ -874,13 +876,13 @@
             // 플랫폼 로고 그리기
             if (platform && logoImages[platform] && logoImages[platform].complete) {
                 const logo = logoImages[platform];
-                // 절대 위치: 오른쪽에서 80px, 하단에서 80px
-                const logoX = width - 80 - logoSize;
-                const logoY = height - 80 - logoSize;
+                // 절대 위치: 오른쪽에서 70px, 하단에서 70px
+                const logoX = width - 70 - logoSize;
+                const logoY = height - 70 - logoSize;
                 
                 // 원형 클리핑 마스크 생성
                 ctx.save();
-                ctx.globalAlpha = 0.8;
+                ctx.globalAlpha = 0.6;
                 ctx.beginPath();
                 ctx.arc(logoX + logoSize/2, logoY + logoSize/2, logoSize/2, 0, Math.PI * 2);
                 ctx.closePath();
