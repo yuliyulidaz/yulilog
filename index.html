@@ -13,79 +13,188 @@
             box-sizing: border-box;
         }
         
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #F8F9FA;
+            --text-primary: #1a1a1a;
+            --text-secondary: #6b7280;
+            --accent: #6366F1;
+            --accent-hover: #4f46e5;
+            --border: #e5e7eb;
+            --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        body.dark {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #9ca3af;
+            --border: #404040;
+            --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+        
         body {
             font-family: 'Noto Sans KR', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 40px 20px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        .header {
+            background: var(--bg-primary);
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background 0.3s;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .dark-mode-toggle {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s;
+        }
+        
+        .dark-mode-toggle:hover {
+            transform: scale(1.05);
         }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .layout {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            align-items: start;
+            grid-template-columns: 1fr;
+            gap: 20px;
         }
         
-        .controls {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        @media (min-width: 900px) {
+            .layout {
+                grid-template-columns: 400px 1fr;
+            }
+            
+            .preview-container {
+                position: sticky;
+                top: 90px;
+            }
         }
         
-        .title {
-            font-size: 2em;
-            font-weight: 700;
-            margin-bottom: 30px;
-            color: #333;
+        .card {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            transition: background 0.2s;
+        }
+        
+        .card-header:hover {
+            background: var(--bg-secondary);
+        }
+        
+        .card-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .card-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s;
+        }
+        
+        .card-content {
+            padding: 20px;
+            display: none;
+        }
+        
+        .card-content.active {
+            display: block;
+        }
+        
+        .card.collapsed .card-icon {
+            transform: rotate(-90deg);
         }
         
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
         
         .form-label {
             display: block;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #555;
-            font-size: 0.95em;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9em;
         }
         
         .form-input,
         .form-textarea,
         .form-select {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
             font-size: 1em;
             font-family: 'Noto Sans KR', sans-serif;
-            transition: border-color 0.3s;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s;
         }
         
         .form-input:focus,
         .form-textarea:focus,
         .form-select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
         
         .form-textarea {
             resize: vertical;
-            min-height: 120px;
+            min-height: 100px;
             line-height: 1.6;
-            white-space: pre-wrap;
         }
         
         .color-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-top: 10px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 12px;
         }
         
         .color-option {
@@ -99,10 +208,11 @@
         
         .color-option:hover {
             transform: scale(1.05);
+            box-shadow: var(--card-shadow-hover);
         }
         
         .color-option.active {
-            border-color: #333;
+            border-color: var(--accent);
             transform: scale(1.05);
         }
         
@@ -113,60 +223,41 @@
             left: 50%;
             transform: translate(-50%, -50%);
             color: white;
-            font-size: 1.5em;
+            font-size: 1.8em;
             font-weight: bold;
-            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
         
-        .preview-container {
-            position: sticky;
-            top: 40px;
+        .color-picker-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 12px;
         }
         
-        .preview {
-            background: white;
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-        
-        #canvas {
-            width: 100%;
-            height: auto;
-            border-radius: 10px;
-            display: block;
-        }
-        
-        .download-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1em;
-            font-weight: 600;
+        .color-picker-row input[type="color"] {
+            width: 60px;
+            height: 44px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
             cursor: pointer;
-            margin-top: 20px;
-            transition: transform 0.3s;
+            background: none;
         }
         
-        .download-btn:hover {
-            transform: translateY(-2px);
-        }
-        
-        .download-btn:active {
-            transform: translateY(0);
+        .color-picker-row span {
+            color: var(--text-secondary);
+            font-size: 0.9em;
         }
         
         .radio-group {
-            display: flex;
-            gap: 15px;
-            margin-top: 10px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 8px;
         }
         
-        .radio-option {
-            flex: 1;
+        .radio-group.four-col {
+            grid-template-columns: repeat(4, 1fr);
         }
         
         .radio-option input[type="radio"] {
@@ -175,26 +266,34 @@
         
         .radio-option label {
             display: block;
-            padding: 10px;
-            border: 2px solid #e0e0e0;
+            padding: 12px;
+            border: 1px solid var(--border);
             border-radius: 8px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
+            font-size: 0.9em;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        
+        .radio-option label:hover {
+            border-color: var(--accent);
         }
         
         .radio-option input[type="radio"]:checked + label {
-            background: #667eea;
+            background: var(--accent);
             color: white;
-            border-color: #667eea;
+            border-color: var(--accent);
         }
         
         .form-range {
             -webkit-appearance: none;
             appearance: none;
-            height: 8px;
-            background: #e0e0e0;
-            border-radius: 5px;
+            width: 100%;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
             outline: none;
             cursor: pointer;
         }
@@ -202,205 +301,366 @@
         .form-range::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 20px;
-            height: 20px;
-            background: #667eea;
+            width: 18px;
+            height: 18px;
+            background: var(--accent);
             border-radius: 50%;
             cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .form-range::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
         }
         
         .form-range::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            background: #667eea;
+            width: 18px;
+            height: 18px;
+            background: var(--accent);
             border-radius: 50%;
             cursor: pointer;
             border: none;
         }
         
-        .color-picker-row {
+        .range-label {
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         
-        .color-picker-row input[type="color"] {
-            width: 80px;
-            height: 40px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
+        .range-value {
+            font-weight: 600;
+            color: var(--accent);
+        }
+        
+        #canvas {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            display: block;
+            box-shadow: var(--card-shadow-hover);
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Noto Sans KR', sans-serif;
         }
         
-        .color-picker-row span {
-            color: #888;
-            font-size: 0.9em;
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
         
-        @media (max-width: 900px) {
-            .container {
-                grid-template-columns: 1fr;
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .mobile-actions {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border);
+            padding: 12px 20px;
+            z-index: 99;
+        }
+        
+        @media (max-width: 899px) {
+            .mobile-actions {
+                display: block;
             }
             
-            .preview-container {
-                position: static;
+            .preview-container .btn-primary {
+                display: none;
+            }
+            
+            .container {
+                padding-bottom: 80px;
+            }
+        }
+        
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 899px) {
+            .logo {
+                font-size: 1.2em;
+            }
+            
+            .color-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="controls">
-            <h1 class="title">📖 발췌 문구 생성기</h1>
-            
-            <div class="form-group">
-                <label class="form-label">발췌 문구</label>
-                <textarea class="form-textarea" id="quote" placeholder="마음에 드는 문구를 입력하세요...">제 연인은 액정 속에 살고 있네요.</textarea>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">제작자</label>
-                <input type="text" class="form-input" id="author" placeholder="제작자" value="제작자">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">캐릭터</label>
-                <input type="text" class="form-input" id="title" placeholder="캐릭터" value="캐릭터">
-            </div>
-
-             <div class="form-group">
-                <label class="form-label">캔버스 비율</label>
-                <select class="form-select" id="canvasRatio">
-                    <option value="1:1">정사각형 (1:1) - 1080x1080</option>
-                    <option value="4:5">세로형 (4:5) - 1080x1350</option>
-                    <option value="16:9">가로형 (16:9) - 1920x1080</option>
-                    <option value="9:16">스토리 (9:16) - 1080x1920</option>
-                </select>
-            </div>
-
-            
-            <div class="form-group">
-                <label class="form-label">폰트 선택</label>
-                <select class="form-select" id="fontSelect">
-                    <option value="Noto Serif KR">본문명조 (Noto Serif KR)</option>
-                    <option value="Nanum Myeongjo">나눔명조</option>
-                    <option value="Noto Sans KR">고딕체 (Noto Sans KR)</option>
-                    <option value="Nanum Gothic">나눔고딕</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">텍스트 정렬</label>
-                <div class="radio-group" style="grid-template-columns: repeat(4, 1fr); display: grid;">
-                    <div class="radio-option">
-                        <input type="radio" name="align" id="align-justify" value="justify" checked>
-                        <label for="align-justify">양쪽</label>
-                    </div>
-                    <div class="radio-option">
-                        <input type="radio" name="align" id="align-left" value="left">
-                        <label for="align-left">왼쪽</label>
-                    </div>
-                    <div class="radio-option">
-                        <input type="radio" name="align" id="align-center" value="center">
-                        <label for="align-center">가운데</label>
-                    </div>
-                    <div class="radio-option">
-                        <input type="radio" name="align" id="align-right" value="right">
-                        <label for="align-right">오른쪽</label>
-                    </div>
-
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">줄바꿈 방식</label>
-                <div class="radio-group">
-                    <div class="radio-option">
-                        <input type="radio" name="linebreak" id="linebreak-char" value="char" checked>
-                        <label for="linebreak-char">글자 단위</label>
-                    </div>
-                    <div class="radio-option">
-                        <input type="radio" name="linebreak" id="linebreak-word" value="word">
-                        <label for="linebreak-word">단어 단위</label>
-                    </div>
-
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">글자 크기: <span id="fontSizeValue">52</span>px</label>
-                <input type="range" class="form-range" id="fontSize" min="30" max="80" value="52" style="width: 100%;">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">줄 간격: <span id="lineHeightValue">1.5</span>배</label>
-                <input type="range" class="form-range" id="lineHeight" min="1.2" max="2.0" step="0.1" value="1.5" style="width: 100%;">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">여백(패딩): <span id="paddingValue">100</span>px</label>
-                <input type="range" class="form-range" id="padding" min="50" max="200" step="10" value="100" style="width: 100%;">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">글자 색상</label>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <input type="color" id="textColor" value="#ffffff" style="width: 60px; height: 40px; border: none; border-radius: 8px; cursor: pointer;">
-                    <span style="color: #888; font-size: 0.9em;">현재: <span id="textColorValue">#ffffff</span></span>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">배경 선택</label>
-                <div class="color-picker-row">
-                    <input type="color" id="solidColor" value="#9B7E6B">
-                    <span>단색 배경 색상 선택</span>
-                </div>
-                <div class="color-picker-row">
-                    <input type="color" id="gradientColor1" value="#9B7E6B">
-                    <input type="color" id="gradientColor2" value="#E6DDD3">
-                    <span>그라데이션 색상 선택</span>
-                </div>
-                <hr style="margin: 15px 0; border: none; border-top: 1px solid #e0e0e0;">
-                <div style="margin-bottom: 10px; color: #666; font-size: 0.9em;">색상 팔레트 선택</div>
-                <div class="color-grid" id="colorGrid"></div>
-            </div>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">📖 발췌 문구 생성기</div>
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
         </div>
-        
-        <div class="preview-container">
-            <div class="preview">
-                <canvas id="canvas" width="1080" height="1080"></canvas>
-                <button class="download-btn" onclick="downloadImage()">📥 이미지 다운로드</button>
+    </div>
+    
+    <div class="container">
+        <div class="layout">
+            <div class="controls">
+                <!-- 텍스트 설정 -->
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <div class="card-title">✏️ 텍스트 설정</div>
+                        <div class="card-icon">▼</div>
+                    </div>
+                    <div class="card-content active">
+                        <div class="form-group">
+                            <label class="form-label">발췌 문구</label>
+                            <textarea class="form-textarea" id="quote" placeholder="마음에 드는 문구를 입력하세요...">제 연인은 액정 속에 살고 있네요.</textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">제작자</label>
+                            <input type="text" class="form-input" id="author" placeholder="제작자" value="제작자">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">캐릭터</label>
+                            <input type="text" class="form-input" id="title" placeholder="캐릭터" value="캐릭터">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 스타일 설정 -->
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <div class="card-title">🎨 스타일 설정</div>
+                        <div class="card-icon">▼</div>
+                    </div>
+                    <div class="card-content active">
+                        <div class="form-group">
+                            <label class="form-label">캔버스 비율</label>
+                            <select class="form-select" id="canvasRatio">
+                                <option value="1:1">정사각형 (1:1) - 1080x1080</option>
+                                <option value="4:5">세로형 (4:5) - 1080x1350</option>
+                                <option value="16:9">가로형 (16:9) - 1920x1080</option>
+                                <option value="9:16">스토리 (9:16) - 1080x1920</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">폰트 선택</label>
+                            <select class="form-select" id="fontSelect">
+                                <option value="Noto Serif KR">본문명조 (Noto Serif KR)</option>
+                                <option value="Nanum Myeongjo">나눔명조</option>
+                                <option value="Noto Sans KR">고딕체 (Noto Sans KR)</option>
+                                <option value="Nanum Gothic">나눔고딕</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">텍스트 정렬</label>
+                            <div class="radio-group four-col">
+                                <div class="radio-option">
+                                    <input type="radio" name="align" id="align-justify" value="justify" checked>
+                                    <label for="align-justify">양쪽</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" name="align" id="align-left" value="left">
+                                    <label for="align-left">왼쪽</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" name="align" id="align-center" value="center">
+                                    <label for="align-center">가운데</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" name="align" id="align-right" value="right">
+                                    <label for="align-right">오른쪽</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">줄바꿈 방식</label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" name="linebreak" id="linebreak-char" value="char" checked>
+                                    <label for="linebreak-char">글자 단위</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" name="linebreak" id="linebreak-word" value="word">
+                                    <label for="linebreak-word">단어 단위</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="range-label">
+                                <label class="form-label" style="margin: 0;">글자 크기</label>
+                                <span class="range-value"><span id="fontSizeValue">52</span>px</span>
+                            </div>
+                            <input type="range" class="form-range" id="fontSize" min="30" max="80" value="52">
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="range-label">
+                                <label class="form-label" style="margin: 0;">줄 간격</label>
+                                <span class="range-value"><span id="lineHeightValue">1.5</span>배</span>
+                            </div>
+                            <input type="range" class="form-range" id="lineHeight" min="1.2" max="2.0" step="0.1" value="1.5">
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="range-label">
+                                <label class="form-label" style="margin: 0;">여백</label>
+                                <span class="range-value"><span id="paddingValue">100</span>px</span>
+                            </div>
+                            <input type="range" class="form-range" id="padding" min="50" max="200" step="10" value="100">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 색상 설정 -->
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <div class="card-title">🎨 색상 설정</div>
+                        <div class="card-icon">▼</div>
+                    </div>
+                    <div class="card-content active">
+                        <div class="form-group">
+                            <label class="form-label">글자 색상</label>
+                            <div class="color-picker-row">
+                                <input type="color" id="textColor" value="#ffffff">
+                                <span id="textColorValue">#ffffff</span>
+                            </div>
+                        </div>
+                        
+                        <div class="divider"></div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">커스텀 배경</label>
+                            <div class="color-picker-row">
+                                <input type="color" id="solidColor" value="#9B7E6B">
+                                <span>단색</span>
+                            </div>
+                            <div class="color-picker-row">
+                                <input type="color" id="gradientColor1" value="#9B7E6B">
+                                <input type="color" id="gradientColor2" value="#E6DDD3">
+                                <span>그라데이션</span>
+                            </div>
+                        </div>
+                        
+                        <div class="divider"></div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">색상 팔레트</label>
+                            <div class="color-grid" id="colorGrid"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 플랫폼 선택 -->
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <div class="card-title">📱 플랫폼 선택</div>
+                        <div class="card-icon">▼</div>
+                    </div>
+                    <div class="card-content active">
+                        <div class="form-group">
+                            <label class="form-label">플랫폼</label>
+                            <select class="form-select" id="platformSelect">
+                                <option value="">로고 없음</option>
+                                <option value="platform1">플랫폼 1</option>
+                                <option value="platform2">플랫폼 2</option>
+                                <option value="platform3">플랫폼 3</option>
+                                <option value="platform4">플랫폼 4</option>
+                                <option value="platform5">플랫폼 5</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group" id="logoPreviewContainer" style="display: none;">
+                            <label class="form-label">로고 미리보기</label>
+                            <div style="padding: 20px; background: var(--bg-secondary); border-radius: 8px; text-align: center;">
+                                <img id="logoPreview" src="" alt="플랫폼 로고" style="max-width: 150px; max-height: 60px; opacity: 0.8;">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="range-label">
+                                <label class="form-label" style="margin: 0;">로고 크기</label>
+                                <span class="range-value"><span id="logoSizeValue">100</span>px</span>
+                            </div>
+                            <input type="range" class="form-range" id="logoSize" min="50" max="200" step="10" value="100">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="preview-container">
+                <div class="card">
+                    <canvas id="canvas" width="1080" height="1080"></canvas>
+                </div>
+                <button class="btn-primary" onclick="downloadImage()" style="margin-top: 20px;">📥 이미지 다운로드</button>
             </div>
         </div>
     </div>
     
+    <div class="mobile-actions">
+        <button class="btn-primary" onclick="downloadImage()">📥 이미지 다운로드</button>
+    </div>
+    
     <script>
+        // 색상 팔레트 (듀오톤 제거, 6개)
         const backgrounds = [
-            // 문학적 중립 (Literary Neutrals) - 단색
+            // 단색 (4개)
             { type: 'solid', color: '#9B7E6B', name: '모카 무스' },
-            { type: 'solid', color: '#8B7B7A', name: '시나몬 슬레이트' },
-            { type: 'solid', color: '#E6DDD3', name: '위트필드 베이지' },
-            { type: 'solid', color: '#B8AEA5', name: '조용한 회색' },
             { type: 'solid', color: '#F5EFE7', name: '앤티크 화이트' },
             { type: 'solid', color: '#4A4845', name: '차콜 미스트' },
+            { type: 'solid', color: '#B8AEA5', name: '조용한 회색' },
             
-            // 문학적 중립 - 그라데이션
+            // 그라데이션 (2개)
             { type: 'gradient', colors: ['#9B7E6B', '#E6DDD3'], name: '모카 → 크림' },
-            { type: 'gradient', colors: ['#8B7B7A', '#C4B5C0'], name: '시나몬 → 라벤더' },
             { type: 'gradient', colors: ['#D4C5B9', '#F8F5F0'], name: '베이지 → 화이트' },
-            
-            // 듀오톤 (2색 단순 배치)
-            { type: 'duotone', colors: ['#9B7E6B', '#E6DDD3'], name: '듀오: 모카/크림' },
-            { type: 'duotone', colors: ['#4A4845', '#F5EFE7'], name: '듀오: 차콜/화이트' },
-            { type: 'duotone', colors: ['#8B7B7A', '#B8AEA5'], name: '듀오: 시나몬/회색' },
-                
         ];
         
-        let selectedBackground = -1; // -1 means using custom colors
+        let selectedBackground = -1;
         
-        // 배경 옵션 생성
+        // 다크모드 토글
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark');
+            const btn = document.querySelector('.dark-mode-toggle');
+            btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+            localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+        }
+        
+        // 다크모드 초기화
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark');
+            document.querySelector('.dark-mode-toggle').textContent = '☀️';
+        }
+        
+        // 카드 접기/펼치기
+        function toggleCard(header) {
+            const card = header.parentElement;
+            const content = card.querySelector('.card-content');
+            card.classList.toggle('collapsed');
+            content.classList.toggle('active');
+        }
+        
+        // 색상 팔레트 생성
         const colorGrid = document.getElementById('colorGrid');
         backgrounds.forEach((bg, index) => {
             const div = document.createElement('div');
@@ -408,8 +668,6 @@
             
             if (bg.type === 'gradient') {
                 div.style.background = `linear-gradient(135deg, ${bg.colors[0]}, ${bg.colors[1]})`;
-            } else if (bg.type === 'duotone') {
-                div.style.background = `linear-gradient(90deg, ${bg.colors[0]} 50%, ${bg.colors[1]} 50%)`;
             } else {
                 div.style.background = bg.color;
             }
@@ -455,7 +713,6 @@
             
             // 배경 그리기
             if (selectedBackground >= 0) {
-                // 팔레트에서 선택
                 const bg = backgrounds[selectedBackground];
                 if (bg.type === 'gradient') {
                     const gradient = ctx.createLinearGradient(0, 0, width, height);
@@ -463,21 +720,14 @@
                     gradient.addColorStop(1, bg.colors[1]);
                     ctx.fillStyle = gradient;
                     ctx.fillRect(0, 0, width, height);
-                } else if (bg.type === 'duotone') {
-                    ctx.fillStyle = bg.colors[0];
-                    ctx.fillRect(0, 0, width / 2, height);
-                    ctx.fillStyle = bg.colors[1];
-                    ctx.fillRect(width / 2, 0, width / 2, height);
                 } else {
                     ctx.fillStyle = bg.color;
                     ctx.fillRect(0, 0, width, height);
                 }
             } else {
-                // 커스텀 색상 사용
                 const color1 = document.getElementById('gradientColor1').value;
                 const color2 = document.getElementById('gradientColor2').value;
                 
-                // 두 색상이 같으면 단색, 다르면 그라데이션
                 if (color1 === color2) {
                     ctx.fillStyle = document.getElementById('solidColor').value;
                     ctx.fillRect(0, 0, width, height);
@@ -499,25 +749,21 @@
             else if (align === 'center') x = width / 2;
             else x = width - padding;
             
-            // 발췌 문구 그리기 (여러 줄, 엔터 처리)
+            // 발췌 문구 그리기
             ctx.font = `600 ${fontSize}px "${font}"`;
             const maxWidth = width - (padding * 2);
             const lineHeight = fontSize * lineHeightMultiplier;
             let lines = [];
             
-            // 먼저 엔터(\n)로 문단 나누기
             const paragraphs = quote.split('\n');
             
             paragraphs.forEach(paragraph => {
                 if (paragraph.trim() === '') {
-                    // 빈 줄 추가
                     lines.push('');
                     return;
                 }
                 
-                // 각 문단을 줄바꿈 방식에 따라 처리
                 if (linebreakMode === 'word') {
-                    // 단어 단위 줄바꿈
                     const words = paragraph.split(' ');
                     let currentLine = '';
                     
@@ -535,7 +781,6 @@
                         lines.push(currentLine.trim());
                     }
                 } else {
-                    // 글자 단위 줄바꿈
                     let currentLine = '';
                     
                     for (let i = 0; i < paragraph.length; i++) {
@@ -556,13 +801,10 @@
                 }
             });
             
-            // 세로 중앙 정렬을 위한 시작 위치 계산
             const totalHeight = lines.length * lineHeight;
             let y = (height - totalHeight) / 2 + fontSize;
             
-            // 문구 그리기
             if (align === 'justify' && linebreakMode === 'word') {
-                // 양쪽 정렬 (단어 단위일 때만)
                 ctx.textAlign = 'left';
                 lines.forEach((line, index) => {
                     if (line === '') {
@@ -570,10 +812,8 @@
                         return;
                     }
                     if (index === lines.length - 1 || lines[index + 1] === '') {
-                        // 마지막 줄이거나 다음이 빈 줄이면 왼쪽 정렬
                         ctx.fillText(line, padding, y);
                     } else {
-                        // 양쪽 정렬 구현
                         drawJustifiedText(ctx, line, padding, y, maxWidth);
                     }
                     y += lineHeight;
@@ -646,7 +886,6 @@
         document.getElementById('solidColor').addEventListener('input', () => {
             document.querySelectorAll('.color-option').forEach(el => el.classList.remove('active'));
             selectedBackground = -1;
-            // 그라데이션 색상도 단색에 맞춤
             const solidColor = document.getElementById('solidColor').value;
             document.getElementById('gradientColor1').value = solidColor;
             document.getElementById('gradientColor2').value = solidColor;
@@ -665,6 +904,12 @@
             updateCanvas();
         });
         
+        // 텍스트 색상 변경
+        document.getElementById('textColor').addEventListener('input', (e) => {
+            document.getElementById('textColorValue').textContent = e.target.value;
+            updateCanvas();
+        });
+        
         // 이벤트 리스너
         document.getElementById('quote').addEventListener('input', updateCanvas);
         document.getElementById('author').addEventListener('input', updateCanvas);
@@ -680,10 +925,6 @@
         });
         document.getElementById('padding').addEventListener('input', (e) => {
             document.getElementById('paddingValue').textContent = e.target.value;
-            updateCanvas();
-        });
-        document.getElementById('textColor').addEventListener('input', (e) => {
-            document.getElementById('textColorValue').textContent = e.target.value;
             updateCanvas();
         });
         document.getElementById('canvasRatio').addEventListener('change', updateCanvas);
