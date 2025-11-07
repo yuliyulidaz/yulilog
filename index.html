@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>발췌 문구 이미지 생성기</title>
     <style>
-            @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400&family=Noto+Sans+KR:wght@100;300;400&family=Nanum+Myeongjo:wght@400;700&family=Nanum+Gothic:wght@400;700&display=swap');
-            @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
-            @import url('https://fonts.googleapis.com/earlyaccess/kopubbatang.css');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700&family=Nanum+Myeongjo:wght@400;700&family=Nanum+Gothic:wght@400;700&display=swap');
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+        @import url('https://fonts.googleapis.com/earlyaccess/kopubbatang.css');
         
         * {
             margin: 0;
@@ -372,31 +372,7 @@
             transform: translateY(0);
         }
         
-        .mobile-actions {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--bg-primary);
-            border-top: 1px solid var(--border);
-            padding: 12px 20px;
-            z-index: 99;
-        }
-        
-        @media (max-width: 899px) {
-            .mobile-actions {
-                display: block;
-            }
-            
-            .preview-container .btn-primary {
-                display: none;
-            }
-            
-            .container {
-                padding-bottom: 80px;
-            }
-        }
+    
         
         .divider {
             height: 1px;
@@ -435,7 +411,7 @@
                     <div class="card-content active">
                         <div class="form-group">
                             <label class="form-label">발췌 문구</label>
-                            <textarea class="form-textarea" id="quote" placeholder="마음에 드는 문구를 입력하세요...">당신의 이야기를 적어주세요.</textarea>
+                            <textarea class="form-textarea" id="quote" placeholder="마음에 드는 문구를 입력하세요..."></textarea>
                         </div>
                         
                         <div class="form-group">
@@ -520,9 +496,9 @@
                         <div class="form-group">
                             <div class="range-label">
                                 <label class="form-label" style="margin: 0;">글자 크기</label>
-                                <span class="range-value"><span id="fontSizeValue">42</span>px</span>
+                                <span class="range-value"><span id="fontSizeValue">52</span>px</span>
                             </div>
-                            <input type="range" class="form-range" id="fontSize" min="30" max="80" value="42">
+                            <input type="range" class="form-range" id="fontSize" min="30" max="80" value="52">
                         </div>
                         
                         <div class="form-group">
@@ -624,10 +600,6 @@
                 <button class="btn-primary" onclick="downloadImage()" style="margin-top: 20px;">📥 이미지 다운로드</button>
             </div>
         </div>
-    </div>
-    
-    <div class="mobile-actions">
-        <button class="btn-primary" onclick="downloadImage()">📥 이미지 다운로드</button>
     </div>
     
     <script>
@@ -785,7 +757,7 @@
             else x = width - padding;
             
             // 발췌 문구 그리기
-            ctx.font = `300 ${fontSize}px "${font}"`;
+            ctx.font = `600 ${fontSize}px "${font}"`;
             const maxWidth = width - (padding * 2);
             const lineHeight = fontSize * lineHeightMultiplier;
             let lines = [];
@@ -865,23 +837,19 @@
             }
             
             // 작가명과 제목
-                ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`;
-                ctx.font = `300 38px "Nanum Gothic"`; 
-                ctx.textAlign = align === 'justify' ? 'left' : align;
-                
-                const bottomY = height - 130;
-                let bottomX = align === 'justify' ? padding : x;
-                if (author && title) {
-                    ctx.fillText(`${author} | `, bottomX, bottomY);
-                    const authorWidth = ctx.measureText(`${author} | `).width;
-                    ctx.font = `600 38px "Nanum Gothic"`; 
-                    ctx.fillText(`${title}`, bottomX + authorWidth, bottomY);
-                } else if (author) {
-                    ctx.fillText(`${author}`, bottomX, bottomY);
-                } else if (title) {
-                    ctx.font = `600 38px "Nanum Gothic"`; 
-                    ctx.fillText(`${title}`, bottomX, bottomY);
-                }
+            ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`;
+            ctx.font = `400 35px "Nanum Gothic"`;
+            ctx.textAlign = align === 'justify' ? 'left' : align;
+            
+            const bottomY = height - 130;
+            let bottomX = align === 'justify' ? padding : x;
+            if (author && title) {
+                ctx.fillText(`— ${author}, 《${title}》`, bottomX, bottomY);
+            } else if (author) {
+                ctx.fillText(`— ${author}`, bottomX, bottomY);
+            } else if (title) {
+                ctx.fillText(`《${title}》`, bottomX, bottomY);
+            }
             
             // 플랫폼 로고 그리기
             if (platform && logoImages[platform] && logoImages[platform].complete) {
@@ -999,6 +967,49 @@
         });
         document.querySelectorAll('input[name="linebreak"]').forEach(radio => {
             radio.addEventListener('change', updateCanvas);
+        });
+        
+        // 입력 필드 클릭/포커스 시 기본값 삭제
+        const defaultValues = {
+            quote: '당신의 이야기를 적어주세요.',
+            author: '제작자',
+            title: '캐릭터'
+        };
+
+        document.getElementById('quote').addEventListener('focus', function() {
+            if (this.value === defaultValues.quote) {
+                this.value = '';
+            }
+        });
+
+        document.getElementById('quote').addEventListener('blur', function() {
+            if (this.value === '') {
+                this.value = defaultValues.quote;
+            }
+        });
+
+        document.getElementById('author').addEventListener('focus', function() {
+            if (this.value === defaultValues.author) {
+                this.value = '';
+            }
+        });
+
+        document.getElementById('author').addEventListener('blur', function() {
+            if (this.value === '') {
+                this.value = defaultValues.author;
+            }
+        });
+
+        document.getElementById('title').addEventListener('focus', function() {
+            if (this.value === defaultValues.title) {
+                this.value = '';
+            }
+        });
+
+        document.getElementById('title').addEventListener('blur', function() {
+            if (this.value === '') {
+                this.value = defaultValues.title;
+            }
         });
         
         // 로고 미리 로드 및 초기 렌더링
