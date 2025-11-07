@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>발췌 문구 이미지 생성기</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700&family=Nanum+Myeongjo:wght@400;700&family=Nanum+Gothic:wght@400;700&display=swap');
-        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
-        @import url('https://fonts.googleapis.com/earlyaccess/kopubbatang.css');
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400&family=Noto+Sans+KR:wght@100;300;400&family=Nanum+Myeongjo:wght@400;700&family=Nanum+Gothic:wght@400;700&display=swap');
+            @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
+            @import url('https://fonts.googleapis.com/earlyaccess/kopubbatang.css');
         
         * {
             margin: 0;
@@ -785,7 +785,7 @@
             else x = width - padding;
             
             // 발췌 문구 그리기
-            ctx.font = `600 ${fontSize}px "${font}"`;
+            ctx.font = `300 ${fontSize}px "${font}"`;
             const maxWidth = width - (padding * 2);
             const lineHeight = fontSize * lineHeightMultiplier;
             let lines = [];
@@ -865,19 +865,23 @@
             }
             
             // 작가명과 제목
-            ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`;
-            ctx.font = `400 35px "Nanum Gothic"`;
-            ctx.textAlign = align === 'justify' ? 'left' : align;
-            
-            const bottomY = height - 130;
-            let bottomX = align === 'justify' ? padding : x;
-            if (author && title) {
-                ctx.fillText(`— ${author}, 《${title}》`, bottomX, bottomY);
-            } else if (author) {
-                ctx.fillText(`— ${author}`, bottomX, bottomY);
-            } else if (title) {
-                ctx.fillText(`《${title}》`, bottomX, bottomY);
-            }
+                ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`;
+                ctx.font = `300 38px "Nanum Gothic"`; 
+                ctx.textAlign = align === 'justify' ? 'left' : align;
+                
+                const bottomY = height - 130;
+                let bottomX = align === 'justify' ? padding : x;
+                if (author && title) {
+                    ctx.fillText(`${author} | `, bottomX, bottomY);
+                    const authorWidth = ctx.measureText(`${author} | `).width;
+                    ctx.font = `600 38px "Nanum Gothic"`; 
+                    ctx.fillText(`${title}`, bottomX + authorWidth, bottomY);
+                } else if (author) {
+                    ctx.fillText(`${author}`, bottomX, bottomY);
+                } else if (title) {
+                    ctx.font = `600 38px "Nanum Gothic"`; 
+                    ctx.fillText(`${title}`, bottomX, bottomY);
+                }
             
             // 플랫폼 로고 그리기
             if (platform && logoImages[platform] && logoImages[platform].complete) {
