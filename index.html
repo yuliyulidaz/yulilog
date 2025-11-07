@@ -859,18 +859,22 @@
             }
             
             // 작가명과 제목
-            ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.8)`;
-            ctx.font = `400 40px "Nanum Gothic"`;
+            ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`;
+            ctx.font = `400 38px "Nanum Gothic"`;
             ctx.textAlign = align === 'justify' ? 'left' : align;
             
             const bottomY = height - 130;
             let bottomX = align === 'justify' ? padding : x;
             if (author && title) {
-                ctx.fillText(`— ${author}, 《${title}》`, bottomX, bottomY);
+                ctx.fillText(`${author} | `, bottomX, bottomY);
+                const authorWidth = ctx.measureText(`${author} | `).width;
+                ctx.font = `700 38px "Nanum Gothic"`;
+                ctx.fillText(`${title}`, bottomX + authorWidth, bottomY);
             } else if (author) {
-                ctx.fillText(`— ${author}`, bottomX, bottomY);
+                ctx.fillText(`${author}`, bottomX, bottomY);
             } else if (title) {
-                ctx.fillText(`《${title}》`, bottomX, bottomY);
+                ctx.font = `700 38px "Nanum Gothic"`;
+                ctx.fillText(`${title}`, bottomX, bottomY);
             }
             
             // 플랫폼 로고 그리기
