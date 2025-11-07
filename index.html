@@ -6,6 +6,8 @@
     <title>발췌 문구 이미지 생성기</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700&family=Nanum+Myeongjo:wght@400;700&family=Nanum+Gothic:wght@400;700&display=swap');
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+        @import url('https://fonts.googleapis.com/earlyaccess/kopubbatang.css');
         
         * {
             margin: 0;
@@ -433,7 +435,7 @@
                     <div class="card-content active">
                         <div class="form-group">
                             <label class="form-label">발췌 문구</label>
-                            <textarea class="form-textarea" id="quote" placeholder="마음에 드는 문구를 입력하세요...">자랑하고 싶은 내역을 입력해주세요.</textarea>
+                            <textarea class="form-textarea" id="quote" placeholder="마음에 드는 문구를 입력하세요...">제 연인은 액정 속에 살고 있네요.</textarea>
                         </div>
                         
                         <div class="form-group">
@@ -468,9 +470,13 @@
                         <div class="form-group">
                             <label class="form-label">폰트 선택</label>
                             <select class="form-select" id="fontSelect">
-                                <option value="Noto Serif KR">본문명조 (Noto Serif KR)</option>
+                                <option value="Noto Serif KR">Noto Serif KR (우아한 명조)</option>
+                                <option value="KoPub Batang">KoPub 바탕 (독서용 명조)</option>
+                                <option value="Noto Serif KR">본명조 (깊이있는 명조)</option>
                                 <option value="Nanum Myeongjo">나눔명조</option>
-                                <option value="Noto Sans KR">고딕체 (Noto Sans KR)</option>
+                                <option value="Pretendard">Pretendard (모던 고딕)</option>
+                                <option value="Noto Sans KR">본고딕 (고품질 고딕)</option>
+                                <option value="Noto Sans KR">Noto Sans KR (고딕)</option>
                                 <option value="Nanum Gothic">나눔고딕</option>
                             </select>
                         </div>
@@ -860,33 +866,29 @@
             
             // 작가명과 제목
             ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`;
-            ctx.font = `400 38px "Nanum Gothic"`;
+            ctx.font = `400 35px "Nanum Gothic"`;
             ctx.textAlign = align === 'justify' ? 'left' : align;
             
             const bottomY = height - 130;
             let bottomX = align === 'justify' ? padding : x;
             if (author && title) {
-                ctx.fillText(`${author} | `, bottomX, bottomY);
-                const authorWidth = ctx.measureText(`${author} | `).width;
-                ctx.font = `700 38px "Nanum Gothic"`;
-                ctx.fillText(`${title}`, bottomX + authorWidth, bottomY);
+                ctx.fillText(`— ${author}, 《${title}》`, bottomX, bottomY);
             } else if (author) {
-                ctx.fillText(`${author}`, bottomX, bottomY);
+                ctx.fillText(`— ${author}`, bottomX, bottomY);
             } else if (title) {
-                ctx.font = `700 38px "Nanum Gothic"`;
-                ctx.fillText(`${title}`, bottomX, bottomY);
+                ctx.fillText(`《${title}》`, bottomX, bottomY);
             }
             
             // 플랫폼 로고 그리기
             if (platform && logoImages[platform] && logoImages[platform].complete) {
                 const logo = logoImages[platform];
-                // 절대 위치: 오른쪽에서 70px, 하단에서 70px
-                const logoX = width - 70 - logoSize;
-                const logoY = height - 70 - logoSize;
+                // 절대 위치: 오른쪽에서 100px, 하단에서 100px
+                const logoX = width - 100 - logoSize;
+                const logoY = height - 100 - logoSize;
                 
                 // 원형 클리핑 마스크 생성
                 ctx.save();
-                ctx.globalAlpha = 0.6;
+                ctx.globalAlpha = 0.8;
                 ctx.beginPath();
                 ctx.arc(logoX + logoSize/2, logoY + logoSize/2, logoSize/2, 0, Math.PI * 2);
                 ctx.closePath();
