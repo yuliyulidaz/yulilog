@@ -652,37 +652,49 @@
     </footer>
     
     <script>
-        // 색상 팔레트
         const backgrounds = [
-            // 단색 (4개)
             { type: 'solid', color: '#9B7E6B', name: '모카 무스' },
             { type: 'solid', color: '#F5EFE7', name: '앤티크 화이트' },
             { type: 'solid', color: '#4A4845', name: '차콜 미스트' },
             { type: 'solid', color: '#B8AEA5', name: '조용한 회색' },
-            
-            // 그라데이션 (2개)
             { type: 'gradient', colors: ['#9B7E6B', '#E6DDD3'], name: '모카 → 크림' },
             { type: 'gradient', colors: ['#D4C5B9', '#F8F5F0'], name: '베이지 → 화이트' },
         ];
         
-        // 플랫폼 로고 URL (여기에 실제 이미지 URL을 넣으세요)
         const platformLogos = {
-            bloom: 'BLOOM_LOGO_URL_HERE',
-            carat: 'CARAT_LOGO_URL_HERE',
-            caveDuck: 'CAVEDUCK_LOGO_URL_HERE',
-            dokiChat: 'DOKICHAT_LOGO_URL_HERE',
-            inkChat: 'INKCHAT_LOGO_URL_HERE',
-            zeta: 'ZETA_LOGO_URL_HERE',
-            luvDuv: 'LUVDUV_LOGO_URL_HERE',
-            melting: 'MELTING_LOGO_URL_HERE',
-            pulse: 'PULSE_LOGO_URL_HERE',
-            ropanAI: 'ROPANAI_LOGO_URL_HERE'
+            bloom: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/bloom.jpg',
+            carat: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/carat.png',
+            caveDuck: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/Caveduck.jpg',  
+    	   dokiChat: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/dokichat.jpg',
+            inkChat: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/inkchat.jpg',
+            zeta: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/zeta.jpg',
+            luvDuv: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/LoveyDovey.jpg',
+            melting: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/melting.jpg',
+            pulse: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/pulse.jpg',
+            ropanAI: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/rofan.png'
         };
         
         let selectedBackground = -1;
         let logoImages = {};
+        let fontsLoaded = false;
         
-        // 로고 이미지 미리 로드
+        async function preloadFonts() {
+            try {
+                const fontPromises = [
+                    document.fonts.load('300 12px "Noto Serif KR"'),
+                    document.fonts.load('300 12px "Noto Sans KR"'),
+                    document.fonts.load('300 12px "Pretendard"'),
+                    document.fonts.load('400 12px "KoPub Batang"'),
+                    document.fonts.load('400 12px "Nanum Myeongjo"'),
+                    document.fonts.load('400 12px "Nanum Gothic"')
+                ];
+                await Promise.all(fontPromises);
+                fontsLoaded = true;
+            } catch (error) {
+                fontsLoaded = true;
+            }
+        }
+        
         function preloadLogos() {
             Object.keys(platformLogos).forEach(key => {
                 const img = new Image();
@@ -692,7 +704,6 @@
             });
         }
         
-        // 다크모드 토글
         function toggleDarkMode() {
             document.body.classList.toggle('dark');
             const btn = document.querySelector('.dark-mode-toggle');
@@ -700,13 +711,11 @@
             localStorage.setItem('darkMode', document.body.classList.contains('dark'));
         }
         
-        // 다크모드 초기화
         if (localStorage.getItem('darkMode') === 'true') {
             document.body.classList.add('dark');
             document.querySelector('.dark-mode-toggle').textContent = '☀️';
         }
         
-        // 카드 접기/펼치기
         function toggleCard(header) {
             const card = header.parentElement;
             const content = card.querySelector('.card-content');
@@ -714,7 +723,6 @@
             content.classList.toggle('active');
         }
         
-        // 색상 팔레트 생성
         const colorGrid = document.getElementById('colorGrid');
         backgrounds.forEach((bg, index) => {
             const div = document.createElement('div');
@@ -737,12 +745,14 @@
             colorGrid.appendChild(div);
         });
         
-        // 캔버스 업데이트
-        function updateCanvas() {
+        async function updateCanvas() {
+            if (!fontsLoaded) {
+                await preloadFonts();
+            }
+            
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
             
-            // 캔버스 크기 조정
             const ratio = document.getElementById('canvasRatio').value;
             let width, height;
             switch(ratio) {
@@ -767,7 +777,6 @@
             const platform = document.getElementById('platformSelect').value;
             const logoSize = parseInt(document.getElementById('logoSize').value);
             
-            // 배경 그리기
             if (selectedBackground >= 0) {
                 const bg = backgrounds[selectedBackground];
                 if (bg.type === 'gradient') {
@@ -796,7 +805,6 @@
                 }
             }
             
-            // 텍스트 설정
             const rgb = hexToRgb(textColor);
             ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.95)`;
             
@@ -805,8 +813,7 @@
             else if (align === 'center') x = width / 2;
             else x = width - padding;
             
-            // 발췌 문구 그리기
-            ctx.font = `300 ${fontSize}px "${font}"`;
+            ctx.font = `300 ${fontSize}px "${font}", "Noto Sans KR", sans-serif`;
             const maxWidth = width - (padding * 2);
             const lineHeight = fontSize * lineHeightMultiplier;
             let lines = [];
@@ -885,9 +892,8 @@
                 });
             }
             
-            // 작가명과 제목
             ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`;
-            ctx.font = `300 38px "Nanum Gothic"`; 
+            ctx.font = `300 38px "Nanum Gothic", "Noto Sans KR", sans-serif`; 
             ctx.textAlign = align === 'justify' ? 'left' : align;
             
             const bottomY = height - 130;
@@ -895,23 +901,20 @@
             if (author && title) {
                 ctx.fillText(`${author} | `, bottomX, bottomY);
                 const authorWidth = ctx.measureText(`${author} | `).width;
-                ctx.font = `600 38px "Nanum Gothic"`; 
+                ctx.font = `600 38px "Nanum Gothic", "Noto Sans KR", sans-serif`; 
                 ctx.fillText(`${title}`, bottomX + authorWidth, bottomY);
             } else if (author) {
                 ctx.fillText(`${author}`, bottomX, bottomY);
             } else if (title) {
-                ctx.font = `600 38px "Nanum Gothic"`; 
+                ctx.font = `600 38px "Nanum Gothic", "Noto Sans KR", sans-serif`; 
                 ctx.fillText(`${title}`, bottomX, bottomY);
             }
             
-            // 플랫폼 로고 그리기
             if (platform && logoImages[platform] && logoImages[platform].complete) {
                 const logo = logoImages[platform];
-                // 절대 위치: 오른쪽에서 100px, 하단에서 100px
                 const logoX = width - 100 - logoSize;
                 const logoY = height - 100 - logoSize;
                 
-                // 원형 클리핑 마스크 생성
                 ctx.save();
                 ctx.globalAlpha = 0.8;
                 ctx.beginPath();
@@ -919,13 +922,11 @@
                 ctx.closePath();
                 ctx.clip();
                 
-                // 로고 이미지 그리기
                 ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
                 ctx.restore();
             }
         }
         
-        // 양쪽 정렬 함수
         function drawJustifiedText(ctx, text, x, y, maxWidth) {
             const words = text.split(' ');
             if (words.length === 1) {
@@ -943,7 +944,6 @@
             });
         }
         
-        // Hex to RGB 변환
         function hexToRgb(hex) {
             const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
             return result ? {
@@ -953,7 +953,6 @@
             } : { r: 255, g: 255, b: 255 };
         }
         
-        // 다운로드
         function downloadImage() {
             const canvas = document.getElementById('canvas');
             const link = document.createElement('a');
@@ -962,7 +961,6 @@
             link.click();
         }
         
-        // 커스텀 색상 변경 시 팔레트 선택 해제
         document.getElementById('solidColor').addEventListener('input', () => {
             document.querySelectorAll('.color-option').forEach(el => el.classList.remove('active'));
             selectedBackground = -1;
@@ -984,20 +982,17 @@
             updateCanvas();
         });
         
-        // 텍스트 색상 변경
         document.getElementById('textColor').addEventListener('input', (e) => {
             document.getElementById('textColorValue').textContent = e.target.value;
             updateCanvas();
         });
         
-        // 플랫폼 변경 이벤트
         document.getElementById('platformSelect').addEventListener('change', updateCanvas);
         document.getElementById('logoSize').addEventListener('input', (e) => {
             document.getElementById('logoSizeValue').textContent = e.target.value;
             updateCanvas();
         });
         
-        // 이벤트 리스너
         document.getElementById('quote').addEventListener('input', updateCanvas);
         document.getElementById('author').addEventListener('input', updateCanvas);
         document.getElementById('title').addEventListener('input', updateCanvas);
@@ -1022,9 +1017,8 @@
             radio.addEventListener('change', updateCanvas);
         });
         
-        // 입력 필드 클릭/포커스 시 기본값 삭제
         const defaultValues = {
-            quote: '당신의 이야기를 적어주세요.',
+            quote: '',
             author: '제작자',
             title: '캐릭터'
         };
@@ -1065,9 +1059,12 @@
             }
         });
         
-        // 로고 미리 로드 및 초기 렌더링
-        preloadLogos();
-        updateCanvas();
+        (async function init() {
+            await preloadFonts();
+            preloadLogos();
+            await document.fonts.ready;
+            updateCanvas();
+        })();
     </script>
 </body>
 </html>
