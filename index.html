@@ -102,8 +102,6 @@
                 position: sticky;
                 top: 90px;
                 align-self: start;
-                max-height: calc(100vh - 110px);
-                overflow: visible;
             }
         }
         
@@ -605,7 +603,7 @@
                                 <label class="form-label" style="margin: 0;">로고 크기</label>
                                 <span class="range-value"><span id="logoSizeValue">100</span>px</span>
                             </div>
-                            <input type="range" class="form-range" id="logoSize" min="50" max="100" step="10" value="100">
+                            <input type="range" class="form-range" id="logoSize" min="50" max="200" step="10" value="100">
                         </div>
                     </div>
                 </div>
@@ -876,12 +874,13 @@
             // 플랫폼 로고 그리기
             if (platform && logoImages[platform] && logoImages[platform].complete) {
                 const logo = logoImages[platform];
-                const logoX = width - padding - logoSize;
-                const logoY = height - padding - logoSize;
+                // 절대 위치: 오른쪽에서 100px, 하단에서 100px
+                const logoX = width - 100 - logoSize;
+                const logoY = height - 100 - logoSize;
                 
                 // 원형 클리핑 마스크 생성
                 ctx.save();
-                ctx.globalAlpha = 0.6;
+                ctx.globalAlpha = 0.8;
                 ctx.beginPath();
                 ctx.arc(logoX + logoSize/2, logoY + logoSize/2, logoSize/2, 0, Math.PI * 2);
                 ctx.closePath();
