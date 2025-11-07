@@ -256,18 +256,29 @@
             
             <div class="form-group">
                 <label class="form-label">발췌 문구</label>
-                <textarea class="form-textarea" id="quote" placeholder="마음에 드는 문구를 입력하세요...">우리는 모두 별이 되기 위해 어둠 속을 헤매는 존재다.</textarea>
+                <textarea class="form-textarea" id="quote" placeholder="마음에 드는 문구를 입력하세요...">제 연인은 액정 속에 살고 있네요.</textarea>
             </div>
             
             <div class="form-group">
-                <label class="form-label">작가명</label>
-                <input type="text" class="form-input" id="author" placeholder="작가 이름" value="김소월">
+                <label class="form-label">제작자</label>
+                <input type="text" class="form-input" id="author" placeholder="제작자" value="제작자">
             </div>
             
             <div class="form-group">
-                <label class="form-label">작품 제목</label>
-                <input type="text" class="form-input" id="title" placeholder="작품 제목" value="진달래꽃">
+                <label class="form-label">캐릭터</label>
+                <input type="text" class="form-input" id="title" placeholder="캐릭터" value="캐릭터">
             </div>
+
+             <div class="form-group">
+                <label class="form-label">캔버스 비율</label>
+                <select class="form-select" id="canvasRatio">
+                    <option value="1:1">정사각형 (1:1) - 1080x1080</option>
+                    <option value="4:5">세로형 (4:5) - 1080x1350</option>
+                    <option value="16:9">가로형 (16:9) - 1920x1080</option>
+                    <option value="9:16">스토리 (9:16) - 1080x1920</option>
+                </select>
+            </div>
+
             
             <div class="form-group">
                 <label class="form-label">폰트 선택</label>
@@ -283,6 +294,10 @@
                 <label class="form-label">텍스트 정렬</label>
                 <div class="radio-group" style="grid-template-columns: repeat(4, 1fr); display: grid;">
                     <div class="radio-option">
+                        <input type="radio" name="align" id="align-justify" value="justify" checked>
+                        <label for="align-justify">양쪽</label>
+                    </div>
+                    <div class="radio-option">
                         <input type="radio" name="align" id="align-left" value="left">
                         <label for="align-left">왼쪽</label>
                     </div>
@@ -294,10 +309,7 @@
                         <input type="radio" name="align" id="align-right" value="right">
                         <label for="align-right">오른쪽</label>
                     </div>
-                    <div class="radio-option">
-                        <input type="radio" name="align" id="align-justify" value="justify" checked>
-                        <label for="align-justify">양쪽</label>
-                    </div>
+
                 </div>
             </div>
             
@@ -305,13 +317,14 @@
                 <label class="form-label">줄바꿈 방식</label>
                 <div class="radio-group">
                     <div class="radio-option">
-                        <input type="radio" name="linebreak" id="linebreak-word" value="word">
-                        <label for="linebreak-word">단어 단위</label>
-                    </div>
-                    <div class="radio-option">
                         <input type="radio" name="linebreak" id="linebreak-char" value="char" checked>
                         <label for="linebreak-char">글자 단위</label>
                     </div>
+                    <div class="radio-option">
+                        <input type="radio" name="linebreak" id="linebreak-word" value="word">
+                        <label for="linebreak-word">단어 단위</label>
+                    </div>
+
                 </div>
             </div>
             
@@ -336,16 +349,6 @@
                     <input type="color" id="textColor" value="#ffffff" style="width: 60px; height: 40px; border: none; border-radius: 8px; cursor: pointer;">
                     <span style="color: #888; font-size: 0.9em;">현재: <span id="textColorValue">#ffffff</span></span>
                 </div>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">캔버스 비율</label>
-                <select class="form-select" id="canvasRatio">
-                    <option value="1:1">정사각형 (1:1) - 1080x1080</option>
-                    <option value="4:5">세로형 (4:5) - 1080x1350</option>
-                    <option value="16:9">가로형 (16:9) - 1920x1080</option>
-                    <option value="9:16">스토리 (9:16) - 1080x1920</option>
-                </select>
             </div>
             
             <div class="form-group">
