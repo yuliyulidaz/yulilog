@@ -239,13 +239,13 @@
             </div>
             
             <div class="form-group">
-                <label class="form-label">제작자</label>
-                <input type="text" class="form-input" id="author" placeholder="제작자" value="제작자">
+                <label class="form-label">작가명</label>
+                <input type="text" class="form-input" id="author" placeholder="작가 이름" value="김소월">
             </div>
             
             <div class="form-group">
-                <label class="form-label">캐릭터</label>
-                <input type="text" class="form-input" id="title" placeholder="캐릭터" value="캐릭터">
+                <label class="form-label">작품 제목</label>
+                <input type="text" class="form-input" id="title" placeholder="작품 제목" value="진달래꽃">
             </div>
             
             <div class="form-group">
@@ -300,11 +300,44 @@
             </div>
             
             <div class="form-group">
+                <label class="form-label">줄 간격: <span id="lineHeightValue">1.5</span>배</label>
+                <input type="range" class="form-range" id="lineHeight" min="1.2" max="2.0" step="0.1" value="1.5" style="width: 100%;">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">여백(패딩): <span id="paddingValue">100</span>px</label>
+                <input type="range" class="form-range" id="padding" min="50" max="200" step="10" value="100" style="width: 100%;">
+            </div>
+            
+            <div class="form-group">
                 <label class="form-label">글자 색상</label>
                 <div style="display: flex; gap: 10px; align-items: center;">
                     <input type="color" id="textColor" value="#ffffff" style="width: 60px; height: 40px; border: none; border-radius: 8px; cursor: pointer;">
                     <span style="color: #888; font-size: 0.9em;">현재: <span id="textColorValue">#ffffff</span></span>
                 </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">글자 테두리 두께: <span id="strokeValue">0</span>px</label>
+                <input type="range" class="form-range" id="strokeWidth" min="0" max="5" step="1" value="0" style="width: 100%;">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">테두리 색상</label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="color" id="strokeColor" value="#000000" style="width: 60px; height: 40px; border: none; border-radius: 8px; cursor: pointer;">
+                    <span style="color: #888; font-size: 0.9em;">현재: <span id="strokeColorValue">#000000</span></span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">캔버스 비율</label>
+                <select class="form-select" id="canvasRatio">
+                    <option value="1:1">정사각형 (1:1) - 1080x1080</option>
+                    <option value="4:5">세로형 (4:5) - 1080x1350</option>
+                    <option value="16:9">가로형 (16:9) - 1920x1080</option>
+                    <option value="9:16">스토리 (9:16) - 1080x1920</option>
+                </select>
             </div>
             
             <div class="form-group">
@@ -331,25 +364,23 @@
     
     <script>
         const backgrounds = [
-            // 그라데이션
-            { type: 'gradient', colors: ['#667eea', '#764ba2'], name: '보라 그라데이션' },
-            { type: 'gradient', colors: ['#f093fb', '#f5576c'], name: '핑크 그라데이션' },
-            { type: 'gradient', colors: ['#4facfe', '#00f2fe'], name: '하늘 그라데이션' },
-            { type: 'gradient', colors: ['#43e97b', '#38f9d7'], name: '민트 그라데이션' },
-            { type: 'gradient', colors: ['#fa709a', '#fee140'], name: '선셋 그라데이션' },
-            { type: 'gradient', colors: ['#30cfd0', '#330867'], name: '심해 그라데이션' },
-            { type: 'gradient', colors: ['#a8edea', '#fed6e3'], name: '파스텔 그라데이션' },
-            { type: 'gradient', colors: ['#ff9a9e', '#fecfef'], name: '로즈 그라데이션' },
+            // 문학적 중립 (Literary Neutrals) - 단색
+            { type: 'solid', color: '#9B7E6B', name: '모카 무스' },
+            { type: 'solid', color: '#8B7B7A', name: '시나몬 슬레이트' },
+            { type: 'solid', color: '#E6DDD3', name: '위트필드 베이지' },
+            { type: 'solid', color: '#B8AEA5', name: '조용한 회색' },
+            { type: 'solid', color: '#F5EFE7', name: '앤티크 화이트' },
+            { type: 'solid', color: '#4A4845', name: '차콜 미스트' },
             
-            // 단색
-            { type: 'solid', color: '#2c3e50', name: '다크 네이비' },
-            { type: 'solid', color: '#34495e', name: '슬레이트' },
-            { type: 'solid', color: '#7f8c8d', name: '회색' },
-            { type: 'solid', color: '#95a5a6', name: '밝은 회색' },
-            { type: 'solid', color: '#c7b198', name: '베이지' },
-            { type: 'solid', color: '#dcc48e', name: '샌드' },
-            { type: 'solid', color: '#5d4e37', name: '브라운' },
-            { type: 'solid', color: '#1a1a1a', name: '블랙' },
+            // 문학적 중립 - 그라데이션
+            { type: 'gradient', colors: ['#9B7E6B', '#E6DDD3'], name: '모카 → 크림' },
+            { type: 'gradient', colors: ['#8B7B7A', '#C4B5C0'], name: '시나몬 → 라벤더' },
+            { type: 'gradient', colors: ['#D4C5B9', '#F8F5F0'], name: '베이지 → 화이트' },
+            
+            // 듀오톤 (2색 단순 배치)
+            { type: 'duotone', colors: ['#9B7E6B', '#E6DDD3'], name: '듀오: 모카/크림' },
+            { type: 'duotone', colors: ['#4A4845', '#F5EFE7'], name: '듀오: 차콜/화이트' },
+            { type: 'duotone', colors: ['#8B7B7A', '#B8AEA5'], name: '듀오: 시나몬/회색' },
         ];
         
         let selectedBackground = 0;
@@ -382,40 +413,70 @@
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
             
+            // 캔버스 크기 조정
+            const ratio = document.getElementById('canvasRatio').value;
+            let width, height;
+            switch(ratio) {
+                case '1:1': width = 1080; height = 1080; break;
+                case '4:5': width = 1080; height = 1350; break;
+                case '16:9': width = 1920; height = 1080; break;
+                case '9:16': width = 1080; height = 1920; break;
+            }
+            canvas.width = width;
+            canvas.height = height;
+            
             const quote = document.getElementById('quote').value;
             const author = document.getElementById('author').value;
             const title = document.getElementById('title').value;
             const font = document.getElementById('fontSelect').value;
             const align = document.querySelector('input[name="align"]:checked').value;
             const fontSize = parseInt(document.getElementById('fontSize').value);
+            const lineHeightMultiplier = parseFloat(document.getElementById('lineHeight').value);
+            const padding = parseInt(document.getElementById('padding').value);
             const textColor = document.getElementById('textColor').value;
+            const strokeWidth = parseInt(document.getElementById('strokeWidth').value);
+            const strokeColor = document.getElementById('strokeColor').value;
             const linebreakMode = document.querySelector('input[name="linebreak"]:checked').value;
             
             // 배경 그리기
             const bg = backgrounds[selectedBackground];
             if (bg.type === 'gradient') {
-                const gradient = ctx.createLinearGradient(0, 0, 1080, 1080);
+                const gradient = ctx.createLinearGradient(0, 0, width, height);
                 gradient.addColorStop(0, bg.colors[0]);
                 gradient.addColorStop(1, bg.colors[1]);
                 ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, width, height);
+            } else if (bg.type === 'duotone') {
+                // 듀오톤: 반반 나누기
+                ctx.fillStyle = bg.colors[0];
+                ctx.fillRect(0, 0, width / 2, height);
+                ctx.fillStyle = bg.colors[1];
+                ctx.fillRect(width / 2, 0, width / 2, height);
             } else {
                 ctx.fillStyle = bg.color;
+                ctx.fillRect(0, 0, width, height);
             }
-            ctx.fillRect(0, 0, 1080, 1080);
             
             // 텍스트 설정
             const rgb = hexToRgb(textColor);
             ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.95)`;
             
+            // 테두리 설정
+            if (strokeWidth > 0) {
+                const strokeRgb = hexToRgb(strokeColor);
+                ctx.strokeStyle = `rgb(${strokeRgb.r}, ${strokeRgb.g}, ${strokeRgb.b})`;
+                ctx.lineWidth = strokeWidth;
+            }
+            
             let x;
-            if (align === 'left' || align === 'justify') x = 100;
-            else if (align === 'center') x = 540;
-            else x = 980;
+            if (align === 'left' || align === 'justify') x = padding;
+            else if (align === 'center') x = width / 2;
+            else x = width - padding;
             
             // 발췌 문구 그리기 (여러 줄)
             ctx.font = `600 ${fontSize}px "${font}"`;
-            const maxWidth = 880;
-            const lineHeight = fontSize * 1.5;
+            const maxWidth = width - (padding * 2);
+            const lineHeight = fontSize * lineHeightMultiplier;
             let lines = [];
             
             // 줄바꿈 방식에 따라 분기
@@ -458,7 +519,7 @@
             
             // 세로 중앙 정렬을 위한 시작 위치 계산
             const totalHeight = lines.length * lineHeight;
-            let y = (1080 - totalHeight) / 2 + fontSize;
+            let y = (height - totalHeight) / 2 + fontSize;
             
             // 문구 그리기
             if (align === 'justify' && linebreakMode === 'word') {
@@ -467,17 +528,19 @@
                 lines.forEach((line, index) => {
                     if (index === lines.length - 1) {
                         // 마지막 줄은 왼쪽 정렬
-                        ctx.fillText(line, 100, y);
+                        if (strokeWidth > 0) ctx.strokeText(line, padding, y);
+                        ctx.fillText(line, padding, y);
                     } else {
                         // 양쪽 정렬 구현
-                        drawJustifiedText(ctx, line, 100, y, maxWidth);
+                        drawJustifiedText(ctx, line, padding, y, maxWidth, strokeWidth);
                     }
                     y += lineHeight;
                 });
             } else {
                 ctx.textAlign = align === 'justify' ? 'left' : align;
-                let drawX = align === 'justify' ? 100 : x;
+                let drawX = align === 'justify' ? padding : x;
                 lines.forEach(line => {
+                    if (strokeWidth > 0) ctx.strokeText(line, drawX, y);
                     ctx.fillText(line, drawX, y);
                     y += lineHeight;
                 });
@@ -485,24 +548,32 @@
             
             // 작가명과 제목 (하단에 작고 흐리게, 나눔 고딕으로, 35px)
             ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`;
+            if (strokeWidth > 0) {
+                const strokeRgb = hexToRgb(strokeColor);
+                ctx.strokeStyle = `rgba(${strokeRgb.r}, ${strokeRgb.g}, ${strokeRgb.b}, 0.6)`;
+            }
             ctx.font = `400 35px "Nanum Gothic"`;
             ctx.textAlign = align === 'justify' ? 'left' : align;
             
-            const bottomY = 950;
-            let bottomX = align === 'justify' ? 100 : x;
+            const bottomY = height - 130;
+            let bottomX = align === 'justify' ? padding : x;
             if (author && title) {
+                if (strokeWidth > 0) ctx.strokeText(`— ${author}, 《${title}》`, bottomX, bottomY);
                 ctx.fillText(`— ${author}, 《${title}》`, bottomX, bottomY);
             } else if (author) {
+                if (strokeWidth > 0) ctx.strokeText(`— ${author}`, bottomX, bottomY);
                 ctx.fillText(`— ${author}`, bottomX, bottomY);
             } else if (title) {
+                if (strokeWidth > 0) ctx.strokeText(`《${title}》`, bottomX, bottomY);
                 ctx.fillText(`《${title}》`, bottomX, bottomY);
             }
         }
         
         // 양쪽 정렬 함수
-        function drawJustifiedText(ctx, text, x, y, maxWidth) {
+        function drawJustifiedText(ctx, text, x, y, maxWidth, strokeWidth) {
             const words = text.split(' ');
             if (words.length === 1) {
+                if (strokeWidth > 0) ctx.strokeText(text, x, y);
                 ctx.fillText(text, x, y);
                 return;
             }
@@ -512,6 +583,7 @@
             
             let currentX = x;
             words.forEach((word, index) => {
+                if (strokeWidth > 0) ctx.strokeText(word, currentX, y);
                 ctx.fillText(word, currentX, y);
                 currentX += ctx.measureText(word).width + spaceWidth;
             });
@@ -574,10 +646,27 @@
             document.getElementById('fontSizeValue').textContent = e.target.value;
             updateCanvas();
         });
+        document.getElementById('lineHeight').addEventListener('input', (e) => {
+            document.getElementById('lineHeightValue').textContent = e.target.value;
+            updateCanvas();
+        });
+        document.getElementById('padding').addEventListener('input', (e) => {
+            document.getElementById('paddingValue').textContent = e.target.value;
+            updateCanvas();
+        });
         document.getElementById('textColor').addEventListener('input', (e) => {
             document.getElementById('textColorValue').textContent = e.target.value;
             updateCanvas();
         });
+        document.getElementById('strokeWidth').addEventListener('input', (e) => {
+            document.getElementById('strokeValue').textContent = e.target.value;
+            updateCanvas();
+        });
+        document.getElementById('strokeColor').addEventListener('input', (e) => {
+            document.getElementById('strokeColorValue').textContent = e.target.value;
+            updateCanvas();
+        });
+        document.getElementById('canvasRatio').addEventListener('change', updateCanvas);
         document.querySelectorAll('input[name="align"]').forEach(radio => {
             radio.addEventListener('change', updateCanvas);
         });
