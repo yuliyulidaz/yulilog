@@ -583,19 +583,17 @@
                             <label class="form-label">플랫폼</label>
                             <select class="form-select" id="platformSelect">
                                 <option value="">로고 없음</option>
-                                <option value="platform1">플랫폼 1</option>
-                                <option value="platform2">플랫폼 2</option>
-                                <option value="platform3">플랫폼 3</option>
-                                <option value="platform4">플랫폼 4</option>
-                                <option value="platform5">플랫폼 5</option>
+                                <option value="bloom">블룸</option>
+                                <option value="carat">캐럿</option>
+                                <option value="caveDuck">케이브덕</option>
+                                <option value="dokiChat">도키챗</option>
+                                <option value="inkChat">잉크챗</option>
+                                <option value="zeta">제타</option>
+                                <option value="luvDuv">러비더비</option>
+                                <option value="melting">멜팅</option>
+                                <option value="pulse">펄스</option>
+                                <option value="ropanAI">로판AI</option>
                             </select>
-                        </div>
-                        
-                        <div class="form-group" id="logoPreviewContainer" style="display: none;">
-                            <label class="form-label">로고 미리보기</label>
-                            <div style="padding: 20px; background: var(--bg-secondary); border-radius: 8px; text-align: center;">
-                                <img id="logoPreview" src="" alt="플랫폼 로고" style="max-width: 150px; max-height: 60px; opacity: 0.8;">
-                            </div>
                         </div>
                         
                         <div class="form-group">
@@ -623,7 +621,7 @@
     </div>
     
     <script>
-        // 색상 팔레트 (듀오톤 제거, 6개)
+        // 색상 팔레트
         const backgrounds = [
             // 단색 (4개)
             { type: 'solid', color: '#9B7E6B', name: '모카 무스' },
@@ -636,7 +634,32 @@
             { type: 'gradient', colors: ['#D4C5B9', '#F8F5F0'], name: '베이지 → 화이트' },
         ];
         
+        // 플랫폼 로고 URL (여기에 실제 이미지 URL을 넣으세요)
+        const platformLogos = {
+            bloom: 'https://github.com/yuliyulidaz/yulilog/blob/logos/bloom.jpg',
+            carat: 'CARAT_LOGO_URL_HERE',
+            caveDuck: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/Caveduck.jpg',
+            dokiChat: 'DOKICHAT_LOGO_URL_HERE',
+            inkChat: 'INKCHAT_LOGO_URL_HERE',
+            zeta: 'ZETA_LOGO_URL_HERE',
+            luvDuv: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/LoveyDovey.jpg',
+            melting: 'MELTING_LOGO_URL_HERE',
+            pulse: 'PULSE_LOGO_URL_HERE',
+            ropanAI: 'ROPANAI_LOGO_URL_HERE'
+        };
+        
         let selectedBackground = -1;
+        let logoImages = {};
+        
+        // 로고 이미지 미리 로드
+        function preloadLogos() {
+            Object.keys(platformLogos).forEach(key => {
+                const img = new Image();
+                img.src = platformLogos[key];
+                img.crossOrigin = 'anonymous';
+                logoImages[key] = img;
+            });
+        }
         
         // 다크모드 토글
         function toggleDarkMode() {
@@ -709,7 +732,9 @@
             const lineHeightMultiplier = parseFloat(document.getElementById('lineHeight').value);
             const padding = parseInt(document.getElementById('padding').value);
             const textColor = document.getElementById('textColor').value;
-            const linebreakMode = document.querySelector('input[name="linebreak"]:checked').value;
+            const linebreakMode = document.querySelector('input[name="linebreak"]').value;
+            const platform = document.getElementById('platformSelect').value;
+            const logoSize = parseInt(document.getElementById('logoSize').value);
             
             // 배경 그리기
             if (selectedBackground >= 0) {
@@ -843,6 +868,25 @@
             } else if (title) {
                 ctx.fillText(`《${title}》`, bottomX, bottomY);
             }
+            
+            // 플랫폼 로고 그리기
+            if (platform && logoImages[platform] && logoImages[platform].complete) {
+                const logo = logoImages[platform];
+                const logoX = width - padding - logoSize;
+                const logoY = height - padding - logoSize;
+                
+                // 원형 클리핑 마스크 생성
+                ctx.save();
+                ctx.globalAlpha = 0.8;
+                ctx.beginPath();
+                ctx.arc(logoX + logoSize/2, logoY + logoSize/2, logoSize/2, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.clip();
+                
+                // 로고 이미지 그리기
+                ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+                ctx.restore();
+            }
         }
         
         // 양쪽 정렬 함수
@@ -910,6 +954,13 @@
             updateCanvas();
         });
         
+        // 플랫폼 변경 이벤트
+        document.getElementById('platformSelect').addEventListener('change', updateCanvas);
+        document.getElementById('logoSize').addEventListener('input', (e) => {
+            document.getElementById('logoSizeValue').textContent = e.target.value;
+            updateCanvas();
+        });
+        
         // 이벤트 리스너
         document.getElementById('quote').addEventListener('input', updateCanvas);
         document.getElementById('author').addEventListener('input', updateCanvas);
@@ -935,7 +986,8 @@
             radio.addEventListener('change', updateCanvas);
         });
         
-        // 초기 렌더링
+        // 로고 미리 로드 및 초기 렌더링
+        preloadLogos();
         updateCanvas();
     </script>
 </body>
