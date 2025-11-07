@@ -969,61 +969,28 @@
             ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`;
             
             const bottomY = height - 130;
+            const bottomX = padding; // 항상 왼쪽 padding에 고정
             
-            // 전체 텍스트를 먼저 측정하여 한 묶음으로 정렬
+            // 제작자와 캐릭터는 항상 왼쪽 정렬
             if (author && title) {
-                // 전체 텍스트 조합
-                const fullText = `${author} | ${title}`;
-                
-                // 일반 폰트로 제작자 부분 측정
-                ctx.font = `300 38px "Nanum Gothic", "Noto Sans KR", sans-serif`;
-                const authorPartWidth = ctx.measureText(`${author} | `).width;
-                const fullTextWidth = ctx.measureText(fullText).width;
-                
-                // 정렬에 따른 시작 위치 계산
-                let startX;
-                if (align === 'left' || align === 'justify') {
-                    startX = padding;
-                } else if (align === 'center') {
-                    startX = (width - fullTextWidth) / 2;
-                } else { // right
-                    startX = width - padding - fullTextWidth;
-                }
-                
                 // 제작자 그리기
+                ctx.font = `300 38px "Nanum Gothic", "Noto Sans KR", sans-serif`;
                 ctx.textAlign = 'left';
-                ctx.fillText(`${author} | `, startX, bottomY);
+                ctx.fillText(`${author} | `, bottomX, bottomY);
                 
                 // 캐릭터 그리기 (볼드)
+                const authorPartWidth = ctx.measureText(`${author} | `).width;
                 ctx.font = `600 38px "Nanum Gothic", "Noto Sans KR", sans-serif`;
-                ctx.fillText(`${title}`, startX + authorPartWidth, bottomY);
+                ctx.fillText(`${title}`, bottomX + authorPartWidth, bottomY);
                 
             } else if (author) {
                 ctx.font = `300 38px "Nanum Gothic", "Noto Sans KR", sans-serif`;
-                ctx.textAlign = align === 'justify' ? 'left' : align;
-                
-                let bottomX;
-                if (align === 'left' || align === 'justify') {
-                    bottomX = padding;
-                } else if (align === 'center') {
-                    bottomX = width / 2;
-                } else {
-                    bottomX = width - padding;
-                }
+                ctx.textAlign = 'left';
                 ctx.fillText(`${author}`, bottomX, bottomY);
                 
             } else if (title) {
                 ctx.font = `600 38px "Nanum Gothic", "Noto Sans KR", sans-serif`;
-                ctx.textAlign = align === 'justify' ? 'left' : align;
-                
-                let bottomX;
-                if (align === 'left' || align === 'justify') {
-                    bottomX = padding;
-                } else if (align === 'center') {
-                    bottomX = width / 2;
-                } else {
-                    bottomX = width - padding;
-                }
+                ctx.textAlign = 'left';
                 ctx.fillText(`${title}`, bottomX, bottomY);
             }
             
