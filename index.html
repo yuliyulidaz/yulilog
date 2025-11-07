@@ -107,6 +107,37 @@
             }
         }
         
+        @media (max-width: 899px) {
+            .layout {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .preview-container {
+                order: -1;
+                position: sticky;
+                top: 70px;
+                background: var(--bg-secondary);
+                padding: 10px 0;
+                z-index: 50;
+                margin-bottom: 10px;
+            }
+            
+            .preview-container #canvas {
+                max-height: 40vh;
+                width: auto;
+                margin: 0 auto;
+            }
+            
+            .preview-container .btn-primary {
+                margin-top: 10px;
+            }
+            
+            .controls {
+                order: 1;
+            }
+        }
+        
         .card {
             background: var(--bg-primary);
             border-radius: 12px;
@@ -372,6 +403,9 @@
             transform: translateY(0);
         }
         
+        .mobile-download-btn {
+            display: none;
+        }
     
         
         .divider {
@@ -386,7 +420,43 @@
             }
             
             .color-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(6, 1fr);
+                gap: 8px;
+            }
+            
+            .layout {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .preview-container {
+                order: -1;
+                position: sticky;
+                top: 70px;
+                background: var(--bg-secondary);
+                padding: 10px 0;
+                z-index: 50;
+                margin-bottom: 10px;
+            }
+            
+            .preview-container #canvas {
+                max-height: 40vh;
+                width: auto;
+                margin: 0 auto;
+            }
+            
+            .preview-container .btn-primary {
+                display: none;
+            }
+            
+            .controls {
+                order: 1;
+            }
+            
+            .mobile-download-btn {
+                display: block;
+                width: 100%;
+                margin-top: 20px;
             }
         }
         
@@ -473,7 +543,6 @@
                                 <option value="1:1">정사각형 (1:1) - 1080x1080</option>
                                 <option value="4:5">세로형 (4:5) - 1080x1350</option>
                                 <option value="16:9">가로형 (16:9) - 1920x1080</option>
-                                <option value="9:16">스토리 (9:16) - 1080x1920</option>
                             </select>
                         </div>
                         
@@ -625,6 +694,9 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- 모바일 다운로드 버튼 -->
+                <button class="btn-primary mobile-download-btn" onclick="downloadImage()">📥 이미지 다운로드</button>
             </div>
             
             <div class="preview-container">
@@ -681,8 +753,8 @@
         async function preloadFonts() {
             try {
                 const fontPromises = [
-                    document.fonts.load('200 12px "Noto Serif KR"'),
-                    document.fonts.load('100 12px "Noto Sans KR"'),
+                    document.fonts.load('300 12px "Noto Serif KR"'),
+                    document.fonts.load('300 12px "Noto Sans KR"'),
                     document.fonts.load('300 12px "Pretendard"'),
                     document.fonts.load('400 12px "KoPub Batang"'),
                     document.fonts.load('400 12px "Nanum Myeongjo"'),
@@ -759,7 +831,6 @@
                 case '1:1': width = 1080; height = 1080; break;
                 case '4:5': width = 1080; height = 1350; break;
                 case '16:9': width = 1920; height = 1080; break;
-                case '9:16': width = 1080; height = 1920; break;
             }
             canvas.width = width;
             canvas.height = height;
@@ -813,7 +884,7 @@
             else if (align === 'center') x = width / 2;
             else x = width - padding;
             
-            ctx.font = `200 ${fontSize}px "${font}", "Noto Sans KR", sans-serif`;
+            ctx.font = `300 ${fontSize}px "${font}", "Noto Sans KR", sans-serif`;
             const maxWidth = width - (padding * 2);
             const lineHeight = fontSize * lineHeightMultiplier;
             let lines = [];
@@ -893,20 +964,63 @@
             }
             
             ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`;
-            ctx.font = `300 38px "Nanum Gothic", "Noto Sans KR", sans-serif`; 
-            ctx.textAlign = align === 'justify' ? 'left' : align;
             
             const bottomY = height - 130;
-            let bottomX = align === 'justify' ? padding : x;
+            
+            // 전체 텍스트를 먼저 측정하여 한 묶음으로 정렬
             if (author && title) {
-                ctx.fillText(`${author} | `, bottomX, bottomY);
-                const authorWidth = ctx.measureText(`${author} | `).width;
-                ctx.font = `600 38px "Nanum Gothic", "Noto Sans KR", sans-serif`; 
-                ctx.fillText(`${title}`, bottomX + authorWidth, bottomY);
+                // 전체 텍스트 조합
+                const fullText = `${author} | ${title}`;
+                
+                // 일반 폰트로 제작자 부분 측정
+                ctx.font = `300 38px "Nanum Gothic", "Noto Sans KR", sans-serif`;
+                const authorPartWidth = ctx.measureText(`${author} | `).width;
+                const fullTextWidth = ctx.measureText(fullText).width;
+                
+                // 정렬에 따른 시작 위치 계산
+                let startX;
+                if (align === 'left' || align === 'justify') {
+                    startX = padding;
+                } else if (align === 'center') {
+                    startX = (width - fullTextWidth) / 2;
+                } else { // right
+                    startX = width - padding - fullTextWidth;
+                }
+                
+                // 제작자 그리기
+                ctx.textAlign = 'left';
+                ctx.fillText(`${author} | `, startX, bottomY);
+                
+                // 캐릭터 그리기 (볼드)
+                ctx.font = `600 38px "Nanum Gothic", "Noto Sans KR", sans-serif`;
+                ctx.fillText(`${title}`, startX + authorPartWidth, bottomY);
+                
             } else if (author) {
+                ctx.font = `300 38px "Nanum Gothic", "Noto Sans KR", sans-serif`;
+                ctx.textAlign = align === 'justify' ? 'left' : align;
+                
+                let bottomX;
+                if (align === 'left' || align === 'justify') {
+                    bottomX = padding;
+                } else if (align === 'center') {
+                    bottomX = width / 2;
+                } else {
+                    bottomX = width - padding;
+                }
                 ctx.fillText(`${author}`, bottomX, bottomY);
+                
             } else if (title) {
-                ctx.font = `600 38px "Nanum Gothic", "Noto Sans KR", sans-serif`; 
+                ctx.font = `600 38px "Nanum Gothic", "Noto Sans KR", sans-serif`;
+                ctx.textAlign = align === 'justify' ? 'left' : align;
+                
+                let bottomX;
+                if (align === 'left' || align === 'justify') {
+                    bottomX = padding;
+                } else if (align === 'center') {
+                    bottomX = width / 2;
+                } else {
+                    bottomX = width - padding;
+                }
                 ctx.fillText(`${title}`, bottomX, bottomY);
             }
             
