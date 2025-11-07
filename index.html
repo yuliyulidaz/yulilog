@@ -681,8 +681,8 @@
         async function preloadFonts() {
             try {
                 const fontPromises = [
-                    document.fonts.load('300 12px "Noto Serif KR"'),
-                    document.fonts.load('300 12px "Noto Sans KR"'),
+                    document.fonts.load('200 12px "Noto Serif KR"'),
+                    document.fonts.load('100 12px "Noto Sans KR"'),
                     document.fonts.load('300 12px "Pretendard"'),
                     document.fonts.load('400 12px "KoPub Batang"'),
                     document.fonts.load('400 12px "Nanum Myeongjo"'),
@@ -813,7 +813,7 @@
             else if (align === 'center') x = width / 2;
             else x = width - padding;
             
-            ctx.font = `300 ${fontSize}px "${font}", "Noto Sans KR", sans-serif`;
+            ctx.font = `200 ${fontSize}px "${font}", "Noto Sans KR", sans-serif`;
             const maxWidth = width - (padding * 2);
             const lineHeight = fontSize * lineHeightMultiplier;
             let lines = [];
