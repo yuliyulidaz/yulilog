@@ -483,44 +483,49 @@
             const maxWidth = width - (padding * 2);
             const lineHeight = fontSize * lineHeightMultiplier;
             let lines = [];
+
+            // 줄바꿈 문자(\n)를 인식해 문단별로 처리
+            const paragraphs = quote.split(/\n/);
             
-            // 줄바꿈 방식에 따라 분기
-            if (linebreakMode === 'word') {
-                // 단어 단위 줄바꿈
-                const words = quote.split(' ');
-                let currentLine = '';
-                
-                words.forEach(word => {
-                    const testLine = currentLine + word + ' ';
-                    const metrics = ctx.measureText(testLine);
-                    if (metrics.width > maxWidth && currentLine !== '') {
-                        lines.push(currentLine.trim());
-                        currentLine = word + ' ';
-                    } else {
-                        currentLine = testLine;
+            paragraphs.forEach(para => {
+                if (linebreakMode === 'word') {
+                    // 단어 단위 줄바꿈
+                    const words = para.split(' ');
+                    let currentLine = '';
+            
+                    words.forEach(word => {
+                        const testLine = currentLine + word + ' ';
+                        const metrics = ctx.measureText(testLine);
+                        if (metrics.width > maxWidth && currentLine !== '') {
+                            lines.push(currentLine.trim());
+                            currentLine = word + ' ';
+                        } else {
+                            currentLine = testLine;
+                        }
+                    });
+                    lines.push(currentLine.trim());
+                } else {
+                    // 글자 단위 줄바꿈
+                    let currentLine = '';
+            
+                    for (let i = 0; i < para.length; i++) {
+                        const char = para[i];
+                        const testLine = currentLine + char;
+                        const metrics = ctx.measureText(testLine);
+            
+                        if (metrics.width > maxWidth && currentLine !== '') {
+                            lines.push(currentLine);
+                            currentLine = char;
+                        } else {
+                            currentLine = testLine;
+                        }
                     }
-                });
-                lines.push(currentLine.trim());
-            } else {
-                // 글자 단위 줄바꿈
-                let currentLine = '';
-                
-                for (let i = 0; i < quote.length; i++) {
-                    const char = quote[i];
-                    const testLine = currentLine + char;
-                    const metrics = ctx.measureText(testLine);
-                    
-                    if (metrics.width > maxWidth && currentLine !== '') {
-                        lines.push(currentLine);
-                        currentLine = char;
-                    } else {
-                        currentLine = testLine;
-                    }
+                    if (currentLine) lines.push(currentLine);
                 }
-                if (currentLine) {
-                    lines.push(currentLine);
-                }
-            }
+            
+                // 문단 사이에 빈 줄 추가 (줄 간격만큼 공백)
+                lines.push('');
+            });
             
             // 세로 중앙 정렬을 위한 시작 위치 계산
             const totalHeight = lines.length * lineHeight;
