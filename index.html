@@ -105,6 +105,11 @@
                 top: 90px;
                 align-self: start;
             }
+            
+            /* PC에서 모바일 버튼 완전히 숨김 */
+            .mobile-download-btn {
+                display: none !important;
+            }
         }
         
         @media (max-width: 899px) {
@@ -125,12 +130,15 @@
             
             .preview-container #canvas {
                 max-height: 40vh;
+                max-width: 100%;
                 width: auto;
+                height: auto;
                 margin: 0 auto;
+                object-fit: contain;
             }
             
             .preview-container .btn-primary {
-                margin-top: 10px;
+                display: none;
             }
             
             .controls {
@@ -380,7 +388,6 @@
         }
         
         .btn-primary {
-            width: 100%;
             padding: 16px;
             background: var(--accent);
             color: white;
@@ -405,6 +412,73 @@
         
         .mobile-download-btn {
             display: none;
+        }
+        
+        .button-group {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            width: 100%;
+        }
+        
+        .btn-third {
+            flex: 1 1 0;
+            min-width: 0;
+            max-width: none;
+            white-space: nowrap;
+        }
+        
+        /* 다운로드 버튼 - 파란색 */
+        .btn-download {
+            background: #6366F1;
+        }
+        
+        .btn-download:hover {
+            background: #4f46e5;
+        }
+        
+        /* 복사 버튼 - 초록색 */
+        .btn-copy {
+            background: #10B981;
+        }
+        
+        .btn-copy:hover {
+            background: #059669;
+        }
+        
+        /* 공유 버튼 - 주황색 */
+        .btn-share {
+            background: #F59E0B;
+        }
+        
+        .btn-share:hover {
+            background: #D97706;
+        }
+        
+        /* PC에서 공유 버튼 숨김 */
+        .mobile-only-btn {
+            display: none;
+        }
+        
+        /* 토스트 메시지 */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        .toast.show {
+            opacity: 1;
         }
     
         
@@ -457,9 +531,16 @@
             }
             
             .mobile-download-btn {
-                display: block;
+                display: flex;
                 width: 100%;
                 margin-top: 20px;
+                margin-left: 0;
+                margin-right: 0;
+            }
+            
+            /* 모바일에서 공유 버튼 표시 */
+            .mobile-only-btn {
+                display: block;
             }
         }
         
@@ -518,7 +599,7 @@
                     <div class="card-content active">
                         <div class="form-group">
                             <label class="form-label">발췌 문구</label>
-                            <textarea class="form-textarea" id="quote" placeholder="마음에 드는 문구를 입력하세요.."></textarea>
+                            <textarea class="form-textarea" id="quote" placeholder="마음에 드는 문구를 입력하세요..."></textarea>
                         </div>
                         
                         <div class="form-group">
@@ -698,15 +779,23 @@
                     </div>
                 </div>
                 
-                <!-- 모바일 다운로드 버튼 -->
-                <button class="btn-primary mobile-download-btn" onclick="downloadImage()">📥 이미지 다운로드</button>
+                <!-- 모바일 버튼 -->
+                <div class="button-group mobile-download-btn">
+                    <button class="btn-primary btn-third btn-download" onclick="downloadImage()">📥 저장</button>
+                    <button class="btn-primary btn-third btn-copy" onclick="copyImage()">📋 복사</button>
+                    <button class="btn-primary btn-third btn-share" onclick="shareImage()">📤 공유</button>
+                </div>
             </div>
             
             <div class="preview-container">
                 <div class="card">
                     <canvas id="canvas" width="1080" height="1080"></canvas>
                 </div>
-                <button class="btn-primary" onclick="downloadImage()" style="margin-top: 20px;">📥 이미지 다운로드</button>
+                <div class="button-group" style="margin-top: 20px;">
+                    <button class="btn-primary btn-third btn-download" onclick="downloadImage()">📥 저장</button>
+                    <button class="btn-primary btn-third btn-copy" onclick="copyImage()">📋 복사</button>
+                    <button class="btn-primary btn-third btn-share mobile-only-btn" onclick="shareImage()">📤 공유</button>
+                </div>
             </div>
         </div>
     </div>
@@ -721,11 +810,14 @@
             <div class="footer-divider"></div>
             <p class="footer-text">
                 생성된 이미지의 사용에 대한 책임은 사용자에게 있습니다.<br>
-                플랫폼 로고는 각 플랫폼의 상표이며, 사용 시 해당 플랫폼의 가이드라인을 준수해 주세요.
-                1.1.1
+                플랫폼 로고는 각 플랫폼의 상표이며, 사용 시 해당 플랫폼의 가이드라인을 준수해 주세요.<br>
+                1.1.2
             </p>
         </div>
     </footer>
+    
+    <!-- 토스트 메시지 -->
+    <div id="toast" class="toast"></div>
     
     <script>
         const backgrounds = [
@@ -753,6 +845,17 @@
         let selectedBackground = -1;
         let logoImages = {};
         let fontsLoaded = false;
+        
+        // 토스트 메시지 표시 함수
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
         
         async function preloadFonts() {
             try {
@@ -940,8 +1043,9 @@
             });
             
             const totalHeight = lines.length * lineHeight;
-            const bottomReserved = 80;
-            let y = (height - totalHeight) / 2 + fontSize;
+            // 하단 여백(제작자/캐릭터 + 로고 영역) 고려하여 시각적 중앙 배치
+            const bottomReserved = 100;
+            let y = (height - totalHeight - bottomReserved) / 2 + fontSize;
             
             if (align === 'justify' && linebreakMode === 'word') {
                 ctx.textAlign = 'left';
@@ -1045,6 +1149,52 @@
             link.download = 'quote_' + Date.now() + '.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
+        }
+        
+        function copyImage() {
+            const canvas = document.getElementById('canvas');
+            
+            canvas.toBlob(async (blob) => {
+                try {
+                    await navigator.clipboard.write([
+                        new ClipboardItem({
+                            'image/png': blob
+                        })
+                    ]);
+                    showToast('📋 클립보드에 복사되었습니다!');
+                } catch (err) {
+                    showToast('❌ 복사 중 오류가 발생했습니다.');
+                }
+            });
+        }
+        
+        function shareImage() {
+            const canvas = document.getElementById('canvas');
+            
+            // 공유 기능 지원 확인
+            if (navigator.share && navigator.canShare) {
+                canvas.toBlob(async (blob) => {
+                    const file = new File([blob], 'quote_' + Date.now() + '.png', { type: 'image/png' });
+                    
+                    if (navigator.canShare({ files: [file] })) {
+                        try {
+                            await navigator.share({
+                                files: [file],
+                                title: '발췌 문구',
+                                text: '발췌 문구 이미지'
+                            });
+                        } catch (err) {
+                            if (err.name !== 'AbortError') {
+                                alert('공유 중 오류가 발생했습니다.');
+                            }
+                        }
+                    } else {
+                        alert('이 브라우저는 이미지 공유를 지원하지 않습니다.');
+                    }
+                });
+            } else {
+                alert('이 브라우저는 공유 기능을 지원하지 않습니다.');
+            }
         }
         
         document.getElementById('solidColor').addEventListener('input', () => {
