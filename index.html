@@ -205,6 +205,34 @@
             font-size: 0.9em;
         }
         
+        .form-label-with-button {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .btn-clear {
+            background: #EF4444;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        
+        .btn-clear:hover {
+            background: #DC2626;
+            transform: scale(1.05);
+        }
+        
+        .btn-clear:active {
+            transform: scale(0.95);
+        }
+        
         .form-input,
         .form-textarea,
         .form-select {
@@ -605,7 +633,10 @@
                     </div>
                     <div class="card-content active">
                         <div class="form-group">
-                            <label class="form-label">발췌 문구</label>
+                            <div class="form-label-with-button">
+                                <label class="form-label">발췌 문구</label>
+                                <button class="btn-clear" onclick="clearQuote()">🗑️ 전체삭제</button>
+                            </div>
                             <textarea class="form-textarea" id="quote" placeholder="마음에 드는 문구를 입력하세요..."></textarea>
                         </div>
                         
@@ -817,7 +848,7 @@
             <div class="footer-divider"></div>
             <p class="footer-text">
                 생성된 이미지의 사용에 대한 책임은 사용자에게 있습니다.<br>
-                플랫폼 로고는 각 플랫폼의 상표이며, 사용 시 해당 플랫폼의 가이드라인을 준수해 주세요.<br>1.1.4
+                플랫폼 로고는 각 플랫폼의 상표이며, 사용 시 해당 플랫폼의 가이드라인을 준수해 주세요.<br>1.1.5
             </p>
         </div>
     </footer>
@@ -894,6 +925,14 @@
             const btn = document.querySelector('.dark-mode-toggle');
             btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
             localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+        }
+        
+        function clearQuote() {
+            if (confirm('발췌 문구를 모두 삭제하시겠습니까?')) {
+                document.getElementById('quote').value = '';
+                updateCanvas();
+                showToast('🗑️ 발췌 문구가 삭제되었습니다.');
+            }
         }
         
         if (localStorage.getItem('darkMode') === 'true') {
@@ -1290,6 +1329,25 @@
         document.getElementById('quote').addEventListener('input', updateCanvas);
         document.getElementById('author').addEventListener('input', updateCanvas);
         document.getElementById('title').addEventListener('input', updateCanvas);
+        
+        // 붙여넣기 시 서식 제거 (순수 텍스트만)
+        document.getElementById('quote').addEventListener('paste', function(e) {
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+            document.execCommand('insertText', false, text);
+        });
+        
+        document.getElementById('author').addEventListener('paste', function(e) {
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+            document.execCommand('insertText', false, text);
+        });
+        
+        document.getElementById('title').addEventListener('paste', function(e) {
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+            document.execCommand('insertText', false, text);
+        });
         document.getElementById('fontSelect').addEventListener('change', updateCanvas);
         document.getElementById('fontSize').addEventListener('input', (e) => {
             document.getElementById('fontSizeValue').textContent = e.target.value;
