@@ -455,6 +455,13 @@
             background: #D97706;
         }
         
+        /* 모바일에서 공유 버튼 숨김 */
+        @media (max-width: 899px) {
+            .btn-share {
+                display: none;
+            }
+        }
+        
         /* PC에서 공유 버튼 숨김 */
         .mobile-only-btn {
             display: none;
@@ -810,8 +817,7 @@
             <div class="footer-divider"></div>
             <p class="footer-text">
                 생성된 이미지의 사용에 대한 책임은 사용자에게 있습니다.<br>
-                플랫폼 로고는 각 플랫폼의 상표이며, 사용 시 해당 플랫폼의 가이드라인을 준수해 주세요.<br>
-                1.1.2
+                플랫폼 로고는 각 플랫폼의 상표이며, 사용 시 해당 플랫폼의 가이드라인을 준수해 주세요.<br>1.1.3
             </p>
         </div>
     </footer>
@@ -1044,7 +1050,7 @@
             
             const totalHeight = lines.length * lineHeight;
             // 하단 여백(제작자/캐릭터 + 로고 영역) 고려하여 시각적 중앙 배치
-            const bottomReserved = 100;
+            const bottomReserved = 90;
             let y = (height - totalHeight - bottomReserved) / 2 + fontSize;
             
             if (align === 'justify' && linebreakMode === 'word') {
@@ -1145,6 +1151,36 @@
         
         function downloadImage() {
             const canvas = document.getElementById('canvas');
+            
+            // 모바일에서는 공유 기능 사용
+            if (window.innerWidth <= 899 && navigator.share && navigator.canShare) {
+                canvas.toBlob(async (blob) => {
+                    const file = new File([blob], 'quote_' + Date.now() + '.png', { type: 'image/png' });
+                    
+                    if (navigator.canShare({ files: [file] })) {
+                        try {
+                            await navigator.share({
+                                files: [file],
+                                title: '발췌 문구',
+                                text: '발췌 문구 이미지'
+                            });
+                        } catch (err) {
+                            if (err.name !== 'AbortError') {
+                                // 공유 취소가 아닌 경우에만 다운로드로 폴백
+                                downloadDirectly(canvas);
+                            }
+                        }
+                    } else {
+                        downloadDirectly(canvas);
+                    }
+                });
+            } else {
+                // PC에서는 일반 다운로드
+                downloadDirectly(canvas);
+            }
+        }
+        
+        function downloadDirectly(canvas) {
             const link = document.createElement('a');
             link.download = 'quote_' + Date.now() + '.png';
             link.href = canvas.toDataURL('image/png');
@@ -1154,18 +1190,29 @@
         function copyImage() {
             const canvas = document.getElementById('canvas');
             
+            // iOS Safari를 위한 체크
+            if (!navigator.clipboard || !navigator.clipboard.write) {
+                showToast('❌ 이 브라우저는 복사 기능을 지원하지 않습니다.');
+                return;
+            }
+            
             canvas.toBlob(async (blob) => {
+                if (!blob) {
+                    showToast('❌ 이미지 생성 중 오류가 발생했습니다.');
+                    return;
+                }
+                
                 try {
-                    await navigator.clipboard.write([
-                        new ClipboardItem({
-                            'image/png': blob
-                        })
-                    ]);
+                    const item = new ClipboardItem({
+                        'image/png': blob
+                    });
+                    await navigator.clipboard.write([item]);
                     showToast('📋 클립보드에 복사되었습니다!');
                 } catch (err) {
-                    showToast('❌ 복사 중 오류가 발생했습니다.');
+                    console.error('복사 오류:', err);
+                    showToast('❌ 복사 중 오류가 발생했습니다.\n대신 저장 또는 공유를 이용해주세요.');
                 }
-            });
+            }, 'image/png');
         }
         
         function shareImage() {
