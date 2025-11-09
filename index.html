@@ -523,6 +523,126 @@
             margin: 20px 0;
         }
         
+        .section-divider {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 20px 0 15px 0;
+            position: relative;
+        }
+        
+        .section-divider::before,
+        .section-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 30%;
+            height: 1px;
+            background: var(--border);
+        }
+        
+        .section-divider::before {
+            left: 0;
+        }
+        
+        .section-divider::after {
+            right: 0;
+        }
+        
+        .image-upload-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .btn-upload {
+            flex: 1;
+            padding: 12px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95em;
+            font-weight: 500;
+        }
+        
+        .btn-upload:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+        
+        .btn-image-delete {
+            padding: 12px 16px;
+            background: #EF4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95em;
+        }
+        
+        .btn-image-delete:hover {
+            background: #DC2626;
+        }
+        
+        .image-file-name {
+            margin-top: 8px;
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            word-break: break-all;
+        }
+        
+        .copyright-notice {
+            margin-top: 8px;
+            font-size: 0.8em;
+            color: #6B7280;
+            text-align: center;
+            padding: 4px 8px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 4px;
+            border-left: 3px solid #EF4444;
+        }
+        
+        .position-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            max-width: 150px;
+        }
+        
+        .position-option input[type="radio"] {
+            display: none;
+        }
+        
+        .position-option label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            aspect-ratio: 1;
+            position: relative;
+            background: transparent;
+        }
+        
+        .position-option label:hover {
+            border-color: var(--accent);
+            background: var(--bg-secondary);
+        }
+        
+        .position-option input[type="radio"]:checked + label {
+            border-color: var(--accent);
+            background: var(--accent);
+        }
+        
         @media (max-width: 899px) {
             .logo {
                 font-size: 1.2em;
@@ -655,7 +775,7 @@
                 <!-- 스타일 설정 -->
                 <div class="card">
                     <div class="card-header" onclick="toggleCard(this)">
-                        <div class="card-title">📐 스타일 설정</div>
+                        <div class="card-title">🎨 스타일 설정</div>
                         <div class="card-icon">▼</div>
                     </div>
                     <div class="card-content active">
@@ -759,10 +879,9 @@
                             </div>
                         </div>
                         
-                        <div class="divider"></div>
+                        <div class="section-divider">배경 색상</div>
                         
                         <div class="form-group">
-                            <label class="form-label">커스텀 배경</label>
                             <div class="color-picker-row">
                                 <input type="color" id="solidColor" value="#9B7E6B">
                                 <span>단색</span>
@@ -774,11 +893,82 @@
                             </div>
                         </div>
                         
-                        <div class="divider"></div>
+                        <div class="section-divider">이미지 배경</div>
                         
                         <div class="form-group">
-                            <label class="form-label">색상 팔레트</label>
-                            <div class="color-grid" id="colorGrid"></div>
+                            <div class="image-upload-row">
+                                <label for="bgImageUpload" class="btn-upload">📁 이미지 업로드</label>
+                                <input type="file" id="bgImageUpload" accept="image/*" style="display: none;">
+                                <button class="btn-image-delete" id="btnImageDelete" onclick="deleteBackgroundImage()" style="display: none;">🗑️ 삭제</button>
+                            </div>
+                            <div class="copyright-notice">⚠️ 저작권 확인 필수</div>
+                            <div id="imageFileName" class="image-file-name"></div>
+                        </div>
+                        
+                        <div id="imageOptions" style="display: none;">
+                            <div class="form-group">
+                                <label class="form-label">이미지 맞춤</label>
+                                <div class="radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" name="imageFit" id="fit-cover" value="cover" checked>
+                                        <label for="fit-cover">채우기</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" name="imageFit" id="fit-contain" value="contain">
+                                        <label for="fit-contain">맞추기</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">이미지 위치</label>
+                                <div class="position-grid">
+                                    <div class="position-option">
+                                        <input type="radio" name="imagePosition" id="pos-tl" value="top-left">
+                                        <label for="pos-tl"></label>
+                                    </div>
+                                    <div class="position-option">
+                                        <input type="radio" name="imagePosition" id="pos-tc" value="top-center">
+                                        <label for="pos-tc"></label>
+                                    </div>
+                                    <div class="position-option">
+                                        <input type="radio" name="imagePosition" id="pos-tr" value="top-right">
+                                        <label for="pos-tr"></label>
+                                    </div>
+                                    <div class="position-option">
+                                        <input type="radio" name="imagePosition" id="pos-ml" value="middle-left">
+                                        <label for="pos-ml"></label>
+                                    </div>
+                                    <div class="position-option">
+                                        <input type="radio" name="imagePosition" id="pos-mc" value="middle-center" checked>
+                                        <label for="pos-mc"></label>
+                                    </div>
+                                    <div class="position-option">
+                                        <input type="radio" name="imagePosition" id="pos-mr" value="middle-right">
+                                        <label for="pos-mr"></label>
+                                    </div>
+                                    <div class="position-option">
+                                        <input type="radio" name="imagePosition" id="pos-bl" value="bottom-left">
+                                        <label for="pos-bl"></label>
+                                    </div>
+                                    <div class="position-option">
+                                        <input type="radio" name="imagePosition" id="pos-bc" value="bottom-center">
+                                        <label for="pos-bc"></label>
+                                    </div>
+                                    <div class="position-option">
+                                        <input type="radio" name="imagePosition" id="pos-br" value="bottom-right">
+                                        <label for="pos-br"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="range-label">
+                                    <label class="form-label" style="margin: 0;">오버레이 투명도</label>
+                                    <span class="range-value"><span id="overlayValue">40</span>%</span>
+                                </div>
+                                <input type="range" class="form-range" id="overlayOpacity" min="0" max="80" value="40">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -797,6 +987,7 @@
                                 <option value="bloom">블룸</option>
                                 <option value="carat">캐럿</option>
                                 <option value="caveDuck">케이브덕</option>
+                                <option value="crack">크랙</option>
                                 <option value="dokiChat">도키챗</option>
                                 <option value="inkChat">잉크챗</option>
                                 <option value="zeta">제타</option>
@@ -804,7 +995,6 @@
                                 <option value="melting">멜팅</option>
                                 <option value="pulse">펄스</option>
                                 <option value="ropanAI">로판AI</option>
-                                <option value="crack">크랙</option>
                             </select>
                         </div>
                         
@@ -820,7 +1010,7 @@
                 
                 <!-- 모바일 버튼 -->
                 <div class="button-group mobile-download-btn">
-                    <button class="btn-primary btn-third btn-download" onclick="downloadImage()">📥 저장</button>
+                    <button class="btn-primary btn-third btn-download" onclick="downloadImage()">💾 저장</button>
                     <button class="btn-primary btn-third btn-copy" onclick="copyImage()">📋 복사</button>
                     <button class="btn-primary btn-third btn-share" onclick="shareImage()">📤 공유</button>
                 </div>
@@ -831,7 +1021,7 @@
                     <canvas id="canvas" width="1080" height="1080"></canvas>
                 </div>
                 <div class="button-group" style="margin-top: 20px;">
-                    <button class="btn-primary btn-third btn-download" onclick="downloadImage()">📥 저장</button>
+                    <button class="btn-primary btn-third btn-download" onclick="downloadImage()">💾 저장</button>
                     <button class="btn-primary btn-third btn-copy" onclick="copyImage()">📋 복사</button>
                     <button class="btn-primary btn-third btn-share mobile-only-btn" onclick="shareImage()">📤 공유</button>
                 </div>
@@ -841,15 +1031,28 @@
     
     <footer class="footer">
         <div class="footer-content">
-            <div class="footer-title">📖 발췌 문구 생성기</div>
+            <div class="footer-title">📖 발췌 문구 생성기 v1.2.0</div>
             <p class="footer-text">
                 본 사이트는 어떠한 개인정보도 수집하지 않습니다.<br>
                 모든 작업은 귀하의 브라우저에서만 이루어집니다.
             </p>
             <div class="footer-divider"></div>
-            <p class="footer-text">
-                생성된 이미지의 사용에 대한 책임은 사용자에게 있습니다.<br>
-                플랫폼 로고는 각 플랫폼의 상표이며, 사용 시 해당 플랫폼의 가이드라인을 준수해 주세요.<br>1.1.6
+            <div class="footer-disclaimer">
+                <p class="footer-text" style="font-weight: 600; color: var(--text-primary); margin-bottom: 10px;">
+                    ⚠️ 이용 시 주의사항
+                </p>
+                <p class="footer-text" style="text-align: left; max-width: 700px; margin: 0 auto;">
+                    • <strong>저작권 책임:</strong> 업로드한 이미지 및 텍스트의 저작권은 사용자에게 있으며, 저작권 침해에 대한 모든 법적 책임은 사용자에게 있습니다.<br>
+                    • <strong>이미지 사용:</strong> 타인의 저작물(사진, 일러스트 등)을 무단으로 사용하지 마세요. 저작권자의 허락을 받거나 저작권이 없는 이미지만 사용하세요.<br>
+                    • <strong>텍스트 인용:</strong> 책이나 기타 저작물의 텍스트를 발췌할 경우, 저작권법상 허용 범위 내에서 사용하고 출처를 명시하세요.<br>
+                    • <strong>플랫폼 로고:</strong> 각 플랫폼의 로고는 해당 플랫폼의 상표이며, 사용 시 각 플랫폼의 브랜드 가이드라인을 준수해야 합니다.<br>
+                    • <strong>상업적 이용:</strong> 생성된 이미지를 상업적으로 사용할 경우, 관련 법규를 확인하고 필요한 권리를 확보하세요.
+                </p>
+            </div>
+            <div class="footer-divider"></div>
+            <p class="footer-text" style="font-size: 0.8em; color: var(--text-secondary);">
+                본 도구의 제작자는 사용자가 생성한 콘텐츠에 대해 어떠한 책임도 지지 않습니다.<br>
+                이미지 및 텍스트 사용으로 인해 발생하는 모든 법적 문제는 사용자 본인의 책임입니다.
             </p>
         </div>
     </footer>
@@ -858,15 +1061,6 @@
     <div id="toast" class="toast"></div>
     
     <script>
-        const backgrounds = [
-            { type: 'solid', color: '#9B7E6B', name: '모카 무스' },
-            { type: 'solid', color: '#F5EFE7', name: '앤티크 화이트' },
-            { type: 'solid', color: '#4A4845', name: '차콜 미스트' },
-            { type: 'solid', color: '#B8AEA5', name: '조용한 회색' },
-            { type: 'gradient', colors: ['#9B7E6B', '#E6DDD3'], name: '모카 → 크림' },
-            { type: 'gradient', colors: ['#D4C5B9', '#F8F5F0'], name: '베이지 → 화이트' },
-        ];
-        
         const platformLogos = {
             bloom: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/bloom.jpg',
             carat: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/carat.png',
@@ -881,9 +1075,9 @@
             crack: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/crack.png'
         };
         
-        let selectedBackground = -1;
         let logoImages = {};
         let fontsLoaded = false;
+        let backgroundImage = null;
         
         // 토스트 메시지 표시 함수
         function showToast(message) {
@@ -922,6 +1116,129 @@
             });
         }
         
+        // 배경 이미지 업로드
+        document.getElementById('bgImageUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.startsWith('image/')) {
+                showToast('❌ 이미지 파일만 업로드 가능합니다.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    backgroundImage = img;
+                    document.getElementById('imageFileName').textContent = `📎 ${file.name}`;
+                    document.getElementById('btnImageDelete').style.display = 'block';
+                    document.getElementById('imageOptions').style.display = 'block';
+                    updateCanvas();
+                    showToast('✅ 이미지가 업로드되었습니다!');
+                };
+                img.onerror = function() {
+                    showToast('❌ 이미지를 불러올 수 없습니다.');
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        // 배경 이미지 삭제
+        function deleteBackgroundImage() {
+            backgroundImage = null;
+            document.getElementById('bgImageUpload').value = '';
+            document.getElementById('imageFileName').textContent = '';
+            document.getElementById('btnImageDelete').style.display = 'none';
+            document.getElementById('imageOptions').style.display = 'none';
+            updateCanvas();
+            showToast('🗑️ 배경 이미지가 삭제되었습니다.');
+        }
+        
+        // 배경 이미지 그리기 (fit과 position에 따라)
+        function drawBackgroundImage(ctx, img, canvasWidth, canvasHeight, fit, position) {
+            const imgRatio = img.width / img.height;
+            const canvasRatio = canvasWidth / canvasHeight;
+            
+            let sourceX, sourceY, sourceWidth, sourceHeight;
+            let destX = 0, destY = 0, destWidth = canvasWidth, destHeight = canvasHeight;
+            
+            if (fit === 'cover') {
+                // 채우기: 캔버스를 꽉 채움 (일부 잘림)
+                if (imgRatio > canvasRatio) {
+                    // 이미지가 더 넓음 - 높이 기준
+                    sourceHeight = img.height;
+                    sourceWidth = img.height * canvasRatio;
+                    sourceY = 0;
+                    
+                    // position에 따라 x 위치 결정
+                    if (position.includes('left')) {
+                        sourceX = 0;
+                    } else if (position.includes('right')) {
+                        sourceX = img.width - sourceWidth;
+                    } else {
+                        sourceX = (img.width - sourceWidth) / 2;
+                    }
+                } else {
+                    // 이미지가 더 높음 - 너비 기준
+                    sourceWidth = img.width;
+                    sourceHeight = img.width / canvasRatio;
+                    sourceX = 0;
+                    
+                    // position에 따라 y 위치 결정
+                    if (position.includes('top')) {
+                        sourceY = 0;
+                    } else if (position.includes('bottom')) {
+                        sourceY = img.height - sourceHeight;
+                    } else {
+                        sourceY = (img.height - sourceHeight) / 2;
+                    }
+                }
+                
+                ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, 
+                             destX, destY, destWidth, destHeight);
+                             
+            } else {
+                // 맞추기: 전체 이미지 보임 (여백 생김)
+                if (imgRatio > canvasRatio) {
+                    // 이미지가 더 넓음 - 너비 맞춤
+                    destWidth = canvasWidth;
+                    destHeight = canvasWidth / imgRatio;
+                    destX = 0;
+                    
+                    if (position.includes('top')) {
+                        destY = 0;
+                    } else if (position.includes('bottom')) {
+                        destY = canvasHeight - destHeight;
+                    } else {
+                        destY = (canvasHeight - destHeight) / 2;
+                    }
+                } else {
+                    // 이미지가 더 높음 - 높이 맞춤
+                    destHeight = canvasHeight;
+                    destWidth = canvasHeight * imgRatio;
+                    destY = 0;
+                    
+                    if (position.includes('left')) {
+                        destX = 0;
+                    } else if (position.includes('right')) {
+                        destX = canvasWidth - destWidth;
+                    } else {
+                        destX = (canvasWidth - destWidth) / 2;
+                    }
+                }
+                
+                // 여백을 배경색으로 채우기
+                const bgColor = document.getElementById('solidColor').value;
+                ctx.fillStyle = bgColor;
+                ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+                
+                ctx.drawImage(img, 0, 0, img.width, img.height,
+                             destX, destY, destWidth, destHeight);
+            }
+        }
+        
         function toggleDarkMode() {
             document.body.classList.toggle('dark');
             const btn = document.querySelector('.dark-mode-toggle');
@@ -948,28 +1265,6 @@
             card.classList.toggle('collapsed');
             content.classList.toggle('active');
         }
-        
-        const colorGrid = document.getElementById('colorGrid');
-        backgrounds.forEach((bg, index) => {
-            const div = document.createElement('div');
-            div.className = 'color-option';
-            
-            if (bg.type === 'gradient') {
-                div.style.background = `linear-gradient(135deg, ${bg.colors[0]}, ${bg.colors[1]})`;
-            } else {
-                div.style.background = bg.color;
-            }
-            
-            div.title = bg.name;
-            div.onclick = () => {
-                document.querySelectorAll('.color-option').forEach(el => el.classList.remove('active'));
-                div.classList.add('active');
-                selectedBackground = index;
-                updateCanvas();
-            };
-            
-            colorGrid.appendChild(div);
-        });
         
         async function updateCanvas() {
             if (!fontsLoaded) {
@@ -1002,19 +1297,22 @@
             const platform = document.getElementById('platformSelect').value;
             const logoSize = parseInt(document.getElementById('logoSize').value);
             
-            if (selectedBackground >= 0) {
-                const bg = backgrounds[selectedBackground];
-                if (bg.type === 'gradient') {
-                    const gradient = ctx.createLinearGradient(0, 0, width, height);
-                    gradient.addColorStop(0, bg.colors[0]);
-                    gradient.addColorStop(1, bg.colors[1]);
-                    ctx.fillStyle = gradient;
-                    ctx.fillRect(0, 0, width, height);
-                } else {
-                    ctx.fillStyle = bg.color;
+            // 배경 그리기
+            if (backgroundImage) {
+                // 이미지 배경 사용
+                const imageFit = document.querySelector('input[name="imageFit"]:checked').value;
+                const imagePosition = document.querySelector('input[name="imagePosition"]:checked').value;
+                const overlayOpacity = parseInt(document.getElementById('overlayOpacity').value) / 100;
+                
+                drawBackgroundImage(ctx, backgroundImage, width, height, imageFit, imagePosition);
+                
+                // 오버레이 적용
+                if (overlayOpacity > 0) {
+                    ctx.fillStyle = `rgba(0, 0, 0, ${overlayOpacity})`;
                     ctx.fillRect(0, 0, width, height);
                 }
             } else {
+                // 단색/그라데이션 배경
                 const color1 = document.getElementById('gradientColor1').value;
                 const color2 = document.getElementById('gradientColor2').value;
                 
@@ -1190,33 +1488,50 @@
             } : { r: 255, g: 255, b: 255 };
         }
         
+        // OS 감지 함수
+        function iOSDevice() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        }
+        
         function downloadImage() {
             const canvas = document.getElementById('canvas');
             
-            // 모바일에서는 공유 기능 사용
-            if (window.innerWidth <= 899 && navigator.share && navigator.canShare) {
-                canvas.toBlob(async (blob) => {
-                    const file = new File([blob], 'quote_' + Date.now() + '.png', { type: 'image/png' });
-                    
-                    if (navigator.canShare({ files: [file] })) {
-                        try {
-                            await navigator.share({
-                                files: [file],
-                                title: '발췌 문구',
-                                text: '발췌 문구 이미지'
-                            });
-                        } catch (err) {
-                            if (err.name !== 'AbortError') {
-                                // 공유 취소가 아닌 경우에만 다운로드로 폴백
-                                showToast('❌ 저장 중 오류가 발생했습니다.');
+            // 모바일에서 OS별 분기
+            if (window.innerWidth <= 899) {
+                if (iOSDevice()) {
+                    // iOS: 공유 기능 사용
+                    if (navigator.share && navigator.canShare) {
+                        canvas.toBlob(async (blob) => {
+                            const file = new File([blob], 'quote_' + Date.now() + '.png', { type: 'image/png' });
+                            
+                            if (navigator.canShare({ files: [file] })) {
+                                try {
+                                    await navigator.share({
+                                        files: [file],
+                                        title: '발췌 문구',
+                                        text: '발췌 문구 이미지'
+                                    });
+                                } catch (err) {
+                                    if (err.name !== 'AbortError') {
+                                        showToast('❌ 저장 중 오류가 발생했습니다.');
+                                    }
+                                }
+                            } else {
+                                downloadDirectly(canvas);
+                                showToast('✅ 이미지가 저장되었습니다!');
                             }
-                        }
+                        });
                     } else {
                         downloadDirectly(canvas);
+                        showToast('✅ 이미지가 저장되었습니다!');
                     }
-                });
+                } else {
+                    // Android: 직접 다운로드
+                    downloadDirectly(canvas);
+                    showToast('✅ 이미지가 저장되었습니다!');
+                }
             } else {
-                // PC에서는 일반 다운로드
+                // PC: 직접 다운로드
                 downloadDirectly(canvas);
             }
         }
@@ -1297,8 +1612,6 @@
         }
         
         document.getElementById('solidColor').addEventListener('input', () => {
-            document.querySelectorAll('.color-option').forEach(el => el.classList.remove('active'));
-            selectedBackground = -1;
             const solidColor = document.getElementById('solidColor').value;
             document.getElementById('gradientColor1').value = solidColor;
             document.getElementById('gradientColor2').value = solidColor;
@@ -1306,14 +1619,10 @@
         });
         
         document.getElementById('gradientColor1').addEventListener('input', () => {
-            document.querySelectorAll('.color-option').forEach(el => el.classList.remove('active'));
-            selectedBackground = -1;
             updateCanvas();
         });
         
         document.getElementById('gradientColor2').addEventListener('input', () => {
-            document.querySelectorAll('.color-option').forEach(el => el.classList.remove('active'));
-            selectedBackground = -1;
             updateCanvas();
         });
         
@@ -1369,6 +1678,18 @@
         });
         document.querySelectorAll('input[name="linebreak"]').forEach(radio => {
             radio.addEventListener('change', updateCanvas);
+        });
+        
+        // 이미지 배경 관련 이벤트 리스너
+        document.querySelectorAll('input[name="imageFit"]').forEach(radio => {
+            radio.addEventListener('change', updateCanvas);
+        });
+        document.querySelectorAll('input[name="imagePosition"]').forEach(radio => {
+            radio.addEventListener('change', updateCanvas);
+        });
+        document.getElementById('overlayOpacity').addEventListener('input', (e) => {
+            document.getElementById('overlayValue').textContent = e.target.value;
+            updateCanvas();
         });
         
         const defaultValues = {
