@@ -638,8 +638,9 @@
         }
         
         .position-option input[type="radio"]:checked + label::before {
-            content: '●';
-            color: white;
+            content: '●' !important;
+            color: white !important;
+            font-weight: bold;
         }
         
         @media (max-width: 899px) {
