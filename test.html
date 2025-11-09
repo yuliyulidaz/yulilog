@@ -597,6 +597,17 @@
             word-break: break-all;
         }
         
+        .copyright-notice {
+            margin-top: 8px;
+            font-size: 0.8em;
+            color: #6B7280;
+            text-align: center;
+            padding: 4px 8px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 4px;
+            border-left: 3px solid #EF4444;
+        }
+        
         .position-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -617,14 +628,9 @@
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
-            font-size: 1.2em;
             aspect-ratio: 1;
             position: relative;
-        }
-        
-        .position-option label::before {
-            content: '◯';
-            color: var(--text-secondary);
+            background: transparent;
         }
         
         .position-option label:hover {
@@ -635,12 +641,6 @@
         .position-option input[type="radio"]:checked + label {
             border-color: var(--accent);
             background: var(--accent);
-        }
-        
-        .position-option input[type="radio"]:checked + label::before {
-            content: '●' !important;
-            color: white !important;
-            font-weight: bold;
         }
         
         @media (max-width: 899px) {
@@ -901,6 +901,7 @@
                                 <input type="file" id="bgImageUpload" accept="image/*" style="display: none;">
                                 <button class="btn-image-delete" id="btnImageDelete" onclick="deleteBackgroundImage()" style="display: none;">🗑️ 삭제</button>
                             </div>
+                            <div class="copyright-notice">⚠️ 저작권 확인 필수</div>
                             <div id="imageFileName" class="image-file-name"></div>
                         </div>
                         
@@ -1030,15 +1031,28 @@
     
     <footer class="footer">
         <div class="footer-content">
-            <div class="footer-title">📖 발췌 문구 생성기</div>
+            <div class="footer-title">📖 발췌 문구 생성기 v1.2.0</div>
             <p class="footer-text">
                 본 사이트는 어떠한 개인정보도 수집하지 않습니다.<br>
                 모든 작업은 귀하의 브라우저에서만 이루어집니다.
             </p>
             <div class="footer-divider"></div>
-            <p class="footer-text">
-                생성된 이미지의 사용에 대한 책임은 사용자에게 있습니다.<br>
-                플랫폼 로고는 각 플랫폼의 상표이며, 사용 시 해당 플랫폼의 가이드라인을 준수해 주세요.
+            <div class="footer-disclaimer">
+                <p class="footer-text" style="font-weight: 600; color: var(--text-primary); margin-bottom: 10px;">
+                    ⚠️ 이용 시 주의사항
+                </p>
+                <p class="footer-text" style="text-align: left; max-width: 700px; margin: 0 auto;">
+                    • <strong>저작권 책임:</strong> 업로드한 이미지 및 텍스트의 저작권은 사용자에게 있으며, 저작권 침해에 대한 모든 법적 책임은 사용자에게 있습니다.<br>
+                    • <strong>이미지 사용:</strong> 타인의 저작물(사진, 일러스트 등)을 무단으로 사용하지 마세요. 저작권자의 허락을 받거나 저작권이 없는 이미지만 사용하세요.<br>
+                    • <strong>텍스트 인용:</strong> 책이나 기타 저작물의 텍스트를 발췌할 경우, 저작권법상 허용 범위 내에서 사용하고 출처를 명시하세요.<br>
+                    • <strong>플랫폼 로고:</strong> 각 플랫폼의 로고는 해당 플랫폼의 상표이며, 사용 시 각 플랫폼의 브랜드 가이드라인을 준수해야 합니다.<br>
+                    • <strong>상업적 이용:</strong> 생성된 이미지를 상업적으로 사용할 경우, 관련 법규를 확인하고 필요한 권리를 확보하세요.
+                </p>
+            </div>
+            <div class="footer-divider"></div>
+            <p class="footer-text" style="font-size: 0.8em; color: var(--text-secondary);">
+                본 도구의 제작자는 사용자가 생성한 콘텐츠에 대해 어떠한 책임도 지지 않습니다.<br>
+                이미지 및 텍스트 사용으로 인해 발생하는 모든 법적 문제는 사용자 본인의 책임입니다.
             </p>
         </div>
     </footer>
