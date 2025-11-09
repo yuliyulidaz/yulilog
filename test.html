@@ -775,7 +775,7 @@
                 <!-- 스타일 설정 -->
                 <div class="card">
                     <div class="card-header" onclick="toggleCard(this)">
-                        <div class="card-title">📐 스타일 설정</div>
+                        <div class="card-title">🎨 스타일 설정</div>
                         <div class="card-icon">▼</div>
                     </div>
                     <div class="card-content active">
@@ -1010,7 +1010,7 @@
                 
                 <!-- 모바일 버튼 -->
                 <div class="button-group mobile-download-btn">
-                    <button class="btn-primary btn-third btn-download" onclick="downloadImage()">📥 저장</button>
+                    <button class="btn-primary btn-third btn-download" onclick="downloadImage()">💾 저장</button>
                     <button class="btn-primary btn-third btn-copy" onclick="copyImage()">📋 복사</button>
                     <button class="btn-primary btn-third btn-share" onclick="shareImage()">📤 공유</button>
                 </div>
@@ -1021,7 +1021,7 @@
                     <canvas id="canvas" width="1080" height="1080"></canvas>
                 </div>
                 <div class="button-group" style="margin-top: 20px;">
-                    <button class="btn-primary btn-third btn-download" onclick="downloadImage()">📥 저장</button>
+                    <button class="btn-primary btn-third btn-download" onclick="downloadImage()">💾 저장</button>
                     <button class="btn-primary btn-third btn-copy" onclick="copyImage()">📋 복사</button>
                     <button class="btn-primary btn-third btn-share mobile-only-btn" onclick="shareImage()">📤 공유</button>
                 </div>
@@ -1488,33 +1488,50 @@
             } : { r: 255, g: 255, b: 255 };
         }
         
+        // OS 감지 함수
+        function iOSDevice() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        }
+        
         function downloadImage() {
             const canvas = document.getElementById('canvas');
             
-            // 모바일에서는 공유 기능 사용
-            if (window.innerWidth <= 899 && navigator.share && navigator.canShare) {
-                canvas.toBlob(async (blob) => {
-                    const file = new File([blob], 'quote_' + Date.now() + '.png', { type: 'image/png' });
-                    
-                    if (navigator.canShare({ files: [file] })) {
-                        try {
-                            await navigator.share({
-                                files: [file],
-                                title: '발췌 문구',
-                                text: '발췌 문구 이미지'
-                            });
-                        } catch (err) {
-                            if (err.name !== 'AbortError') {
-                                // 공유 취소가 아닌 경우에만 다운로드로 폴백
-                                showToast('❌ 저장 중 오류가 발생했습니다.');
+            // 모바일에서 OS별 분기
+            if (window.innerWidth <= 899) {
+                if (iOSDevice()) {
+                    // iOS: 공유 기능 사용
+                    if (navigator.share && navigator.canShare) {
+                        canvas.toBlob(async (blob) => {
+                            const file = new File([blob], 'quote_' + Date.now() + '.png', { type: 'image/png' });
+                            
+                            if (navigator.canShare({ files: [file] })) {
+                                try {
+                                    await navigator.share({
+                                        files: [file],
+                                        title: '발췌 문구',
+                                        text: '발췌 문구 이미지'
+                                    });
+                                } catch (err) {
+                                    if (err.name !== 'AbortError') {
+                                        showToast('❌ 저장 중 오류가 발생했습니다.');
+                                    }
+                                }
+                            } else {
+                                downloadDirectly(canvas);
+                                showToast('✅ 이미지가 저장되었습니다!');
                             }
-                        }
+                        });
                     } else {
                         downloadDirectly(canvas);
+                        showToast('✅ 이미지가 저장되었습니다!');
                     }
-                });
+                } else {
+                    // Android: 직접 다운로드
+                    downloadDirectly(canvas);
+                    showToast('✅ 이미지가 저장되었습니다!');
+                }
             } else {
-                // PC에서는 일반 다운로드
+                // PC: 직접 다운로드
                 downloadDirectly(canvas);
             }
         }
