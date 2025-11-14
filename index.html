@@ -81,6 +81,41 @@
         .dark-mode-toggle:hover {
             transform: scale(1.05);
         }
+
+                .link-button {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+        
+        .link-button:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        
+        .header-buttons {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
         
         .container {
             max-width: 1200px;
@@ -735,10 +770,15 @@
     </style>
 </head>
 <body>
-    <div class="header">
+     <div class="header">
         <div class="header-content">
             <div class="logo">📖 발췌 문구 생성기</div>
-            <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
+            <div class="header-buttons">
+                <a href="https://yuliyulidaz.github.io/yulipage/" target="_blank" class="link-button" title="소설 내지 생성기">
+                    📄 내지 생성기
+                </a>
+                <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
+            </div>
         </div>
     </div>
     
