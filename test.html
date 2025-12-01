@@ -8,7 +8,7 @@
     <!-- 폰트 로드 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;500;600&family=Noto+Sans+KR:wght@100;300;400;500;700&family=Nanum+Myeongjo:wght@400;700&family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;500;600;700&family=Noto+Sans+KR:wght@100;300;400;500;700&family=Nanum+Myeongjo:wght@400;700&family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/earlyaccess/kopubbatang.css">
     
@@ -192,23 +192,7 @@
                 
                 <div class="h-full overflow-y-auto custom-scrollbar p-5 space-y-8 pb-10 md:pb-5">
 
-                    <!-- Section: Canvas Settings -->
-                    <section class="space-y-4">
-                        <h2 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">캔버스 설정</h2>
-                        
-                        <div class="space-y-2">
-                            <label class="text-xs font-medium text-slate-500">비율 선택</label>
-                            <select id="canvasRatio" class="w-full appearance-none px-3 py-2.5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                                <option value="1:1">1:1 정방형 (1080x1080) - 인스타/트위터</option>
-                                <option value="4:5">4:5 세로형 (1080x1350) - 인스타 포트레이트</option>
-                                <option value="16:9">16:9 가로형 (1920x1080) - 유튜브/배경화면</option>
-                            </select>
-                        </div>
-                    </section>
-
-                    <hr class="border-slate-100 dark:border-slate-800">
-                    
-                    <!-- Section: Content -->
+                    <!-- Section: Content (Moved to Top) -->
                     <section class="space-y-4">
                         <div class="flex items-center justify-between">
                             <h2 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">내용 입력</h2>
@@ -233,6 +217,22 @@
                                 <label class="text-xs font-medium text-slate-500">캐릭터/제목</label>
                                 <input type="text" id="title" placeholder="캐릭터/제목 (선택)" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all">
                             </div>
+                        </div>
+                    </section>
+
+                    <hr class="border-slate-100 dark:border-slate-800">
+
+                    <!-- Section: Canvas Settings (Moved below Content) -->
+                    <section class="space-y-4">
+                        <h2 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">캔버스 설정</h2>
+                        
+                        <div class="space-y-2">
+                            <label class="text-xs font-medium text-slate-500">비율 선택</label>
+                            <select id="canvasRatio" class="w-full appearance-none px-3 py-2.5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                <option value="1:1">1:1 정방형 (1080x1080) - 인스타/트위터</option>
+                                <option value="4:5">4:5 세로형 (1080x1350) - 인스타 포트레이트</option>
+                                <option value="16:9">16:9 가로형 (1920x1080) - 유튜브/배경화면</option>
+                            </select>
                         </div>
                     </section>
 
@@ -264,7 +264,7 @@
                             <div class="bg-slate-50 dark:bg-black/20 p-1 rounded-lg flex border border-slate-200 dark:border-slate-700">
                                 <!-- Radio Group for Align -->
                                 <label class="flex-1 cursor-pointer">
-                                    <input type="radio" name="align" value="left" class="peer hidden" id="align-left">
+                                    <input type="radio" name="align" value="left" checked class="peer hidden" id="align-left">
                                     <div class="w-full h-8 flex items-center justify-center rounded text-slate-400 peer-checked:bg-white dark:peer-checked:bg-slate-700 peer-checked:text-brand-600 peer-checked:shadow-sm transition-all">
                                         <i class="ph ph-text-align-left text-lg"></i>
                                     </div>
@@ -282,7 +282,7 @@
                                     </div>
                                 </label>
                                 <label class="flex-1 cursor-pointer">
-                                    <input type="radio" name="align" value="justify" checked class="peer hidden" id="align-justify">
+                                    <input type="radio" name="align" value="justify" class="peer hidden" id="align-justify">
                                     <div class="w-full h-8 flex items-center justify-center rounded text-slate-400 peer-checked:bg-white dark:peer-checked:bg-slate-700 peer-checked:text-brand-600 peer-checked:shadow-sm transition-all">
                                         <i class="ph ph-text-align-justify text-lg"></i>
                                     </div>
@@ -571,7 +571,16 @@
             initColorPickers();
             loadLogos();
             bindEvents();
-            updateCanvas(); // Initial draw
+            
+            // Font Loading Fix: Wait for fonts to load before drawing
+            document.fonts.ready.then(() => {
+                updateCanvas();
+            });
+            // Fallback: Redraw after short delay to ensure fonts are applied
+            setTimeout(updateCanvas, 500);
+            setTimeout(updateCanvas, 1000);
+            
+            updateCanvas(); // Initial draw attempt
         });
 
         function initTheme() {
@@ -595,6 +604,8 @@
 
         function initColorPickers() {
             const createPickr = (elId, defaultColor, key) => {
+                let initialColor = defaultColor;
+
                 const pickr = Pickr.create({
                     el: elId,
                     theme: 'classic',
@@ -611,7 +622,8 @@
                         interaction: {
                             hex: true,
                             input: true,
-                            save: true
+                            save: true,
+                            cancel: true // 취소 버튼 활성화
                         }
                     },
                     i18n: {
@@ -621,21 +633,51 @@
                     }
                 });
 
+                // 열릴 때 현재 색상 저장 (취소 시 복구용)
+                pickr.on('show', (color, instance) => {
+                    initialColor = state.colors[key];
+                });
+
+                // 색상 변경 시 (드래그 등) - 미리보기만 적용 (applyColor 호출 X)
                 pickr.on('change', (color, source, instance) => {
-                    // Update state
                     const hex = color.toHEXA().toString();
                     state.colors[key] = hex;
-                    // Apply button color immediately
-                    pickr.applyColor();
-                    // Redraw canvas
-                    updateCanvas();
-                }).on('swatchselect', (color) => {
+                    // pickr.applyColor(); // <-- 제거: 버튼 업데이트로 인한 DOM 변경/포커스 문제 방지
+                    updateCanvas();     // 캔버스 미리보기 갱신
+                });
+
+                // 확인 버튼 클릭 시
+                pickr.on('save', (color, instance) => {
                     const hex = color.toHEXA().toString();
                     state.colors[key] = hex;
-                    pickr.setColor(hex); // Update picker internal state
+                    
+                    // Force update button color silently to avoid re-triggering logic
+                    instance.applyColor(true); 
+                    
+                    // Close popup asynchronously to bypass any event blocking
+                    setTimeout(() => {
+                        instance.hide();
+                    }, 0);
+                });
+
+                // 취소 버튼 클릭 시
+                pickr.on('cancel', (instance) => {
+                    // 색상 원상복구
+                    state.colors[key] = initialColor;
+                    // Pickr 내부 색상도 되돌리기 (Silent)
+                    pickr.setColor(initialColor, true); 
+                    // 캔버스 다시 그리기
                     updateCanvas();
-                }).on('save', (color, instance) => {
-                    pickr.hide();
+                    instance.hide(); // 창 닫기
+                });
+
+                // 팔레트(Swatch) 클릭 시
+                pickr.on('swatchselect', (color) => {
+                    const hex = color.toHEXA().toString();
+                    state.colors[key] = hex;
+                    pickr.setColor(hex); // UI 업데이트 (여기서는 내부적으로 처리되므로 OK)
+                    updateCanvas();
+                    // hide() 호출하지 않음 (계속 선택 가능하도록)
                 });
 
                 return pickr;
@@ -652,6 +694,10 @@
                 img.crossOrigin = "Anonymous"; 
                 img.src = url;
                 state.logoImages[key] = img;
+                // Redraw when loaded if this is the selected platform
+                img.onload = () => {
+                    if (state.platform === key) updateCanvas();
+                };
             }
         }
 
@@ -760,15 +806,15 @@
         }
 
         function applyPreset(main, sub, text, isGradient) {
-            // Update State
+            // Update State directly
             state.colors.bgMain = main;
             state.colors.bgSub = sub;
             state.colors.text = text;
 
-            // Update Pickrs
-            if(state.pickrs.text) state.pickrs.text.setColor(text);
-            if(state.pickrs.bgMain) state.pickrs.bgMain.setColor(main);
-            if(state.pickrs.bgSub) state.pickrs.bgSub.setColor(sub);
+            // Update Pickrs Silently (이벤트 발생 차단하여 #NAN 오류 방지)
+            if(state.pickrs.text) state.pickrs.text.setColor(text, true);
+            if(state.pickrs.bgMain) state.pickrs.bgMain.setColor(main, true);
+            if(state.pickrs.bgSub) state.pickrs.bgSub.setColor(sub, true);
 
             document.getElementById('useGradient').checked = isGradient;
             
@@ -796,11 +842,8 @@
             // 1. Background
             drawBackground(ctx, width, height);
 
-            // 2. Text (Quote, Author, Title)
-            drawText(ctx, width, height);
-
-            // 3. Logo
-            drawLogo(ctx, width, height);
+            // 2. Content (Text + Logo)
+            drawContent(ctx, width, height);
         }
 
         function drawBackground(ctx, width, height) {
@@ -810,10 +853,16 @@
             const colorSub = state.colors.bgSub;
 
             if (useGradient) {
-                const gradient = ctx.createLinearGradient(0, 0, width, height);
-                gradient.addColorStop(0, colorMain);
-                gradient.addColorStop(1, colorSub);
-                ctx.fillStyle = gradient;
+                try {
+                    const gradient = ctx.createLinearGradient(0, 0, width, height);
+                    gradient.addColorStop(0, colorMain);
+                    gradient.addColorStop(1, colorSub);
+                    ctx.fillStyle = gradient;
+                } catch (e) {
+                    // Fallback if gradient fails due to color parsing
+                    console.warn("Gradient Error, falling back to main color", e);
+                    ctx.fillStyle = colorMain;
+                }
             } else {
                 ctx.fillStyle = colorMain;
             }
@@ -893,49 +942,42 @@
             ctx.drawImage(img, dx, dy, dWidth, dHeight);
         }
 
-        function drawText(ctx, width, height) {
+        function drawContent(ctx, width, height) {
             const quote = document.getElementById('quote').value;
             const author = document.getElementById('author').value;
             const title = document.getElementById('title').value;
+            const platform = state.platform;
             
             const fontSize = parseInt(document.getElementById('fontSize').value);
             const lineHeightMultiplier = parseFloat(document.getElementById('lineHeight').value);
             const padding = parseInt(document.getElementById('padding').value);
             const align = document.querySelector('input[name="align"]:checked').value;
             const fontFamily = document.getElementById('fontSelect').value;
-            const textColor = state.colors.text;
             const breakMode = document.querySelector('input[name="linebreak"]:checked').value;
+            const logoSize = parseInt(document.getElementById('logoSize').value);
 
-            ctx.fillStyle = textColor;
+            ctx.fillStyle = state.colors.text;
             ctx.textBaseline = 'middle';
 
-            // 1. Prepare Footer Text (Author | Title)
-            let footerText = '';
-            if (author && title) footerText = `${author} | ${title}`;
-            else if (author) footerText = author;
-            else if (title) footerText = title;
+            // --- Footer Metrics (Increased Size) ---
+            const footerFontSize = Math.max(24, fontSize * 0.65);
+            const footerLineHeight = footerFontSize * 1.5;
 
-            let footerHeight = 0;
-            if (footerText) {
-                const footerFontSize = Math.max(20, fontSize * 0.45); 
-                ctx.font = `300 ${footerFontSize}px '${fontFamily}'`;
-                footerHeight = footerFontSize * 2.5; 
-            }
-
-            // 2. Prepare Main Quote
+            // --- Quote Calculation ---
             const contentWidth = width - (padding * 2);
-            
             ctx.font = `400 ${fontSize}px '${fontFamily}'`;
             const lineHeight = fontSize * lineHeightMultiplier;
-            
             const lines = getLines(ctx, quote, contentWidth, breakMode);
             
-            const totalTextHeight = lines.length * lineHeight;
-            const totalContentHeight = totalTextHeight + (footerText ? (fontSize * 1.0) : 0) + (footerText ? (Math.max(20, fontSize * 0.45)) : 0); 
+            // --- Vertical Layout ---
+            const hasFooterText = !!(author || title);
+            const quoteBlockHeight = lines.length * lineHeight;
+            const spacing = hasFooterText ? (fontSize * 1.0) : 0;
+            const totalContentHeight = quoteBlockHeight + spacing + (hasFooterText ? footerLineHeight : 0);
             
             let currentY = (height - totalContentHeight) / 2 + (lineHeight / 2);
 
-            // Draw Quote Lines
+            // --- Draw Quote ---
             if (quote) {
                 lines.forEach(line => {
                     let x;
@@ -951,26 +993,89 @@
                         ctx.textAlign = align === 'justify' ? 'center' : align;
                         ctx.fillText(line, x, currentY);
                     }
-                    
                     currentY += lineHeight;
                 });
             }
 
-            // Draw Footer
-            if (footerText) {
-                currentY += (fontSize * 0.5); 
+            // --- Draw Footer Text (Fixed to Pretendard, Mixed Styles) ---
+            if (hasFooterText) {
+                currentY = currentY - (lineHeight/2) + spacing + (footerLineHeight / 2);
                 
-                const footerFontSize = Math.max(20, fontSize * 0.45);
-                ctx.font = `300 ${footerFontSize}px '${fontFamily}'`;
-                ctx.fillStyle = textColor;
-                
-                let footerX;
-                 if (align === 'left') footerX = padding;
-                else if (align === 'center' || align === 'justify') footerX = width / 2;
-                else if (align === 'right') footerX = width - padding;
+                // Prepare parts
+                const authorPart = author || '';
+                const separator = (author && title) ? ' | ' : '';
+                const titlePart = title || '';
 
-                ctx.textAlign = (align === 'justify') ? 'center' : align;
-                ctx.fillText(footerText, footerX, currentY);
+                // Force Fonts to Pretendard
+                const footerFontFamily = 'Pretendard';
+                const fontNormal = `300 ${footerFontSize}px '${footerFontFamily}'`;
+                const fontBold = `700 ${footerFontSize}px '${footerFontFamily}'`;
+
+                // Measure widths
+                ctx.font = fontNormal;
+                const wAuthor = ctx.measureText(authorPart).width;
+                const wSep = ctx.measureText(separator).width;
+                ctx.font = fontBold;
+                const wTitle = ctx.measureText(titlePart).width;
+                
+                const totalFooterWidth = wAuthor + wSep + wTitle;
+
+                // Calculate Start X
+                let startX;
+                if (align === 'left') {
+                    startX = padding;
+                } else if (align === 'center' || align === 'justify') {
+                    startX = (width - totalFooterWidth) / 2;
+                } else if (align === 'right') {
+                    startX = width - padding - totalFooterWidth;
+                }
+
+                // Draw Parts
+                ctx.textAlign = 'left'; // Always draw left-to-right from startX
+                
+                // 1. Author (Normal)
+                ctx.font = fontNormal;
+                ctx.fillText(authorPart, startX, currentY);
+                
+                // 2. Separator (Normal)
+                ctx.fillText(separator, startX + wAuthor, currentY);
+
+                // 3. Title (Bold)
+                ctx.font = fontBold;
+                ctx.fillText(titlePart, startX + wAuthor + wSep, currentY);
+            }
+
+            // --- Draw Logo (Fixed Position: Bottom Right) ---
+            const logoImg = platform ? state.logoImages[platform] : null;
+            if (logoImg && logoImg.complete && logoImg.naturalHeight !== 0) {
+                const radius = logoSize / 2;
+                const margin = 60; // Fixed margin from edges
+                
+                // Absolute Position: Bottom Right
+                const logoX = width - margin - radius;
+                const logoY = height - margin - radius;
+
+                ctx.save();
+                
+                // Apply 20% Transparency (80% Opacity)
+                ctx.globalAlpha = 0.8;
+                
+                ctx.beginPath();
+                ctx.arc(logoX, logoY, radius, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.clip();
+                
+                // Image fitting (cover)
+                const aspect = logoImg.width / logoImg.height;
+                let sw, sh, sx, sy;
+                if (aspect > 1) {
+                    sh = logoImg.height; sw = sh; sx = (logoImg.width - sw) / 2; sy = 0;
+                } else {
+                    sw = logoImg.width; sh = sw; sx = 0; sy = (logoImg.height - sh) / 2;
+                }
+
+                ctx.drawImage(logoImg, sx, sy, sw, sh, logoX - radius, logoY - radius, logoSize, logoSize);
+                ctx.restore();
             }
         }
 
@@ -1012,41 +1117,6 @@
                 }
             });
             return lines;
-        }
-
-        function drawLogo(ctx, width, height) {
-            const platform = state.platform;
-            if (!platform) return;
-
-            const logoSize = parseInt(document.getElementById('logoSize').value);
-            const padding = 40; 
-            
-            const x = width / 2;
-            const y = padding + (logoSize / 2);
-            
-            const img = state.logoImages[platform];
-            
-            if (img && img.complete && img.naturalHeight !== 0) {
-                const aspect = img.width / img.height;
-                let dw, dh;
-                if (aspect > 1) {
-                    dw = logoSize;
-                    dh = logoSize / aspect;
-                } else {
-                    dh = logoSize;
-                    dw = logoSize * aspect;
-                }
-                ctx.drawImage(img, x - dw/2, y - dh/2, dw, dh);
-            } else {
-                ctx.save();
-                ctx.font = `bold ${logoSize/3}px sans-serif`;
-                ctx.fillStyle = state.colors.text;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.globalAlpha = 0.5;
-                ctx.fillText(platform.toUpperCase(), x, y);
-                ctx.restore();
-            }
         }
 
         // --- 6. Export ---
