@@ -613,7 +613,7 @@
             gradDirection: 'to bottom right',
             colors: {
                 text: '#ffffff',
-                bgMain: '#ffffff', 
+                bgMain: '#E6E6FA', // Default Solid Color: Lavender
                 gradStart: '#a18cd1', // Default Gradient Start
                 gradEnd: '#fbc2eb',   // Default Gradient End
             },
@@ -889,6 +889,11 @@
             state.bgImageName = null;
             document.getElementById('bgImageUpload').value = '';
             document.getElementById('imageControlPanel').classList.add('hidden');
+            
+            // Reset Overlay Settings
+            document.getElementById('overlayOpacity').value = 0;
+            document.getElementById('overlayValueText').innerText = "원본";
+            
             updateCanvas();
         }
         
