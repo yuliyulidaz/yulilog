@@ -141,22 +141,23 @@
                 <h1 class="font-bold text-lg tracking-tight hidden md:block">발췌 문구 생성기</h1>
             </div>
             
-            <div class="flex items-center gap-2 md:gap-3">
-                <!-- Mobile Only Actions (Header) -->
-                <button onclick="copyImage()" class="md:hidden w-9 h-9 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors" title="복사">
-                    <i class="ph ph-copy text-xl"></i>
-                </button>
-                <button onclick="downloadImage()" class="md:hidden flex items-center justify-center px-3 py-1.5 bg-brand-600 text-white text-sm font-bold rounded-lg shadow-sm active:scale-95 transition-transform">
-                    저장
-                </button>
-
-                <!-- External Links (Visible on Mobile as Icon, Desktop as Text) -->
-                <a href="https://yuliyulidaz.github.io/yulipage/" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors rounded-md hover:bg-slate-50 dark:hover:bg-slate-800">
-                    <i class="ph ph-file-text text-lg md:text-base"></i> <span class="hidden md:inline">내지 생성기</span>
-                </a>
-
-                <button onclick="toggleDarkMode()" class="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all dark-mode-toggle">
+            <div class="flex items-center gap-2">
+                <!-- Mobile & Desktop Actions -->
+                
+                <button onclick="toggleDarkMode()" class="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all dark-mode-toggle mr-1">
                     <i class="ph ph-moon text-xl"></i>
+                </button>
+
+                <!-- Copy Button (Mobile Visible with Text) -->
+                <button onclick="copyImage()" class="md:hidden flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-lg border border-slate-200 dark:border-zinc-700 active:scale-95 transition-transform">
+                    <i class="ph ph-copy text-base"></i>
+                    <span>복사</span>
+                </button>
+
+                <!-- Save Button (Mobile Visible with Text) -->
+                <button onclick="downloadImage()" class="md:hidden flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 text-white text-xs font-bold rounded-lg shadow-sm active:scale-95 transition-transform">
+                    <i class="ph ph-download-simple text-base"></i>
+                    <span>저장</span>
                 </button>
             </div>
         </header>
@@ -502,6 +503,15 @@
                     
                     <!-- Footer Info -->
                     <footer class="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-400 dark:text-slate-500 space-y-4 pb-8">
+                         <!-- Sister Site Link (Moved Here) -->
+                        <a href="https://yuliyulidaz.github.io/yulipage/" target="_blank" class="block w-full p-3 bg-brand-50/50 dark:bg-brand-900/10 border border-brand-100 dark:border-brand-800/30 rounded-xl hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-all group">
+                            <div class="flex items-center gap-2 text-brand-600 dark:text-brand-400 font-bold mb-0.5">
+                                <i class="ph ph-file-text text-lg"></i>
+                                <span>소설 내지 생성기</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300">소설 내지 이미지로 제작해 보세요.</p>
+                        </a>
+                        
                         <div>
                             <h3 class="font-bold text-slate-500 dark:text-slate-400 mb-1">📖 발췌 문구 생성기 v1.3.0</h3>
                             <p>본 사이트는 어떠한 개인정보도 수집하지 않습니다.<br>모든 작업은 귀하의 브라우저에서만 이루어집니다.</p>
@@ -540,8 +550,8 @@
             // Colors managed by state now (synced with Pickr)
             colors: {
                 text: '#ffffff',
-                bgMain: '#a18cd1',
-                bgSub: '#fbc2eb'
+                bgMain: '#a18cd1', // Lavender Start
+                bgSub: '#fbc2eb'  // Lavender End
             },
             pickrs: {}
         };
