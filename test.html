@@ -316,7 +316,10 @@
                             <div class="space-y-2">
                                 <label class="text-xs font-medium text-slate-500">글자 색상</label>
                                 <div class="relative w-full h-10 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
-                                    <input type="color" id="textColor" value="#ffffff" class="absolute -top-2 -left-2 w-[150%] h-[150%] cursor-pointer p-0 border-0">
+                                    <!-- Preview div for full visual -->
+                                    <div id="textColorPreview" class="absolute inset-0 w-full h-full pointer-events-none" style="background-color: #ffffff;"></div>
+                                    <!-- Hidden input but clickable -->
+                                    <input type="color" id="textColor" value="#ffffff" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer p-0 border-0">
                                 </div>
                             </div>
 
@@ -335,7 +338,8 @@
                                     <!-- Main Color -->
                                     <div class="flex-1 space-y-1">
                                         <div class="relative w-full h-10 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
-                                            <input type="color" id="bgColorMain" value="#e0c3fc" class="absolute -top-2 -left-2 w-[150%] h-[150%] cursor-pointer p-0 border-0">
+                                            <div id="bgColorMainPreview" class="absolute inset-0 w-full h-full pointer-events-none" style="background-color: #e0c3fc;"></div>
+                                            <input type="color" id="bgColorMain" value="#e0c3fc" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer p-0 border-0">
                                         </div>
                                         <div class="text-[10px] text-center text-slate-400">시작 / 단색</div>
                                     </div>
@@ -343,7 +347,8 @@
                                     <!-- Sub Color (Visible if Gradient) -->
                                     <div class="flex-1 space-y-1 transition-all duration-300" id="subColorContainer">
                                         <div class="relative w-full h-10 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
-                                            <input type="color" id="bgColorSub" value="#8ec5fc" class="absolute -top-2 -left-2 w-[150%] h-[150%] cursor-pointer p-0 border-0">
+                                            <div id="bgColorSubPreview" class="absolute inset-0 w-full h-full pointer-events-none" style="background-color: #8ec5fc;"></div>
+                                            <input type="color" id="bgColorSub" value="#8ec5fc" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer p-0 border-0">
                                         </div>
                                         <div class="text-[10px] text-center text-slate-400">끝 색상</div>
                                     </div>
@@ -600,6 +605,11 @@
                          document.getElementById('overlayValueText').innerText = text;
                     }
                     
+                    // Update Color Previews
+                    if(id === 'textColor') document.getElementById('textColorPreview').style.backgroundColor = e.target.value;
+                    if(id === 'bgColorMain') document.getElementById('bgColorMainPreview').style.backgroundColor = e.target.value;
+                    if(id === 'bgColorSub') document.getElementById('bgColorSubPreview').style.backgroundColor = e.target.value;
+
                     // Toggle Sub Color visibility
                     if(id === 'useGradient') {
                         const subContainer = document.getElementById('subColorContainer');
@@ -687,6 +697,11 @@
             document.getElementById('bgColorSub').value = sub;
             document.getElementById('textColor').value = text;
             document.getElementById('useGradient').checked = isGradient;
+            
+            // Update Color Previews
+            document.getElementById('bgColorMainPreview').style.backgroundColor = main;
+            document.getElementById('bgColorSubPreview').style.backgroundColor = sub;
+            document.getElementById('textColorPreview').style.backgroundColor = text;
             
             // Trigger visual update for sub color container
             const subContainer = document.getElementById('subColorContainer');
