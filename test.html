@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>발췌 문구 생성기</title>
     
-    <!-- 폰트 로드 -->
+    <!-- 폰트 로드 (최적화: 필요한 가장 얇은 굵기만 로드) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;500;600;700&family=Noto+Sans+KR:wght@100;300;400;500;700&family=Nanum+Myeongjo:wght@400;700&family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200&family=Noto+Sans+KR:wght@100&family=Nanum+Myeongjo&family=Nanum+Gothic&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/earlyaccess/kopubbatang.css">
     
@@ -150,10 +150,11 @@
                     저장
                 </button>
 
-                <!-- Desktop Links -->
-                <a href="https://yuliyulidaz.github.io/yulipage/" target="_blank" class="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors rounded-md hover:bg-slate-50 dark:hover:bg-slate-800">
-                    <i class="ph ph-file-text"></i> 내지 생성기
+                <!-- External Links (Visible on Mobile as Icon, Desktop as Text) -->
+                <a href="https://yuliyulidaz.github.io/yulipage/" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors rounded-md hover:bg-slate-50 dark:hover:bg-slate-800">
+                    <i class="ph ph-file-text text-lg md:text-base"></i> <span class="hidden md:inline">내지 생성기</span>
                 </a>
+
                 <button onclick="toggleDarkMode()" class="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all dark-mode-toggle">
                     <i class="ph ph-moon text-xl"></i>
                 </button>
@@ -493,9 +494,9 @@
                         <div class="space-y-1">
                              <div class="flex justify-between text-xs mb-1">
                                 <span class="text-slate-500">로고 크기</span>
-                                <span class="font-mono text-brand-600"><span id="logoSizeValue">100</span>px</span>
+                                <span class="font-mono text-brand-600"><span id="logoSizeValue">80</span>px</span>
                             </div>
-                            <input type="range" id="logoSize" min="50" max="200" step="10" value="100" class="w-full">
+                            <input type="range" id="logoSize" min="50" max="200" step="10" value="80" class="w-full">
                         </div>
                     </section>
                     
@@ -964,8 +965,16 @@
             const footerLineHeight = footerFontSize * 1.5;
 
             // --- Quote Calculation ---
+            // Determine font weight based on family for the thinnest look (Thin/Light Application)
+            let fontWeight = 400; // Default
+            if (fontFamily === 'Noto Serif KR') fontWeight = 200;       // ExtraLight
+            else if (fontFamily === 'Noto Sans KR') fontWeight = 100;    // Thin
+            else if (fontFamily === 'Pretendard') fontWeight = 100;      // Thin
+            else if (fontFamily === 'KoPub Batang') fontWeight = 300;    // Light
+            
+            ctx.font = `${fontWeight} ${fontSize}px '${fontFamily}'`;
             const contentWidth = width - (padding * 2);
-            ctx.font = `400 ${fontSize}px '${fontFamily}'`;
+            
             const lineHeight = fontSize * lineHeightMultiplier;
             const lines = getLines(ctx, quote, contentWidth, breakMode);
             
@@ -1008,8 +1017,8 @@
 
                 // Force Fonts to Pretendard
                 const footerFontFamily = 'Pretendard';
-                const fontNormal = `300 ${footerFontSize}px '${footerFontFamily}'`;
-                const fontBold = `700 ${footerFontSize}px '${footerFontFamily}'`;
+                const fontNormal = `200 ${footerFontSize}px '${footerFontFamily}'`;
+                const fontBold = `400 ${footerFontSize}px '${footerFontFamily}'`;
 
                 // Measure widths
                 ctx.font = fontNormal;
