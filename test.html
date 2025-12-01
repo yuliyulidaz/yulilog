@@ -8,7 +8,7 @@
     <!-- 폰트 로드 (최적화: 필요한 가장 얇은 굵기만 로드) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200&family=Noto+Sans+KR:wght@100&family=Nanum+Myeongjo&family=Nanum+Gothic&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300&family=Noto+Sans+KR:wght@200&family=Nanum+Myeongjo&family=Nanum+Gothic&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/earlyaccess/kopubbatang.css">
     
@@ -248,11 +248,11 @@
                         <div class="space-y-1.5">
                              <div class="relative">
                                 <select id="fontSelect" class="w-full appearance-none pl-3 pr-10 py-2.5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all cursor-pointer">
-                                    <option value="Noto Serif KR">Noto Serif KR (명조)</option>
+                                    <option value=" Serif KR"> Serif KR (명조)</option>
                                     <option value="KoPub Batang">KoPub 바탕 (독서용 명조)</option>
                                     <option value="Nanum Myeongjo">나눔명조</option>
                                     <option value="Pretendard">Pretendard (모던 고딕)</option>
-                                    <option value="Noto Sans KR">Noto Sans KR (고딕)</option>
+                                    <option value=" Sans KR"> Sans KR (고딕)</option>
                                     <option value="Nanum Gothic">나눔고딕</option>
                                 </select>
                                 <div class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
@@ -977,9 +977,9 @@
             // --- Quote Calculation ---
             // Determine font weight based on family for the thinnest look (Thin/Light Application)
             let fontWeight = 400; // Default
-            if (fontFamily === 'Noto Serif KR') fontWeight = 200;       // ExtraLight
-            else if (fontFamily === 'Noto Sans KR') fontWeight = 100;    // Thin
-            else if (fontFamily === 'Pretendard') fontWeight = 100;      // Thin
+            if (fontFamily === 'Noto Serif KR') fontWeight = 300;       // ExtraLight
+            else if (fontFamily === 'Noto Sans KR') fontWeight = 200;    // Thin
+            else if (fontFamily === 'Pretendard') fontWeight = 200;      // Thin
             else if (fontFamily === 'KoPub Batang') fontWeight = 300;    // Light
             
             ctx.font = `${fontWeight} ${fontSize}px '${fontFamily}'`;
