@@ -1,1092 +1,528 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" class="h-full antialiased">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>발췌 문구 이미지 생성기</title>
-    <style>
-         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400&family=Noto+Sans+KR:wght@100;300;400&family=Nanum+Myeongjo:wght@400;700&family=Nanum+Gothic:wght@400;700&display=swap');
-            @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
-            @import url('https://fonts.googleapis.com/earlyaccess/kopubbatang.css');
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #F8F9FA;
-            --text-primary: #1a1a1a;
-            --text-secondary: #6b7280;
-            --accent: #6366F1;
-            --accent-hover: #4f46e5;
-            --border: #e5e7eb;
-            --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            --card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        body.dark {
-            --bg-primary: #1a1a1a;
-            --bg-secondary: #2d2d2d;
-            --text-primary: #ffffff;
-            --text-secondary: #9ca3af;
-            --border: #404040;
-            --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            --card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.5);
-        }
-        
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            transition: background 0.3s, color 0.3s;
-        }
-        
-        .header {
-            background: var(--bg-primary);
-            padding: 20px;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            transition: background 0.3s;
-        }
-        
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            font-size: 1.5em;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-        
-        .dark-mode-toggle {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            padding: 10px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.2em;
-            transition: all 0.3s;
-        }
-        
-        .dark-mode-toggle:hover {
-            transform: scale(1.05);
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .layout {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-        
-        @media (min-width: 900px) {
-            .layout {
-                grid-template-columns: 400px 1fr;
-                align-items: start;
-            }
-            
-            .preview-container {
-                position: sticky;
-                top: 90px;
-                align-self: start;
-            }
-            
-            /* PC에서 모바일 버튼 완전히 숨김 */
-            .mobile-download-btn {
-                display: none !important;
-            }
-        }
-        
-        @media (max-width: 899px) {
-            .layout {
-                display: flex;
-                flex-direction: column;
-            }
-            
-            .preview-container {
-                order: -1;
-                position: sticky;
-                top: 70px;
-                background: var(--bg-secondary);
-                padding: 10px 0;
-                z-index: 50;
-                margin-bottom: 10px;
-            }
-            
-            .preview-container #canvas {
-                max-height: 40vh;
-                max-width: 100%;
-                width: auto;
-                height: auto;
-                margin: 0 auto;
-                object-fit: contain;
-            }
-            
-            .preview-container .btn-primary {
-                display: none;
-            }
-            
-            .controls {
-                order: 1;
-            }
-        }
-        
-        .card {
-            background: var(--bg-primary);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            overflow: hidden;
-            transition: all 0.3s;
-        }
-        
-        .card-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            user-select: none;
-            transition: background 0.2s;
-        }
-        
-        .card-header:hover {
-            background: var(--bg-secondary);
-        }
-        
-        .card-title {
-            font-size: 1.1em;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-        
-        .card-icon {
-            font-size: 1.2em;
-            transition: transform 0.3s;
-        }
-        
-        .card-content {
-            padding: 20px;
-            display: none;
-        }
-        
-        .card-content.active {
-            display: block;
-        }
-        
-        .card.collapsed .card-icon {
-            transform: rotate(-90deg);
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-label {
-            display: block;
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
-            font-size: 0.9em;
-        }
-        
-        .form-label-with-button {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        
-        .btn-clear {
-            background: #EF4444;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.85em;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Noto Sans KR', sans-serif;
-        }
-        
-        .btn-clear:hover {
-            background: #DC2626;
-            transform: scale(1.05);
-        }
-        
-        .btn-clear:active {
-            transform: scale(0.95);
-        }
-        
-        .form-input,
-        .form-textarea,
-        .form-select {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 1em;
-            font-family: 'Noto Sans KR', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            transition: all 0.3s;
-        }
-        
-        .form-input:focus,
-        .form-textarea:focus,
-        .form-select:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-        
-        .form-textarea {
-            resize: vertical;
-            min-height: 100px;
-            line-height: 1.6;
-        }
-        
-        .color-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-top: 12px;
-        }
-        
-        .color-option {
-            aspect-ratio: 1;
-            border-radius: 12px;
-            cursor: pointer;
-            border: 3px solid transparent;
-            transition: all 0.3s;
-            position: relative;
-        }
-        
-        .color-option:hover {
-            transform: scale(1.05);
-            box-shadow: var(--card-shadow-hover);
-        }
-        
-        .color-option.active {
-            border-color: var(--accent);
-            transform: scale(1.05);
-        }
-        
-        .color-option.active::after {
-            content: '✓';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 1.8em;
-            font-weight: bold;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-        
-        .color-picker-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        
-        .color-picker-row input[type="color"] {
-            width: 60px;
-            height: 44px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            cursor: pointer;
-            background: none;
-        }
-        
-        .color-picker-row span {
-            color: var(--text-secondary);
-            font-size: 0.9em;
-        }
-        
-        .radio-group {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 8px;
-        }
-        
-        .radio-group.four-col {
-            grid-template-columns: repeat(4, 1fr);
-        }
-        
-        .radio-option input[type="radio"] {
-            display: none;
-        }
-        
-        .radio-option label {
-            display: block;
-            padding: 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.9em;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-        }
-        
-        .radio-option label:hover {
-            border-color: var(--accent);
-        }
-        
-        .radio-option input[type="radio"]:checked + label {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-        }
-        
-        .form-range {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 100%;
-            height: 6px;
-            background: var(--border);
-            border-radius: 3px;
-            outline: none;
-            cursor: pointer;
-        }
-        
-        .form-range::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            background: var(--accent);
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .form-range::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-        }
-        
-        .form-range::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
-            background: var(--accent);
-            border-radius: 50%;
-            cursor: pointer;
-            border: none;
-        }
-        
-        .range-label {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        
-        .range-value {
-            font-weight: 600;
-            color: var(--accent);
-        }
-        
-        #canvas {
-            width: 100%;
-            height: auto;
-            max-height: calc(100vh - 200px);
-            object-fit: contain;
-            border-radius: 12px;
-            display: block;
-            box-shadow: var(--card-shadow-hover);
-        }
-        
-        .btn-primary {
-            padding: 16px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Noto Sans KR', sans-serif;
-        }
-        
-        .btn-primary:hover {
-            background: var(--accent-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-        }
-        
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-        
-        .mobile-download-btn {
-            display: none;
-        }
-        
-        .button-group {
-            display: flex;
-            flex-direction: row;
-            gap: 10px;
-            width: 100%;
-        }
-        
-        .btn-third {
-            flex: 1 1 0;
-            min-width: 0;
-            max-width: none;
-            white-space: nowrap;
-        }
-        
-        /* 다운로드 버튼 - 파란색 */
-        .btn-download {
-            background: #6366F1;
-        }
-        
-        .btn-download:hover {
-            background: #4f46e5;
-        }
-        
-        /* 복사 버튼 - 초록색 */
-        .btn-copy {
-            background: #10B981;
-        }
-        
-        .btn-copy:hover {
-            background: #059669;
-        }
-        
-        /* 공유 버튼 - 주황색 */
-        .btn-share {
-            background: #F59E0B;
-        }
-        
-        .btn-share:hover {
-            background: #D97706;
-        }
-        
-        /* 모바일에서 공유 버튼 숨김 */
-        @media (max-width: 899px) {
-            .btn-share {
-                display: none;
-            }
-        }
-        
-        /* PC에서 공유 버튼 숨김 */
-        .mobile-only-btn {
-            display: none;
-        }
-        
-        /* 토스트 메시지 */
-        .toast {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.85);
-            color: white;
-            padding: 16px 24px;
-            border-radius: 8px;
-            font-size: 0.95em;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-        }
-        
-        .toast.show {
-            opacity: 1;
-        }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lumina Studio : 발췌 이미지</title>
     
-        
-        .divider {
-            height: 1px;
-            background: var(--border);
-            margin: 20px 0;
+    <!-- 폰트 로드 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;500;600&family=Noto+Sans+KR:wght@100;300;400;500;700&family=Nanum+Myeongjo:wght@400;700&family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/earlyaccess/kopubbatang.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Pretendard Variable', 'Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'sans-serif'],
+                        serif: ['Noto Serif KR', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        },
+                        dark: {
+                            bg: '#0f0f11',
+                            panel: '#18181b',
+                            border: '#27272a'
+                        }
+                    }
+                }
+            }
         }
-        
-        .section-divider {
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 0.85em;
-            font-weight: 600;
-            margin: 20px 0 15px 0;
-            position: relative;
-        }
-        
-        .section-divider::before,
-        .section-divider::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            width: 30%;
-            height: 1px;
-            background: var(--border);
-        }
-        
-        .section-divider::before {
-            left: 0;
-        }
-        
-        .section-divider::after {
-            right: 0;
-        }
-        
-        .image-upload-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .btn-upload {
-            flex: 1;
-            padding: 12px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.95em;
-            font-weight: 500;
-        }
-        
-        .btn-upload:hover {
-            background: var(--accent-hover);
-            transform: translateY(-1px);
-        }
-        
-        .btn-image-delete {
-            padding: 12px 16px;
-            background: #EF4444;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.95em;
-        }
-        
-        .btn-image-delete:hover {
-            background: #DC2626;
-        }
-        
-        .image-file-name {
-            margin-top: 8px;
-            font-size: 0.85em;
-            color: var(--text-secondary);
-            word-break: break-all;
-        }
-        
-        .copyright-notice {
-            margin-top: 8px;
-            font-size: 0.8em;
-            color: #6B7280;
-            text-align: center;
-            padding: 4px 8px;
-            background: rgba(239, 68, 68, 0.1);
-            border-radius: 4px;
-            border-left: 3px solid #EF4444;
-        }
-        
-        .position-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            max-width: 150px;
-        }
-        
-        .position-option input[type="radio"] {
-            display: none;
-        }
-        
-        .position-option label {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            aspect-ratio: 1;
-            position: relative;
+    </script>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        /* Custom Styles for inputs that Tailwind doesn't cover easily */
+        input[type="range"] {
+            -webkit-appearance: none;
             background: transparent;
         }
-        
-        .position-option label:hover {
-            border-color: var(--accent);
-            background: var(--bg-secondary);
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            margin-top: -6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 2px;
+        }
+        .dark input[type="range"]::-webkit-slider-runnable-track {
+            background: #3f3f46;
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
         }
         
-        .position-option input[type="radio"]:checked + label {
-            border-color: var(--accent);
-            background: var(--accent);
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .dark .glass-panel {
+            background: rgba(24, 24, 27, 0.7);
         }
         
-        @media (max-width: 899px) {
-            .logo {
-                font-size: 1.2em;
-            }
-            
-            .color-grid {
-                grid-template-columns: repeat(6, 1fr);
-                gap: 8px;
-            }
-            
-            .layout {
-                display: flex;
-                flex-direction: column;
-            }
-            
-            .preview-container {
-                order: -1;
-                position: sticky;
-                top: 70px;
-                background: var(--bg-secondary);
-                padding: 10px 0;
-                z-index: 50;
-                margin-bottom: 10px;
-            }
-            
-            .preview-container #canvas {
-                max-height: 40vh;
-                max-width: 100%;
-                width: auto;
-                height: auto;
-                margin: 0 auto;
-                object-fit: contain;
-            }
-            
-            .preview-container .btn-primary {
-                display: none;
-            }
-            
-            .controls {
-                order: 1;
-            }
-            
-            .mobile-download-btn {
-                display: flex;
-                width: 100%;
-                margin-top: 20px;
-                margin-left: 0;
-                margin-right: 0;
-            }
-            
-            /* 모바일에서 공유 버튼 표시 */
-            .mobile-only-btn {
-                display: block;
-            }
+        .pattern-grid {
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 20px 20px;
         }
-        
-        .footer {
-            background: var(--bg-primary);
-            border-top: 1px solid var(--border);
-            padding: 30px 20px;
-            margin-top: 40px;
-            text-align: center;
-        }
-        
-        .footer-content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        .footer-title {
-            font-size: 0.95em;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 12px;
-        }
-        
-        .footer-text {
-            font-size: 0.85em;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 8px;
-        }
-        
-        .footer-divider {
-            height: 1px;
-            background: var(--border);
-            margin: 20px auto;
-            max-width: 400px;
+        .dark .pattern-grid {
+            background-image: radial-gradient(#3f3f46 1px, transparent 1px);
         }
     </style>
 </head>
-<body>
-    <div class="header">
-        <div class="header-content">
-            <div class="logo">📖 발췌 문구 생성기</div>
-            <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
-        </div>
-    </div>
-    
-    <div class="container">
-        <div class="layout">
-            <div class="controls">
-                <!-- 텍스트 설정 -->
-                <div class="card">
-                    <div class="card-header" onclick="toggleCard(this)">
-                        <div class="card-title">✏️ 텍스트 설정</div>
-                        <div class="card-icon">▼</div>
-                    </div>
-                    <div class="card-content active">
-                        <div class="form-group">
-                            <div class="form-label-with-button">
-                                <label class="form-label">발췌 문구</label>
-                                <button class="btn-clear" onclick="clearQuote()">🗑️ 전체삭제</button>
-                            </div>
-                            <textarea class="form-textarea" id="quote" placeholder="마음에 드는 문구를 입력하세요..."></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">제작자</label>
-                            <input type="text" class="form-input" id="author" placeholder="제작자" value="제작자">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">캐릭터</label>
-                            <input type="text" class="form-input" id="title" placeholder="캐릭터" value="캐릭터">
-                        </div>
-                    </div>
+<body class="h-full bg-slate-50 dark:bg-zinc-950 text-slate-900 dark:text-slate-100 transition-colors duration-300 overflow-hidden flex flex-col items-center justify-center">
+
+    <!-- App Container (Centered on large screens) -->
+    <div class="w-full h-full max-w-[1200px] mx-auto bg-white dark:bg-dark-panel shadow-2xl flex flex-col border-x border-slate-200 dark:border-zinc-800">
+        
+        <!-- Header -->
+        <header class="h-14 border-b border-slate-200 dark:border-dark-border flex items-center justify-between px-4 lg:px-6 bg-white dark:bg-dark-panel z-20 flex-shrink-0">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-brand-500/30">
+                    <i class="ph ph-quotes"></i>
                 </div>
-                
-                <!-- 스타일 설정 -->
-                <div class="card">
-                    <div class="card-header" onclick="toggleCard(this)">
-                        <div class="card-title">🎨 스타일 설정</div>
-                        <div class="card-icon">▼</div>
-                    </div>
-                    <div class="card-content active">
-                        <div class="form-group">
-                            <label class="form-label">캔버스 비율</label>
-                            <select class="form-select" id="canvasRatio">
-                                <option value="1:1">정사각형 (1:1) - 1080x1080</option>
-                                <option value="4:5">세로형 (4:5) - 1080x1350</option>
-                                <option value="16:9">가로형 (16:9) - 1920x1080</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">폰트 선택</label>
-                            <select class="form-select" id="fontSelect">
-                                <option value="Noto Serif KR">Noto Serif KR (우아한 명조)</option>
-                                <option value="KoPub Batang">KoPub 바탕 (독서용 명조)</option>
-                                <option value="Noto Serif KR">본명조 (깊이있는 명조)</option>
-                                <option value="Nanum Myeongjo">나눔명조</option>
-                                <option value="Pretendard">Pretendard (모던 고딕)</option>
-                                <option value="Noto Sans KR">본고딕 (고품질 고딕)</option>
-                                <option value="Noto Sans KR">Noto Sans KR (고딕)</option>
-                                <option value="Nanum Gothic">나눔고딕</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">텍스트 정렬</label>
-                            <div class="radio-group four-col">
-                                <div class="radio-option">
-                                    <input type="radio" name="align" id="align-justify" value="justify" checked>
-                                    <label for="align-justify">양쪽</label>
-                                </div>
-                                <div class="radio-option">
-                                    <input type="radio" name="align" id="align-left" value="left">
-                                    <label for="align-left">왼쪽</label>
-                                </div>
-                                <div class="radio-option">
-                                    <input type="radio" name="align" id="align-center" value="center">
-                                    <label for="align-center">가운데</label>
-                                </div>
-                                <div class="radio-option">
-                                    <input type="radio" name="align" id="align-right" value="right">
-                                    <label for="align-right">오른쪽</label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">줄바꿈 방식</label>
-                            <div class="radio-group">
-                                <div class="radio-option">
-                                    <input type="radio" name="linebreak" id="linebreak-char" value="char" checked>
-                                    <label for="linebreak-char">글자 단위</label>
-                                </div>
-                                <div class="radio-option">
-                                    <input type="radio" name="linebreak" id="linebreak-word" value="word">
-                                    <label for="linebreak-word">단어 단위</label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <div class="range-label">
-                                <label class="form-label" style="margin: 0;">글자 크기</label>
-                                <span class="range-value"><span id="fontSizeValue">42</span>px</span>
-                            </div>
-                            <input type="range" class="form-range" id="fontSize" min="30" max="80" value="42">
-                        </div>
-                        
-                        <div class="form-group">
-                            <div class="range-label">
-                                <label class="form-label" style="margin: 0;">줄 간격</label>
-                                <span class="range-value"><span id="lineHeightValue">1.5</span>배</span>
-                            </div>
-                            <input type="range" class="form-range" id="lineHeight" min="1.2" max="2.0" step="0.1" value="1.5">
-                        </div>
-                        
-                        <div class="form-group">
-                            <div class="range-label">
-                                <label class="form-label" style="margin: 0;">여백</label>
-                                <span class="range-value"><span id="paddingValue">100</span>px</span>
-                            </div>
-                            <input type="range" class="form-range" id="padding" min="50" max="200" step="10" value="100">
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 색상 설정 -->
-                <div class="card">
-                    <div class="card-header" onclick="toggleCard(this)">
-                        <div class="card-title">🎨 색상 설정</div>
-                        <div class="card-icon">▼</div>
-                    </div>
-                    <div class="card-content active">
-                        <div class="form-group">
-                            <label class="form-label">글자 색상</label>
-                            <div class="color-picker-row">
-                                <input type="color" id="textColor" value="#ffffff">
-                                <span id="textColorValue">#ffffff</span>
-                            </div>
-                        </div>
-                        
-                        <div class="section-divider">배경 색상</div>
-                        
-                        <div class="form-group">
-                            <div class="color-picker-row">
-                                <input type="color" id="solidColor" value="#9B7E6B">
-                                <span>단색</span>
-                            </div>
-                            <div class="color-picker-row">
-                                <input type="color" id="gradientColor1" value="#9B7E6B">
-                                <input type="color" id="gradientColor2" value="#E6DDD3">
-                                <span>그라데이션</span>
-                            </div>
-                        </div>
-                        
-                        <div class="section-divider">이미지 배경</div>
-                        
-                        <div class="form-group">
-                            <div class="image-upload-row">
-                                <label for="bgImageUpload" class="btn-upload">📁 이미지 업로드</label>
-                                <input type="file" id="bgImageUpload" accept="image/*" style="display: none;">
-                                <button class="btn-image-delete" id="btnImageDelete" onclick="deleteBackgroundImage()" style="display: none;">🗑️ 삭제</button>
-                            </div>
-                            <div class="copyright-notice">⚠️ 저작권 확인 필수</div>
-                            <div id="imageFileName" class="image-file-name"></div>
-                        </div>
-                        
-                        <div id="imageOptions" style="display: none;">
-                            <div class="form-group">
-                                <label class="form-label">이미지 맞춤</label>
-                                <div class="radio-group">
-                                    <div class="radio-option">
-                                        <input type="radio" name="imageFit" id="fit-cover" value="cover" checked>
-                                        <label for="fit-cover">채우기</label>
-                                    </div>
-                                    <div class="radio-option">
-                                        <input type="radio" name="imageFit" id="fit-contain" value="contain">
-                                        <label for="fit-contain">맞추기</label>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label">이미지 위치</label>
-                                <div class="position-grid">
-                                    <div class="position-option">
-                                        <input type="radio" name="imagePosition" id="pos-tl" value="top-left">
-                                        <label for="pos-tl"></label>
-                                    </div>
-                                    <div class="position-option">
-                                        <input type="radio" name="imagePosition" id="pos-tc" value="top-center">
-                                        <label for="pos-tc"></label>
-                                    </div>
-                                    <div class="position-option">
-                                        <input type="radio" name="imagePosition" id="pos-tr" value="top-right">
-                                        <label for="pos-tr"></label>
-                                    </div>
-                                    <div class="position-option">
-                                        <input type="radio" name="imagePosition" id="pos-ml" value="middle-left">
-                                        <label for="pos-ml"></label>
-                                    </div>
-                                    <div class="position-option">
-                                        <input type="radio" name="imagePosition" id="pos-mc" value="middle-center" checked>
-                                        <label for="pos-mc"></label>
-                                    </div>
-                                    <div class="position-option">
-                                        <input type="radio" name="imagePosition" id="pos-mr" value="middle-right">
-                                        <label for="pos-mr"></label>
-                                    </div>
-                                    <div class="position-option">
-                                        <input type="radio" name="imagePosition" id="pos-bl" value="bottom-left">
-                                        <label for="pos-bl"></label>
-                                    </div>
-                                    <div class="position-option">
-                                        <input type="radio" name="imagePosition" id="pos-bc" value="bottom-center">
-                                        <label for="pos-bc"></label>
-                                    </div>
-                                    <div class="position-option">
-                                        <input type="radio" name="imagePosition" id="pos-br" value="bottom-right">
-                                        <label for="pos-br"></label>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <div class="range-label">
-                                    <label class="form-label" style="margin: 0;">오버레이 투명도</label>
-                                    <span class="range-value"><span id="overlayValue">40</span>%</span>
-                                </div>
-                                <input type="range" class="form-range" id="overlayOpacity" min="0" max="80" value="40">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 플랫폼 선택 -->
-                <div class="card">
-                    <div class="card-header" onclick="toggleCard(this)">
-                        <div class="card-title">📱 플랫폼 선택</div>
-                        <div class="card-icon">▼</div>
-                    </div>
-                    <div class="card-content active">
-                        <div class="form-group">
-                            <label class="form-label">플랫폼</label>
-                            <select class="form-select" id="platformSelect">
-                                <option value="">로고 없음</option>
-                                <option value="bloom">블룸</option>
-                                <option value="carat">캐럿</option>
-                                <option value="caveDuck">케이브덕</option>
-                                <option value="crack">크랙</option>
-                                <option value="dokiChat">도키챗</option>
-                                <option value="inkChat">잉크챗</option>
-                                <option value="zeta">제타</option>
-                                <option value="luvDuv">러비더비</option>
-                                <option value="melting">멜팅</option>
-                                <option value="pulse">펄스</option>
-                                <option value="ropanAI">로판AI</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <div class="range-label">
-                                <label class="form-label" style="margin: 0;">로고 크기</label>
-                                <span class="range-value"><span id="logoSizeValue">100</span>px</span>
-                            </div>
-                            <input type="range" class="form-range" id="logoSize" min="50" max="200" step="10" value="100">
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 모바일 버튼 -->
-                <div class="button-group mobile-download-btn">
-                    <button class="btn-primary btn-third btn-download" onclick="downloadImage()">💾 저장</button>
-                    <button class="btn-primary btn-third btn-copy" onclick="copyImage()">📋 복사</button>
-                    <button class="btn-primary btn-third btn-share" onclick="shareImage()">📤 공유</button>
-                </div>
+                <!-- Title hidden on mobile to make room for buttons -->
+                <h1 class="font-bold text-lg tracking-tight hidden md:block"><span class="hidden lg:inline">Lumina Studio : </span>발췌 이미지</h1>
             </div>
             
-            <div class="preview-container">
-                <div class="card">
-                    <canvas id="canvas" width="1080" height="1080"></canvas>
-                </div>
-                <div class="button-group" style="margin-top: 20px;">
-                    <button class="btn-primary btn-third btn-download" onclick="downloadImage()">💾 저장</button>
-                    <button class="btn-primary btn-third btn-copy" onclick="copyImage()">📋 복사</button>
-                    <button class="btn-primary btn-third btn-share mobile-only-btn" onclick="shareImage()">📤 공유</button>
-                </div>
+            <div class="flex items-center gap-2 md:gap-3">
+                <!-- Mobile Only Actions (Header) -->
+                <button onclick="copyImage()" class="md:hidden w-9 h-9 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors" title="복사">
+                    <i class="ph ph-copy text-xl"></i>
+                </button>
+                <button onclick="downloadImage()" class="md:hidden flex items-center justify-center px-3 py-1.5 bg-brand-600 text-white text-sm font-bold rounded-lg shadow-sm active:scale-95 transition-transform">
+                    저장
+                </button>
+
+                <!-- Desktop Links -->
+                <a href="https://yuliyulidaz.github.io/yulipage/" target="_blank" class="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors rounded-md hover:bg-slate-50 dark:hover:bg-slate-800">
+                    <i class="ph ph-file-text"></i> 내지 생성기
+                </a>
+                <button onclick="toggleDarkMode()" class="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all dark-mode-toggle">
+                    <i class="ph ph-moon text-xl"></i>
+                </button>
             </div>
-        </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+            
+            <!-- Workspace (Preview) - Mobile: Top (Order 1), Desktop: Right (Order 2) -->
+            <section class="order-1 md:order-2 w-full md:flex-1 h-[40vh] md:h-auto bg-slate-100 dark:bg-[#09090b] relative flex flex-col items-center justify-center p-4 md:p-8 lg:p-12 pattern-grid overflow-hidden flex-shrink-0 z-0 border-b md:border-b-0 border-slate-200 dark:border-zinc-800">
+                
+                <div class="relative w-full h-full flex items-center justify-center">
+                     <!-- Canvas Wrapper -->
+                    <div class="relative shadow-[0_20px_60px_-15px_rgba(0,0,0,0.2)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] transition-all duration-300 transform" id="canvasContainer">
+                        <canvas id="canvas" width="1080" height="1080" class="max-w-full max-h-[35vh] md:max-h-[85vh] object-contain bg-white rounded-sm"></canvas>
+                    </div>
+                </div>
+
+                <!-- Floating Action Bar - Desktop Only -->
+                <div class="hidden md:flex absolute bottom-6 left-1/2 -translate-x-1/2 items-center gap-2 p-1.5 bg-white/90 dark:bg-zinc-800/90 backdrop-blur shadow-xl border border-slate-200 dark:border-zinc-700 rounded-2xl z-20">
+                    <button onclick="downloadImage()" class="flex items-center gap-2 px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-medium transition-transform active:scale-95 shadow-lg shadow-brand-500/20">
+                        <i class="ph ph-download-simple text-lg"></i>
+                        <span>저장</span>
+                    </button>
+                    <div class="w-px h-6 bg-slate-200 dark:bg-zinc-600 mx-1"></div>
+                    <button onclick="copyImage()" class="p-2.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-700 rounded-xl transition-colors" title="복사">
+                        <i class="ph ph-copy text-xl"></i>
+                    </button>
+                </div>
+                
+            </section>
+
+            <!-- Left Sidebar (Controls) - Mobile: Bottom (Order 2), Desktop: Left (Order 1) -->
+            <aside class="order-2 md:order-1 w-full md:w-[400px] lg:w-[420px] bg-white dark:bg-dark-panel border-t md:border-t-0 md:border-r border-slate-200 dark:border-dark-border flex flex-col z-10 md:shadow-none relative flex-1 overflow-hidden" id="sidebar">
+                
+                <div class="h-full overflow-y-auto custom-scrollbar p-5 space-y-8 pb-10 md:pb-5">
+
+                    <!-- Section: Canvas Settings -->
+                    <section class="space-y-4">
+                        <h2 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">캔버스 설정</h2>
+                        
+                        <div class="space-y-2">
+                            <label class="text-xs font-medium text-slate-500">비율 선택</label>
+                            <select id="canvasRatio" class="w-full appearance-none px-3 py-2.5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                <option value="1:1">1:1 정방형 (1080x1080) - 인스타/트위터</option>
+                                <option value="4:5">4:5 세로형 (1080x1350) - 인스타 포트레이트</option>
+                                <option value="16:9">16:9 가로형 (1920x1080) - 유튜브/배경화면</option>
+                            </select>
+                        </div>
+                    </section>
+
+                    <hr class="border-slate-100 dark:border-slate-800">
+                    
+                    <!-- Section: Content -->
+                    <section class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">내용 입력</h2>
+                            <button onclick="clearQuote()" class="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1">
+                                <i class="ph ph-trash"></i> 내용 삭제
+                            </button>
+                        </div>
+                        
+                        <div class="relative group">
+                            <textarea id="quote" placeholder="여기에 문구를 입력하세요..." class="w-full h-32 p-4 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all text-sm leading-relaxed placeholder:text-slate-400"></textarea>
+                            <div class="absolute bottom-3 right-3 text-slate-400 pointer-events-none">
+                                <i class="ph ph-pencil-simple"></i>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-medium text-slate-500">제작자</label>
+                                <input type="text" id="author" placeholder="제작자 (선택)" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-medium text-slate-500">캐릭터/제목</label>
+                                <input type="text" id="title" placeholder="캐릭터/제목 (선택)" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all">
+                            </div>
+                        </div>
+                    </section>
+
+                    <hr class="border-slate-100 dark:border-slate-800">
+
+                    <!-- Section: Typography -->
+                    <section class="space-y-4">
+                        <h2 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">텍스트 스타일</h2>
+                        
+                        <!-- Font Family -->
+                        <div class="space-y-1.5">
+                             <div class="relative">
+                                <select id="fontSelect" class="w-full appearance-none pl-3 pr-10 py-2.5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all cursor-pointer">
+                                    <option value="Noto Serif KR">Noto Serif KR (명조)</option>
+                                    <option value="KoPub Batang">KoPub 바탕 (독서용 명조)</option>
+                                    <option value="Nanum Myeongjo">나눔명조</option>
+                                    <option value="Pretendard">Pretendard (모던 고딕)</option>
+                                    <option value="Noto Sans KR">Noto Sans KR (고딕)</option>
+                                    <option value="Nanum Gothic">나눔고딕</option>
+                                </select>
+                                <div class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                                    <i class="ph ph-caret-down"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Alignment & Break -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-slate-50 dark:bg-black/20 p-1 rounded-lg flex border border-slate-200 dark:border-slate-700">
+                                <!-- Radio Group for Align -->
+                                <label class="flex-1 cursor-pointer">
+                                    <input type="radio" name="align" value="left" class="peer hidden" id="align-left">
+                                    <div class="w-full h-8 flex items-center justify-center rounded text-slate-400 peer-checked:bg-white dark:peer-checked:bg-slate-700 peer-checked:text-brand-600 peer-checked:shadow-sm transition-all">
+                                        <i class="ph ph-text-align-left text-lg"></i>
+                                    </div>
+                                </label>
+                                <label class="flex-1 cursor-pointer">
+                                    <input type="radio" name="align" value="center" class="peer hidden" id="align-center">
+                                    <div class="w-full h-8 flex items-center justify-center rounded text-slate-400 peer-checked:bg-white dark:peer-checked:bg-slate-700 peer-checked:text-brand-600 peer-checked:shadow-sm transition-all">
+                                        <i class="ph ph-text-align-center text-lg"></i>
+                                    </div>
+                                </label>
+                                <label class="flex-1 cursor-pointer">
+                                    <input type="radio" name="align" value="right" class="peer hidden" id="align-right">
+                                    <div class="w-full h-8 flex items-center justify-center rounded text-slate-400 peer-checked:bg-white dark:peer-checked:bg-slate-700 peer-checked:text-brand-600 peer-checked:shadow-sm transition-all">
+                                        <i class="ph ph-text-align-right text-lg"></i>
+                                    </div>
+                                </label>
+                                <label class="flex-1 cursor-pointer">
+                                    <input type="radio" name="align" value="justify" checked class="peer hidden" id="align-justify">
+                                    <div class="w-full h-8 flex items-center justify-center rounded text-slate-400 peer-checked:bg-white dark:peer-checked:bg-slate-700 peer-checked:text-brand-600 peer-checked:shadow-sm transition-all">
+                                        <i class="ph ph-text-align-justify text-lg"></i>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="bg-slate-50 dark:bg-black/20 p-1 rounded-lg flex border border-slate-200 dark:border-slate-700">
+                                 <label class="flex-1 cursor-pointer">
+                                    <input type="radio" name="linebreak" value="char" checked class="peer hidden" id="linebreak-char">
+                                    <div class="w-full h-8 flex items-center justify-center rounded text-xs font-medium text-slate-400 peer-checked:bg-white dark:peer-checked:bg-slate-700 peer-checked:text-brand-600 peer-checked:shadow-sm transition-all">
+                                        글자
+                                    </div>
+                                </label>
+                                <label class="flex-1 cursor-pointer">
+                                    <input type="radio" name="linebreak" value="word" class="peer hidden" id="linebreak-word">
+                                    <div class="w-full h-8 flex items-center justify-center rounded text-xs font-medium text-slate-400 peer-checked:bg-white dark:peer-checked:bg-slate-700 peer-checked:text-brand-600 peer-checked:shadow-sm transition-all">
+                                        단어
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Sliders -->
+                        <div class="space-y-5 pt-2">
+                            <div class="relative">
+                                <div class="flex justify-between text-xs mb-2">
+                                    <span class="text-slate-500">글자 크기</span>
+                                    <span class="font-mono text-brand-600"><span id="fontSizeValue">42</span>px</span>
+                                </div>
+                                <input type="range" id="fontSize" min="30" max="80" value="42" class="w-full">
+                            </div>
+                            <div class="relative">
+                                <div class="flex justify-between text-xs mb-2">
+                                    <span class="text-slate-500">줄 간격</span>
+                                    <span class="font-mono text-brand-600"><span id="lineHeightValue">1.5</span>x</span>
+                                </div>
+                                <input type="range" id="lineHeight" min="1.2" max="2.0" step="0.1" value="1.5" class="w-full">
+                            </div>
+                            <div class="relative">
+                                <div class="flex justify-between text-xs mb-2">
+                                    <span class="text-slate-500">여백</span>
+                                    <span class="font-mono text-brand-600"><span id="paddingValue">100</span>px</span>
+                                </div>
+                                <input type="range" id="padding" min="50" max="200" step="10" value="100" class="w-full">
+                            </div>
+                        </div>
+                    </section>
+
+                    <hr class="border-slate-100 dark:border-slate-800">
+
+                    <!-- Section: Style & Color -->
+                    <section class="space-y-4">
+                        <h2 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">배경 및 스타일</h2>
+                        
+                        <div class="space-y-4">
+                            <!-- 1. Text Color -->
+                            <div class="space-y-2">
+                                <label class="text-xs font-medium text-slate-500">글자 색상</label>
+                                <div class="relative w-full h-10 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+                                    <input type="color" id="textColor" value="#ffffff" class="absolute -top-2 -left-2 w-[150%] h-[150%] cursor-pointer p-0 border-0">
+                                </div>
+                            </div>
+
+                            <!-- 2. Background Color -->
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <label class="text-xs font-medium text-slate-500">배경 색상</label>
+                                    <label class="inline-flex items-center cursor-pointer gap-2">
+                                        <span class="text-xs text-slate-500">그라데이션</span>
+                                        <input type="checkbox" id="useGradient" class="sr-only peer" checked>
+                                        <div class="relative w-9 h-5 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-brand-300 dark:peer-focus:ring-brand-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-brand-600"></div>
+                                    </label>
+                                </div>
+                                
+                                <div class="flex gap-3">
+                                    <!-- Main Color -->
+                                    <div class="flex-1 space-y-1">
+                                        <div class="relative w-full h-10 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+                                            <input type="color" id="bgColorMain" value="#e0c3fc" class="absolute -top-2 -left-2 w-[150%] h-[150%] cursor-pointer p-0 border-0">
+                                        </div>
+                                        <div class="text-[10px] text-center text-slate-400">시작 / 단색</div>
+                                    </div>
+                                    
+                                    <!-- Sub Color (Visible if Gradient) -->
+                                    <div class="flex-1 space-y-1 transition-all duration-300" id="subColorContainer">
+                                        <div class="relative w-full h-10 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+                                            <input type="color" id="bgColorSub" value="#8ec5fc" class="absolute -top-2 -left-2 w-[150%] h-[150%] cursor-pointer p-0 border-0">
+                                        </div>
+                                        <div class="text-[10px] text-center text-slate-400">끝 색상</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 3. Color Presets -->
+                        <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
+                             <button onclick="applyPreset('#1a1a1a', '#1a1a1a', '#ffffff', false)" class="w-8 h-8 rounded-full bg-slate-900 border border-slate-200 shadow-sm flex-shrink-0" title="Dark Mode"></button>
+                            <button onclick="applyPreset('#ffffff', '#ffffff', '#1a1a1a', false)" class="w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm flex-shrink-0" title="Light Mode"></button>
+                            <button onclick="applyPreset('#f5f5f4', '#f5f5f4', '#44403c', false)" class="w-8 h-8 rounded-full bg-[#f5f5f4] border border-slate-200 shadow-sm flex-shrink-0" title="Stone"></button>
+                            <button onclick="applyPreset('#fff1f2', '#fff1f2', '#881337', false)" class="w-8 h-8 rounded-full bg-[#fff1f2] border border-slate-200 shadow-sm flex-shrink-0" title="Rose"></button>
+                             <button onclick="applyPreset('#fdf4ff', '#fdf4ff', '#701a75', false)" class="w-8 h-8 rounded-full bg-[#fdf4ff] border border-slate-200 shadow-sm flex-shrink-0" title="Fuchsia"></button>
+                             <!-- Gradient Presets -->
+                             <button onclick="applyPreset('#e0c3fc', '#8ec5fc', '#ffffff', true)" class="w-8 h-8 rounded-full bg-gradient-to-br from-[#e0c3fc] to-[#8ec5fc] border border-slate-200 shadow-sm flex-shrink-0" title="Dream"></button>
+                             <button onclick="applyPreset('#ff9a9e', '#fecfef', '#ffffff', true)" class="w-8 h-8 rounded-full bg-gradient-to-br from-[#ff9a9e] to-[#fecfef] border border-slate-200 shadow-sm flex-shrink-0" title="Peach"></button>
+                             <button onclick="applyPreset('#a18cd1', '#fbc2eb', '#ffffff', true)" class="w-8 h-8 rounded-full bg-gradient-to-br from-[#a18cd1] to-[#fbc2eb] border border-slate-200 shadow-sm flex-shrink-0" title="Lavender"></button>
+                        </div>
+
+                        <!-- 4. Background Image -->
+                        <div class="pt-2">
+                            <label class="flex items-center justify-center w-full h-24 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl hover:border-brand-500 dark:hover:border-brand-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer group">
+                                <div class="text-center">
+                                    <div class="text-slate-400 group-hover:text-brand-500 transition-colors mb-1">
+                                        <i class="ph ph-image text-2xl"></i>
+                                    </div>
+                                    <span class="text-xs text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300">배경 이미지 업로드</span>
+                                </div>
+                                <input type="file" id="bgImageUpload" accept="image/*" class="hidden">
+                            </label>
+                            
+                            <div id="imageControlPanel" class="hidden mt-3 p-3 bg-slate-50 dark:bg-black/20 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span id="imageFileName" class="text-xs text-slate-500 truncate max-w-[150px]"></span>
+                                    <button id="btnImageDelete" onclick="deleteBackgroundImage()" class="text-xs text-red-500 hover:bg-red-50 p-1 rounded transition-colors"><i class="ph ph-trash"></i> 삭제</button>
+                                </div>
+                                
+                                <!-- Image Controls -->
+                                <div id="imageOptions" class="space-y-3">
+                                    <div class="flex bg-white dark:bg-slate-800 rounded-lg p-1 border border-slate-200 dark:border-slate-700">
+                                        <label class="flex-1 cursor-pointer text-center">
+                                            <input type="radio" name="imageFit" value="cover" checked class="peer hidden" id="fit-cover">
+                                            <span class="block text-xs py-1 rounded text-slate-500 peer-checked:bg-brand-50 peer-checked:text-brand-600 font-medium">채우기</span>
+                                        </label>
+                                        <label class="flex-1 cursor-pointer text-center">
+                                            <input type="radio" name="imageFit" value="contain" class="peer hidden" id="fit-contain">
+                                            <span class="block text-xs py-1 rounded text-slate-500 peer-checked:bg-brand-50 peer-checked:text-brand-600 font-medium">맞추기</span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-3 gap-1 max-w-[120px] mx-auto">
+                                        <!-- 3x3 Grid for Position -->
+                                        <label class="aspect-square cursor-pointer"><input type="radio" name="imagePosition" value="top-left" class="peer hidden"><div class="w-full h-full border border-slate-200 rounded hover:bg-slate-100 peer-checked:bg-brand-500 peer-checked:border-brand-500"></div></label>
+                                        <label class="aspect-square cursor-pointer"><input type="radio" name="imagePosition" value="top-center" class="peer hidden"><div class="w-full h-full border border-slate-200 rounded hover:bg-slate-100 peer-checked:bg-brand-500 peer-checked:border-brand-500"></div></label>
+                                        <label class="aspect-square cursor-pointer"><input type="radio" name="imagePosition" value="top-right" class="peer hidden"><div class="w-full h-full border border-slate-200 rounded hover:bg-slate-100 peer-checked:bg-brand-500 peer-checked:border-brand-500"></div></label>
+                                        
+                                        <label class="aspect-square cursor-pointer"><input type="radio" name="imagePosition" value="middle-left" class="peer hidden"><div class="w-full h-full border border-slate-200 rounded hover:bg-slate-100 peer-checked:bg-brand-500 peer-checked:border-brand-500"></div></label>
+                                        <label class="aspect-square cursor-pointer"><input type="radio" name="imagePosition" value="middle-center" checked class="peer hidden"><div class="w-full h-full border border-slate-200 rounded hover:bg-slate-100 peer-checked:bg-brand-500 peer-checked:border-brand-500"></div></label>
+                                        <label class="aspect-square cursor-pointer"><input type="radio" name="imagePosition" value="middle-right" class="peer hidden"><div class="w-full h-full border border-slate-200 rounded hover:bg-slate-100 peer-checked:bg-brand-500 peer-checked:border-brand-500"></div></label>
+                                        
+                                        <label class="aspect-square cursor-pointer"><input type="radio" name="imagePosition" value="bottom-left" class="peer hidden"><div class="w-full h-full border border-slate-200 rounded hover:bg-slate-100 peer-checked:bg-brand-500 peer-checked:border-brand-500"></div></label>
+                                        <label class="aspect-square cursor-pointer"><input type="radio" name="imagePosition" value="bottom-center" class="peer hidden"><div class="w-full h-full border border-slate-200 rounded hover:bg-slate-100 peer-checked:bg-brand-500 peer-checked:border-brand-500"></div></label>
+                                        <label class="aspect-square cursor-pointer"><input type="radio" name="imagePosition" value="bottom-right" class="peer hidden"><div class="w-full h-full border border-slate-200 rounded hover:bg-slate-100 peer-checked:bg-brand-500 peer-checked:border-brand-500"></div></label>
+                                    </div>
+                                    
+                                    <div class="relative pt-2">
+                                         <div class="flex justify-between text-xs mb-1">
+                                            <span class="text-slate-500">이미지 크기</span>
+                                            <span class="font-mono text-brand-600"><span id="scaleValue">100</span>%</span>
+                                        </div>
+                                        <input type="range" id="bgImageScale" min="10" max="200" value="100" class="w-full">
+                                    </div>
+
+                                    <div class="relative">
+                                         <div class="flex justify-between text-xs mb-1">
+                                            <span class="text-slate-500">오버레이</span>
+                                            <span class="font-mono text-brand-600" id="overlayValueText">원본</span>
+                                        </div>
+                                        <input type="range" id="overlayOpacity" min="-80" max="80" value="0" class="w-full">
+                                        <div class="flex justify-between text-[10px] text-slate-400 mt-1 px-1">
+                                            <span>밝게</span>
+                                            <span>원본</span>
+                                            <span>어둡게</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <hr class="border-slate-100 dark:border-slate-800">
+
+                    <!-- Section: Logo Settings -->
+                    <section class="space-y-4">
+                        <h2 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">로고 설정</h2>
+                        
+                         <div class="space-y-2">
+                            <label class="text-xs font-medium text-slate-500">플랫폼 로고</label>
+                            <select id="platformSelect" class="w-full appearance-none px-3 py-2.5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                <option value="">선택 안함</option>
+                                <option value="dokiChat">도키챗</option>
+                                <option value="luvDuv">러비더비</option>
+                                <option value="reppley">레플리</option>
+                                <option value="rplay">로맨틱플레이</option>
+                                <option value="ropanAI">로판AI</option>
+                                <option value="melting">멜팅</option>
+                                <option value="bloom">블룸</option>
+                                <option value="inkChat">잉크챗</option>
+                                <option value="zeta">제타</option>
+                                <option value="carat">캐럿</option>
+                                <option value="chemi">케밍</option>
+                                <option value="caveDuck">케이브덕</option>
+                                <option value="crack">크랙</option>
+                                <option value="pulse">펄스</option>
+                                <option value="Fizzchat">피즈챗</option>
+                                <option value="whif">WHIF</option> 
+                            </select>
+                        </div>
+
+                        <div class="space-y-1">
+                             <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-500">로고 크기</span>
+                                <span class="font-mono text-brand-600"><span id="logoSizeValue">100</span>px</span>
+                            </div>
+                            <input type="range" id="logoSize" min="50" max="200" step="10" value="100" class="w-full">
+                        </div>
+                    </section>
+                    
+                    <div class="h-8"></div>
+                </div>
+                
+            </aside>
+
+        </main>
     </div>
-    
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-title">📖 발췌 문구 생성기 v1.2.0</div>
-            <p class="footer-text">
-                본 사이트는 어떠한 개인정보도 수집하지 않습니다.<br>
-                모든 작업은 귀하의 브라우저에서만 이루어집니다.
-            </p>
-            <div class="footer-divider"></div>
-            <div class="footer-disclaimer">
-                <p class="footer-text" style="font-weight: 600; color: var(--text-primary); margin-bottom: 10px;">
-                    ⚠️ 이용 시 주의사항
-                </p>
-                <p class="footer-text" style="text-align: left; max-width: 700px; margin: 0 auto;">
-                    • <strong>저작권 책임:</strong> 업로드한 이미지 및 텍스트의 저작권은 사용자에게 있으며, 저작권 침해에 대한 모든 법적 책임은 사용자에게 있습니다.<br>
-                    • <strong>이미지 사용:</strong> 타인의 저작물(사진, 일러스트 등)을 무단으로 사용하지 마세요. 저작권자의 허락을 받거나 저작권이 없는 이미지만 사용하세요.<br>
-                    • <strong>텍스트 인용:</strong> 책이나 기타 저작물의 텍스트를 발췌할 경우, 저작권법상 허용 범위 내에서 사용하고 출처를 명시하세요.<br>
-                    • <strong>플랫폼 로고:</strong> 각 플랫폼의 로고는 해당 플랫폼의 상표이며, 사용 시 각 플랫폼의 브랜드 가이드라인을 준수해야 합니다.<br>
-                    • <strong>상업적 이용:</strong> 생성된 이미지를 상업적으로 사용할 경우, 관련 법규를 확인하고 필요한 권리를 확보하세요.
-                </p>
-            </div>
-            <div class="footer-divider"></div>
-            <p class="footer-text" style="font-size: 0.8em; color: var(--text-secondary);">
-                본 도구의 제작자는 사용자가 생성한 콘텐츠에 대해 어떠한 책임도 지지 않습니다.<br>
-                이미지 및 텍스트 사용으로 인해 발생하는 모든 법적 문제는 사용자 본인의 책임입니다.
-            </p>
-        </div>
-    </footer>
-    
-    <!-- 토스트 메시지 -->
-    <div id="toast" class="toast"></div>
-    
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 px-6 py-3 bg-zinc-900/90 text-white rounded-full shadow-2xl backdrop-blur text-sm font-medium opacity-0 transition-opacity duration-300 pointer-events-none z-50 flex items-center gap-2">
+        <i class="ph ph-check-circle text-brand-400 text-lg"></i>
+        <span id="toastMessage">알림 메시지</span>
+    </div>
+
     <script>
+        // === Core Logic Preserved & Connected to New UI ===
+
         const platformLogos = {
             bloom: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/bloom.jpg',
             carat: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/carat.png',
             caveDuck: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/Caveduck.jpg',  
-    	   dokiChat: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/dokichat.jpg',
+    	    dokiChat: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/dokichat.jpg',
             inkChat: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/inkchat.jpg',
             zeta: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/zeta.jpg',
             luvDuv: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/LoveyDovey.jpg',
             melting: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/melting.jpg',
             pulse: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/pulse.jpg',
             ropanAI: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/rofan.png',
-            crack: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/crack.png'
+            crack: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/crack.png',
+            whif: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/whif.jpg',
+            chemi: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/chemi.png',
+            Fizzchat: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/Fizzchat.png',
+            reppley: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/reppley.jpg',
+            rplay: 'https://raw.githubusercontent.com/yuliyulidaz/yulilog/refs/heads/logos/rplay.png'
         };
         
         let logoImages = {};
         let fontsLoaded = false;
         let backgroundImage = null;
         
-        // 토스트 메시지 표시 함수
+        // Removed Mobile Sidebar Toggle Logic
+
         function showToast(message) {
             const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
+            const toastMsg = document.getElementById('toastMessage');
+            toastMsg.textContent = message;
+            toast.classList.remove('opacity-0');
             
             setTimeout(() => {
-                toast.classList.remove('show');
+                toast.classList.add('opacity-0');
             }, 2000);
         }
         
@@ -1103,7 +539,7 @@
                 await Promise.all(fontPromises);
                 fontsLoaded = true;
             } catch (error) {
-                fontsLoaded = true;
+                fontsLoaded = true; // Proceed anyway
             }
         }
         
@@ -1116,13 +552,40 @@
             });
         }
         
-        // 배경 이미지 업로드
+        // Background Gradient Switch Logic
+        function toggleGradientUI() {
+            const isGradient = document.getElementById('useGradient').checked;
+            const subContainer = document.getElementById('subColorContainer');
+            if (isGradient) {
+                subContainer.classList.remove('opacity-50', 'pointer-events-none');
+                subContainer.classList.remove('hidden');
+            } else {
+                subContainer.classList.add('opacity-50', 'pointer-events-none');
+                subContainer.classList.add('hidden');
+            }
+            updateCanvas();
+        }
+
+        // Color Preset Helper
+        function applyPreset(color1, color2, textColor, isGradient) {
+            document.getElementById('bgColorMain').value = color1;
+            document.getElementById('bgColorSub').value = color2;
+            document.getElementById('textColor').value = textColor;
+            // Removed textColorValue update since element is removed
+            
+            const checkbox = document.getElementById('useGradient');
+            checkbox.checked = isGradient;
+            
+            toggleGradientUI();
+        }
+
+        // Image Handling
         document.getElementById('bgImageUpload').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
             
             if (!file.type.startsWith('image/')) {
-                showToast('❌ 이미지 파일만 업로드 가능합니다.');
+                showToast('이미지 파일만 업로드 가능합니다.');
                 return;
             }
             
@@ -1131,145 +594,147 @@
                 const img = new Image();
                 img.onload = function() {
                     backgroundImage = img;
-                    document.getElementById('imageFileName').textContent = `📎 ${file.name}`;
-                    document.getElementById('btnImageDelete').style.display = 'block';
-                    document.getElementById('imageOptions').style.display = 'block';
+                    document.getElementById('imageFileName').textContent = file.name;
+                    document.getElementById('imageControlPanel').classList.remove('hidden');
                     updateCanvas();
-                    showToast('✅ 이미지가 업로드되었습니다!');
-                };
-                img.onerror = function() {
-                    showToast('❌ 이미지를 불러올 수 없습니다.');
+                    showToast('이미지가 업로드되었습니다.');
                 };
                 img.src = event.target.result;
             };
             reader.readAsDataURL(file);
         });
         
-        // 배경 이미지 삭제
         function deleteBackgroundImage() {
             backgroundImage = null;
             document.getElementById('bgImageUpload').value = '';
             document.getElementById('imageFileName').textContent = '';
-            document.getElementById('btnImageDelete').style.display = 'none';
-            document.getElementById('imageOptions').style.display = 'none';
+            document.getElementById('imageControlPanel').classList.add('hidden');
             updateCanvas();
-            showToast('🗑️ 배경 이미지가 삭제되었습니다.');
+            showToast('배경 이미지가 삭제되었습니다.');
         }
         
-        // 배경 이미지 그리기 (fit과 position에 따라)
-        function drawBackgroundImage(ctx, img, canvasWidth, canvasHeight, fit, position) {
+        function drawBackgroundImage(ctx, img, canvasWidth, canvasHeight, fit, position, scale) {
             const imgRatio = img.width / img.height;
             const canvasRatio = canvasWidth / canvasHeight;
             
-            let sourceX, sourceY, sourceWidth, sourceHeight;
-            let destX = 0, destY = 0, destWidth = canvasWidth, destHeight = canvasHeight;
-            
+            // Calculate base destination rect for fit/cover without scale
+            let destX, destY, destWidth, destHeight;
+            let sourceX = 0, sourceY = 0, sourceWidth = img.width, sourceHeight = img.height;
+
             if (fit === 'cover') {
-                // 채우기: 캔버스를 꽉 채움 (일부 잘림)
-                if (imgRatio > canvasRatio) {
-                    // 이미지가 더 넓음 - 높이 기준
+                 // For cover, we map the source rect to the full canvas
+                 // Apply scale: "Zoom in" means taking a smaller source area
+                 
+                 // 1. Calculate the ideal source rect to cover the canvas
+                 if (imgRatio > canvasRatio) {
                     sourceHeight = img.height;
                     sourceWidth = img.height * canvasRatio;
-                    sourceY = 0;
-                    
-                    // position에 따라 x 위치 결정
-                    if (position.includes('left')) {
-                        sourceX = 0;
-                    } else if (position.includes('right')) {
-                        sourceX = img.width - sourceWidth;
-                    } else {
-                        sourceX = (img.width - sourceWidth) / 2;
-                    }
-                } else {
-                    // 이미지가 더 높음 - 너비 기준
+                 } else {
                     sourceWidth = img.width;
                     sourceHeight = img.width / canvasRatio;
-                    sourceX = 0;
-                    
-                    // position에 따라 y 위치 결정
-                    if (position.includes('top')) {
-                        sourceY = 0;
-                    } else if (position.includes('bottom')) {
-                        sourceY = img.height - sourceHeight;
-                    } else {
-                        sourceY = (img.height - sourceHeight) / 2;
-                    }
-                }
-                
-                ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, 
-                             destX, destY, destWidth, destHeight);
-                             
+                 }
+                 
+                 // 2. Apply scale (Zoom)
+                 // scale = 1.0 -> normal. scale = 1.5 -> zoom in (source gets smaller)
+                 // However, user slider is 10-200%. 100% is normal.
+                 // For cover, increasing scale usually means zooming IN.
+                 // let's interpret scale: 1.0 = fit perfectly. > 1.0 = zoom in.
+                 const zoom = scale;
+                 sourceWidth /= zoom;
+                 sourceHeight /= zoom;
+
+                 // 3. Position the source rect within the image
+                 if (position.includes('left')) sourceX = 0;
+                 else if (position.includes('right')) sourceX = img.width - sourceWidth;
+                 else sourceX = (img.width - sourceWidth) / 2;
+                 
+                 if (position.includes('top')) sourceY = 0;
+                 else if (position.includes('bottom')) sourceY = img.height - sourceHeight;
+                 else sourceY = (img.height - sourceHeight) / 2;
+
+                 destX = 0; destY = 0;
+                 destWidth = canvasWidth;
+                 destHeight = canvasHeight;
+
             } else {
-                // 맞추기: 전체 이미지 보임 (여백 생김)
+                // Contain
+                // 1. Calculate base dest rect
                 if (imgRatio > canvasRatio) {
-                    // 이미지가 더 넓음 - 너비 맞춤
                     destWidth = canvasWidth;
                     destHeight = canvasWidth / imgRatio;
-                    destX = 0;
-                    
-                    if (position.includes('top')) {
-                        destY = 0;
-                    } else if (position.includes('bottom')) {
-                        destY = canvasHeight - destHeight;
-                    } else {
-                        destY = (canvasHeight - destHeight) / 2;
-                    }
                 } else {
-                    // 이미지가 더 높음 - 높이 맞춤
                     destHeight = canvasHeight;
                     destWidth = canvasHeight * imgRatio;
-                    destY = 0;
-                    
-                    if (position.includes('left')) {
-                        destX = 0;
-                    } else if (position.includes('right')) {
-                        destX = canvasWidth - destWidth;
-                    } else {
-                        destX = (canvasWidth - destWidth) / 2;
-                    }
                 }
                 
-                // 여백을 배경색으로 채우기
-                const bgColor = document.getElementById('solidColor').value;
-                ctx.fillStyle = bgColor;
-                ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+                // 2. Apply Scale
+                destWidth *= scale;
+                destHeight *= scale;
                 
-                ctx.drawImage(img, 0, 0, img.width, img.height,
-                             destX, destY, destWidth, destHeight);
+                // 3. Position
+                if (position.includes('left')) destX = 0;
+                else if (position.includes('right')) destX = canvasWidth - destWidth;
+                else destX = (canvasWidth - destWidth) / 2;
+                
+                if (position.includes('top')) destY = 0;
+                else if (position.includes('bottom')) destY = canvasHeight - destHeight;
+                else destY = (canvasHeight - destHeight) / 2;
+
+                // For contain mode, we fill bg first
+                fillBackground(ctx, canvasWidth, canvasHeight);
+            }
+            
+            ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
+        }
+        
+        function fillBackground(ctx, width, height) {
+            const isGradient = document.getElementById('useGradient').checked;
+            const color1 = document.getElementById('bgColorMain').value;
+            
+            if (!isGradient) {
+                ctx.fillStyle = color1;
+                ctx.fillRect(0, 0, width, height);
+            } else {
+                const color2 = document.getElementById('bgColorSub').value;
+                const gradient = ctx.createLinearGradient(0, 0, 0, height);
+                gradient.addColorStop(0, color1);
+                gradient.addColorStop(1, color2);
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, width, height);
             }
         }
         
         function toggleDarkMode() {
-            document.body.classList.toggle('dark');
-            const btn = document.querySelector('.dark-mode-toggle');
-            btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
-            localStorage.setItem('darkMode', document.body.classList.contains('dark'));
-        }
-        
-        function clearQuote() {
-            if (confirm('발췌 문구를 모두 삭제하시겠습니까?')) {
-                document.getElementById('quote').value = '';
-                updateCanvas();
-                showToast('🗑️ 발췌 문구가 삭제되었습니다.');
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('darkMode', isDark);
+            
+            const icon = document.querySelector('.dark-mode-toggle i');
+            if (isDark) {
+                icon.classList.replace('ph-moon', 'ph-sun');
+            } else {
+                icon.classList.replace('ph-sun', 'ph-moon');
             }
         }
         
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.body.classList.add('dark');
-            document.querySelector('.dark-mode-toggle').textContent = '☀️';
+        // Initialize Dark Mode
+        if (localStorage.getItem('darkMode') === 'true' || (!('darkMode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            document.querySelector('.dark-mode-toggle i').classList.replace('ph-moon', 'ph-sun');
         }
-        
-        function toggleCard(header) {
-            const card = header.parentElement;
-            const content = card.querySelector('.card-content');
-            card.classList.toggle('collapsed');
-            content.classList.toggle('active');
+
+        function clearQuote() {
+            if (confirm('모든 내용을 삭제하시겠습니까?')) {
+                document.getElementById('quote').value = '';
+                document.getElementById('author').value = '';
+                document.getElementById('title').value = '';
+                updateCanvas();
+                showToast('내용이 삭제되었습니다.');
+            }
         }
         
         async function updateCanvas() {
-            if (!fontsLoaded) {
-                await preloadFonts();
-            }
+            if (!fontsLoaded) await preloadFonts();
             
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
@@ -1284,50 +749,46 @@
             canvas.width = width;
             canvas.height = height;
             
+            // Get Values
             const quote = document.getElementById('quote').value;
             const author = document.getElementById('author').value;
             const title = document.getElementById('title').value;
             const font = document.getElementById('fontSelect').value;
+            
             const align = document.querySelector('input[name="align"]:checked').value;
+            const linebreakMode = document.querySelector('input[name="linebreak"]:checked').value;
+            
             const fontSize = parseInt(document.getElementById('fontSize').value);
             const lineHeightMultiplier = parseFloat(document.getElementById('lineHeight').value);
             const padding = parseInt(document.getElementById('padding').value);
             const textColor = document.getElementById('textColor').value;
-            const linebreakMode = document.querySelector('input[name="linebreak"]').value;
             const platform = document.getElementById('platformSelect').value;
             const logoSize = parseInt(document.getElementById('logoSize').value);
             
-            // 배경 그리기
+            // Draw Background
             if (backgroundImage) {
-                // 이미지 배경 사용
                 const imageFit = document.querySelector('input[name="imageFit"]:checked').value;
                 const imagePosition = document.querySelector('input[name="imagePosition"]:checked').value;
-                const overlayOpacity = parseInt(document.getElementById('overlayOpacity').value) / 100;
+                const overlayValue = parseInt(document.getElementById('overlayOpacity').value);
+                const bgScale = parseInt(document.getElementById('bgImageScale').value) / 100;
                 
-                drawBackgroundImage(ctx, backgroundImage, width, height, imageFit, imagePosition);
+                drawBackgroundImage(ctx, backgroundImage, width, height, imageFit, imagePosition, bgScale);
                 
-                // 오버레이 적용
-                if (overlayOpacity > 0) {
-                    ctx.fillStyle = `rgba(0, 0, 0, ${overlayOpacity})`;
+                if (overlayValue !== 0) {
+                    if (overlayValue < 0) {
+                         // White overlay
+                        ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(overlayValue) / 100})`;
+                    } else {
+                        // Black overlay
+                        ctx.fillStyle = `rgba(0, 0, 0, ${overlayValue / 100})`;
+                    }
                     ctx.fillRect(0, 0, width, height);
                 }
             } else {
-                // 단색/그라데이션 배경
-                const color1 = document.getElementById('gradientColor1').value;
-                const color2 = document.getElementById('gradientColor2').value;
-                
-                if (color1 === color2) {
-                    ctx.fillStyle = document.getElementById('solidColor').value;
-                    ctx.fillRect(0, 0, width, height);
-                } else {
-                    const gradient = ctx.createLinearGradient(0, 0, width, height);
-                    gradient.addColorStop(0, color1);
-                    gradient.addColorStop(1, color2);
-                    ctx.fillStyle = gradient;
-                    ctx.fillRect(0, 0, width, height);
-                }
+                fillBackground(ctx, width, height);
             }
             
+            // Draw Text
             const rgb = hexToRgb(textColor);
             ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.95)`;
             
@@ -1363,17 +824,13 @@
                             currentLine = testLine;
                         }
                     });
-                    if (currentLine.trim()) {
-                        lines.push(currentLine.trim());
-                    }
+                    if (currentLine.trim()) lines.push(currentLine.trim());
                 } else {
                     let currentLine = '';
-                    
                     for (let i = 0; i < paragraph.length; i++) {
                         const char = paragraph[i];
                         const testLine = currentLine + char;
                         const metrics = ctx.measureText(testLine);
-                        
                         if (metrics.width > maxWidth && currentLine !== '') {
                             lines.push(currentLine);
                             currentLine = char;
@@ -1381,14 +838,11 @@
                             currentLine = testLine;
                         }
                     }
-                    if (currentLine) {
-                        lines.push(currentLine);
-                    }
+                    if (currentLine) lines.push(currentLine);
                 }
             });
             
             const totalHeight = lines.length * lineHeight;
-            // 하단 여백(제작자/캐릭터 + 로고 영역) 고려하여 시각적 중앙 배치
             const bottomReserved = 90;
             let y = (height - totalHeight - bottomReserved) / 2 + fontSize;
             
@@ -1410,41 +864,37 @@
                 ctx.textAlign = align === 'justify' ? 'left' : align;
                 let drawX = align === 'justify' ? padding : x;
                 lines.forEach(line => {
-                    if (line !== '') {
-                        ctx.fillText(line, drawX, y);
-                    }
+                    if (line !== '') ctx.fillText(line, drawX, y);
                     y += lineHeight;
                 });
             }
             
-            ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`;
-            
-            const bottomY = height - 130;
-            const bottomX = padding; // 항상 왼쪽 padding에 고정
-            
-            // 제작자와 캐릭터는 항상 왼쪽 정렬
-            if (author && title) {
-                // 제작자 그리기
-                ctx.font = `300 38px "Nanum Gothic", "Noto Sans KR", sans-serif`;
-                ctx.textAlign = 'left';
-                ctx.fillText(`${author} | `, bottomX, bottomY);
+            // Draw Metadata (Author/Title)
+            // Only draw if values exist
+            if (author || title) {
+                ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`;
+                const bottomY = height - 130;
+                const bottomX = padding;
                 
-                // 캐릭터 그리기 (볼드)
-                const authorPartWidth = ctx.measureText(`${author} | `).width;
-                ctx.font = `600 38px "Nanum Gothic", "Noto Sans KR", sans-serif`;
-                ctx.fillText(`${title}`, bottomX + authorPartWidth, bottomY);
-                
-            } else if (author) {
-                ctx.font = `300 38px "Nanum Gothic", "Noto Sans KR", sans-serif`;
-                ctx.textAlign = 'left';
-                ctx.fillText(`${author}`, bottomX, bottomY);
-                
-            } else if (title) {
-                ctx.font = `600 38px "Nanum Gothic", "Noto Sans KR", sans-serif`;
-                ctx.textAlign = 'left';
-                ctx.fillText(`${title}`, bottomX, bottomY);
+                if (author && title) {
+                    ctx.font = `300 38px "Nanum Gothic", "Noto Sans KR", sans-serif`;
+                    ctx.textAlign = 'left';
+                    ctx.fillText(`${author} | `, bottomX, bottomY);
+                    const authorPartWidth = ctx.measureText(`${author} | `).width;
+                    ctx.font = `600 38px "Nanum Gothic", "Noto Sans KR", sans-serif`;
+                    ctx.fillText(`${title}`, bottomX + authorPartWidth, bottomY);
+                } else if (author) {
+                    ctx.font = `300 38px "Nanum Gothic", "Noto Sans KR", sans-serif`;
+                    ctx.textAlign = 'left';
+                    ctx.fillText(`${author}`, bottomX, bottomY);
+                } else if (title) {
+                    ctx.font = `600 38px "Nanum Gothic", "Noto Sans KR", sans-serif`;
+                    ctx.textAlign = 'left';
+                    ctx.fillText(`${title}`, bottomX, bottomY);
+                }
             }
             
+            // Draw Logo
             if (platform && logoImages[platform] && logoImages[platform].complete) {
                 const logo = logoImages[platform];
                 const logoX = width - 100 - logoSize;
@@ -1468,10 +918,8 @@
                 ctx.fillText(text, x, y);
                 return;
             }
-            
             const totalWidth = ctx.measureText(text).width;
             const spaceWidth = (maxWidth - totalWidth + (words.length - 1) * ctx.measureText(' ').width) / (words.length - 1);
-            
             let currentX = x;
             words.forEach((word) => {
                 ctx.fillText(word, currentX, y);
@@ -1488,51 +936,38 @@
             } : { r: 255, g: 255, b: 255 };
         }
         
-        // OS 감지 함수
-        function iOSDevice() {
-            return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        }
-        
         function downloadImage() {
             const canvas = document.getElementById('canvas');
             
-            // 모바일에서 OS별 분기
-            if (window.innerWidth <= 899) {
-                if (iOSDevice()) {
-                    // iOS: 공유 기능 사용
-                    if (navigator.share && navigator.canShare) {
-                        canvas.toBlob(async (blob) => {
-                            const file = new File([blob], 'quote_' + Date.now() + '.png', { type: 'image/png' });
-                            
-                            if (navigator.canShare({ files: [file] })) {
-                                try {
-                                    await navigator.share({
-                                        files: [file],
-                                        title: '발췌 문구',
-                                        text: '발췌 문구 이미지'
-                                    });
-                                } catch (err) {
-                                    if (err.name !== 'AbortError') {
-                                        showToast('❌ 저장 중 오류가 발생했습니다.');
-                                    }
-                                }
-                            } else {
-                                downloadDirectly(canvas);
-                                showToast('✅ 이미지가 저장되었습니다!');
-                            }
-                        });
+            // 1. Better iOS detection (includes iPads pretending to be Macs)
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            
+            // 2. iOS Logic: Try to Share first
+            if (isIOS && navigator.share && navigator.canShare) {
+                canvas.toBlob(async (blob) => {
+                    if (!blob) return;
+                    const file = new File([blob], 'quote_' + Date.now() + '.png', { type: 'image/png' });
+                    
+                    // Verify if the device can actually share this file
+                    if (navigator.canShare({ files: [file] })) {
+                        try {
+                            await navigator.share({ files: [file] });
+                            // Success - user sees native sheet
+                        } catch (err) {
+                            // User cancelled or error
+                            if (err.name !== 'AbortError') showToast('저장 중 오류가 발생했습니다.');
+                        }
                     } else {
-                        downloadDirectly(canvas);
-                        showToast('✅ 이미지가 저장되었습니다!');
+                        // Fallback if sharing is technically supported but this file fails
+                        downloadDirectly(canvas); 
+                        showToast('이미지가 저장되었습니다.');
                     }
-                } else {
-                    // Android: 직접 다운로드
-                    downloadDirectly(canvas);
-                    showToast('✅ 이미지가 저장되었습니다!');
-                }
+                });
             } else {
-                // PC: 직접 다운로드
+                // 3. PC / Android Logic: Direct Download
                 downloadDirectly(canvas);
+                showToast('이미지가 저장되었습니다.');
             }
         }
         
@@ -1545,201 +980,111 @@
         
         async function copyImage() {
             const canvas = document.getElementById('canvas');
-            
-            // ClipboardItem 지원 확인
             if (!window.ClipboardItem) {
-                showToast('❌ 이 브라우저는 복사 기능을 지원하지 않습니다.');
+                showToast('이 브라우저는 복사를 지원하지 않습니다.');
                 return;
             }
-            
             try {
-                // canvas를 blob으로 변환
-                const blob = await new Promise(resolve => {
-                    canvas.toBlob(resolve, 'image/png');
-                });
-                
-                if (!blob) {
-                    showToast('❌ 이미지 생성 중 오류가 발생했습니다.');
-                    return;
-                }
-                
-                // iOS Safari를 위한 특별 처리
-                const clipboardItem = new ClipboardItem({
-                    'image/png': blob
-                });
-                
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                if (!blob) return;
+                const clipboardItem = new ClipboardItem({ 'image/png': blob });
                 await navigator.clipboard.write([clipboardItem]);
-                showToast('📋 클립보드에 복사되었습니다!');
-                
+                showToast('클립보드에 복사되었습니다.');
             } catch (err) {
-                console.error('복사 오류:', err);
-                // iOS에서는 권한 문제일 수 있음
-                if (err.name === 'NotAllowedError') {
-                    showToast('❌ 복사 권한이 없습니다.\n설정에서 권한을 확인해주세요.');
-                } else {
-                    showToast('❌ 복사 기능을 사용할 수 없습니다.\n저장 버튼을 이용해주세요.');
-                }
+                if (err.name === 'NotAllowedError') showToast('복사 권한이 없습니다.');
+                else showToast('복사 기능을 사용할 수 없습니다.');
             }
         }
         
         function shareImage() {
             const canvas = document.getElementById('canvas');
-            
-            // 공유 기능 지원 확인
             if (navigator.share && navigator.canShare) {
                 canvas.toBlob(async (blob) => {
                     const file = new File([blob], 'quote_' + Date.now() + '.png', { type: 'image/png' });
-                    
                     if (navigator.canShare({ files: [file] })) {
                         try {
-                            await navigator.share({
-                                files: [file],
-                                title: '발췌 문구',
-                                text: '발췌 문구 이미지'
-                            });
-                        } catch (err) {
-                            if (err.name !== 'AbortError') {
-                                alert('공유 중 오류가 발생했습니다.');
-                            }
-                        }
+                            await navigator.share({ files: [file] });
+                        } catch (err) {}
                     } else {
-                        alert('이 브라우저는 이미지 공유를 지원하지 않습니다.');
+                        showToast('공유를 지원하지 않습니다.');
                     }
                 });
             } else {
-                alert('이 브라우저는 공유 기능을 지원하지 않습니다.');
+                showToast('공유 기능을 지원하지 않습니다.');
             }
         }
         
-        document.getElementById('solidColor').addEventListener('input', () => {
-            const solidColor = document.getElementById('solidColor').value;
-            document.getElementById('gradientColor1').value = solidColor;
-            document.getElementById('gradientColor2').value = solidColor;
-            updateCanvas();
-        });
-        
-        document.getElementById('gradientColor1').addEventListener('input', () => {
-            updateCanvas();
-        });
-        
-        document.getElementById('gradientColor2').addEventListener('input', () => {
-            updateCanvas();
-        });
-        
-        document.getElementById('textColor').addEventListener('input', (e) => {
-            document.getElementById('textColorValue').textContent = e.target.value;
-            updateCanvas();
-        });
-        
-        document.getElementById('platformSelect').addEventListener('change', updateCanvas);
-        document.getElementById('logoSize').addEventListener('input', (e) => {
-            document.getElementById('logoSizeValue').textContent = e.target.value;
-            updateCanvas();
-        });
-        
-        document.getElementById('quote').addEventListener('input', updateCanvas);
-        document.getElementById('author').addEventListener('input', updateCanvas);
-        document.getElementById('title').addEventListener('input', updateCanvas);
-        
-        // 붙여넣기 시 서식 제거 (순수 텍스트만)
-        document.getElementById('quote').addEventListener('paste', function(e) {
-            e.preventDefault();
-            const text = (e.clipboardData || window.clipboardData).getData('text/plain');
-            document.execCommand('insertText', false, text);
-        });
-        
-        document.getElementById('author').addEventListener('paste', function(e) {
-            e.preventDefault();
-            const text = (e.clipboardData || window.clipboardData).getData('text/plain');
-            document.execCommand('insertText', false, text);
-        });
-        
-        document.getElementById('title').addEventListener('paste', function(e) {
-            e.preventDefault();
-            const text = (e.clipboardData || window.clipboardData).getData('text/plain');
-            document.execCommand('insertText', false, text);
-        });
-        document.getElementById('fontSelect').addEventListener('change', updateCanvas);
-        document.getElementById('fontSize').addEventListener('input', (e) => {
-            document.getElementById('fontSizeValue').textContent = e.target.value;
-            updateCanvas();
-        });
-        document.getElementById('lineHeight').addEventListener('input', (e) => {
-            document.getElementById('lineHeightValue').textContent = e.target.value;
-            updateCanvas();
-        });
-        document.getElementById('padding').addEventListener('input', (e) => {
-            document.getElementById('paddingValue').textContent = e.target.value;
-            updateCanvas();
-        });
-        document.getElementById('canvasRatio').addEventListener('change', updateCanvas);
-        document.querySelectorAll('input[name="align"]').forEach(radio => {
-            radio.addEventListener('change', updateCanvas);
-        });
-        document.querySelectorAll('input[name="linebreak"]').forEach(radio => {
-            radio.addEventListener('change', updateCanvas);
-        });
-        
-        // 이미지 배경 관련 이벤트 리스너
-        document.querySelectorAll('input[name="imageFit"]').forEach(radio => {
-            radio.addEventListener('change', updateCanvas);
-        });
-        document.querySelectorAll('input[name="imagePosition"]').forEach(radio => {
-            radio.addEventListener('change', updateCanvas);
-        });
-        document.getElementById('overlayOpacity').addEventListener('input', (e) => {
-            document.getElementById('overlayValue').textContent = e.target.value;
-            updateCanvas();
-        });
-        
-        const defaultValues = {
-            quote: '',
-            author: '제작자',
-            title: '캐릭터'
-        };
+        // Event Listeners Setup
+        function setupEventListeners() {
+            document.getElementById('useGradient').addEventListener('change', toggleGradientUI);
+            
+            ['bgColorMain', 'bgColorSub'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updateCanvas);
+            });
+            
+            document.getElementById('textColor').addEventListener('input', (e) => {
+                // Removed span update
+                updateCanvas();
+            });
+            
+            ['quote', 'author', 'title'].forEach(id => {
+                 document.getElementById(id).addEventListener('input', updateCanvas);
+            });
+            
+            ['fontSelect', 'platformSelect', 'canvasRatio'].forEach(id => {
+                document.getElementById(id).addEventListener('change', updateCanvas);
+            });
 
-        document.getElementById('quote').addEventListener('focus', function() {
-            if (this.value === defaultValues.quote) {
-                this.value = '';
-            }
-        });
+            ['fontSize', 'lineHeight', 'padding', 'logoSize', 'bgImageScale'].forEach(id => {
+                document.getElementById(id).addEventListener('input', (e) => {
+                    // Update the display value span
+                    const displayId = id === 'bgImageScale' ? 'scaleValue' : id + 'Value';
+                    const el = document.getElementById(displayId);
+                    if(el) el.textContent = e.target.value;
+                    updateCanvas();
+                });
+            });
 
-        document.getElementById('quote').addEventListener('blur', function() {
-            if (this.value === '') {
-                this.value = defaultValues.quote;
-            }
-        });
+            // Special listener for Overlay Opacity to handle text
+            document.getElementById('overlayOpacity').addEventListener('input', (e) => {
+                const val = parseInt(e.target.value);
+                const displayEl = document.getElementById('overlayValueText');
+                if (val === 0) displayEl.textContent = "원본";
+                else if (val < 0) displayEl.textContent = `밝게 ${Math.abs(val)}%`;
+                else displayEl.textContent = `어둡게 ${val}%`;
+                updateCanvas();
+            });
 
-        document.getElementById('author').addEventListener('focus', function() {
-            if (this.value === defaultValues.author) {
-                this.value = '';
-            }
-        });
-
-        document.getElementById('author').addEventListener('blur', function() {
-            if (this.value === '') {
-                this.value = defaultValues.author;
-            }
-        });
-
-        document.getElementById('title').addEventListener('focus', function() {
-            if (this.value === defaultValues.title) {
-                this.value = '';
-            }
-        });
-
-        document.getElementById('title').addEventListener('blur', function() {
-            if (this.value === '') {
-                this.value = defaultValues.title;
-            }
-        });
+            document.querySelectorAll('input[name="align"], input[name="linebreak"], input[name="imageFit"], input[name="imagePosition"]').forEach(radio => {
+                radio.addEventListener('change', updateCanvas);
+            });
+            
+            // Paste handlers
+            ['quote', 'author', 'title'].forEach(id => {
+                document.getElementById(id).addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+                    document.execCommand('insertText', false, text);
+                });
+            });
+        }
         
         (async function init() {
+            setupEventListeners();
             await preloadFonts();
             preloadLogos();
             await document.fonts.ready;
+            
+            // Init default visual state
+            document.getElementById('fontSizeValue').textContent = document.getElementById('fontSize').value;
+            document.getElementById('lineHeightValue').textContent = document.getElementById('lineHeight').value;
+            
+            // Ensure UI matches checked state
+            toggleGradientUI();
+            
             updateCanvas();
         })();
+
     </script>
 </body>
 </html>
