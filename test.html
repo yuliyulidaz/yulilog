@@ -45,6 +45,10 @@
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
+    <!-- Pickr (Color Picker) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+
     <style>
         /* Custom Styles for inputs that Tailwind doesn't cover easily */
         input[type="range"] {
@@ -97,6 +101,28 @@
         }
         .dark .pattern-grid {
             background-image: radial-gradient(#3f3f46 1px, transparent 1px);
+        }
+
+        /* Pickr Customization to Fill Container */
+        .pickr {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .pickr .pcr-button {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+        .pickr .pcr-button::before {
+            border-radius: 0 !important;
+        }
+        .pcr-app {
+            z-index: 9999 !important;
+            font-family: 'Pretendard', sans-serif !important;
         }
     </style>
 </head>
@@ -316,10 +342,7 @@
                             <div class="space-y-2">
                                 <label class="text-xs font-medium text-slate-500">글자 색상</label>
                                 <div class="relative w-full h-10 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
-                                    <!-- Preview div for full visual -->
-                                    <div id="textColorPreview" class="absolute inset-0 w-full h-full pointer-events-none" style="background-color: #ffffff;"></div>
-                                    <!-- Hidden input but clickable -->
-                                    <input type="color" id="textColor" value="#ffffff" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer p-0 border-0">
+                                    <div id="textColorPicker"></div>
                                 </div>
                             </div>
 
@@ -338,8 +361,7 @@
                                     <!-- Main Color -->
                                     <div class="flex-1 space-y-1">
                                         <div class="relative w-full h-10 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
-                                            <div id="bgColorMainPreview" class="absolute inset-0 w-full h-full pointer-events-none" style="background-color: #e0c3fc;"></div>
-                                            <input type="color" id="bgColorMain" value="#e0c3fc" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer p-0 border-0">
+                                            <div id="bgColorMainPicker"></div>
                                         </div>
                                         <div class="text-[10px] text-center text-slate-400">시작 / 단색</div>
                                     </div>
@@ -347,8 +369,7 @@
                                     <!-- Sub Color (Visible if Gradient) -->
                                     <div class="flex-1 space-y-1 transition-all duration-300" id="subColorContainer">
                                         <div class="relative w-full h-10 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
-                                            <div id="bgColorSubPreview" class="absolute inset-0 w-full h-full pointer-events-none" style="background-color: #8ec5fc;"></div>
-                                            <input type="color" id="bgColorSub" value="#8ec5fc" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer p-0 border-0">
+                                            <div id="bgColorSubPicker"></div>
                                         </div>
                                         <div class="text-[10px] text-center text-slate-400">끝 색상</div>
                                     </div>
@@ -514,7 +535,14 @@
             bgImageName: null,
             logoImages: {}, // Preloaded logos
             platform: '',
-            isDarkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+            isDarkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
+            // Colors managed by state now (synced with Pickr)
+            colors: {
+                text: '#ffffff',
+                bgMain: '#e0c3fc',
+                bgSub: '#8ec5fc'
+            },
+            pickrs: {}
         };
 
         const LOGO_URLS = {
@@ -536,13 +564,11 @@
             whif: "https://i.imgur.com/1Hh1H1H.png"  // Placeholder
         };
         
-        // Correct Logo URLs (Replaced placeholders with uploaded/provided ones if available, otherwise using text fallback logic in draw)
-        // For this demo, I will use some dummy colored circles or text if image fails, but the logic handles image loading.
-        
         // --- 2. Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
             initCanvas();
+            initColorPickers();
             loadLogos();
             bindEvents();
             updateCanvas(); // Initial draw
@@ -567,15 +593,64 @@
             state.ctx = state.canvas.getContext('2d');
         }
 
+        function initColorPickers() {
+            const createPickr = (elId, defaultColor, key) => {
+                const pickr = Pickr.create({
+                    el: elId,
+                    theme: 'classic',
+                    default: defaultColor,
+                    swatches: [
+                        '#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22c55e', '#06b6d4',
+                        '#3b82f6', '#6366f1', '#8b5cf6', '#d946ef', '#f43f5e', '#000000', '#ffffff',
+                        '#e0c3fc', '#8ec5fc', '#ff9a9e', '#fecfef', '#a18cd1', '#fbc2eb'
+                    ],
+                    components: {
+                        preview: true,
+                        opacity: true,
+                        hue: true,
+                        interaction: {
+                            hex: true,
+                            input: true,
+                            save: true
+                        }
+                    },
+                    i18n: {
+                        'btn:save': '확인',
+                        'btn:cancel': '취소',
+                        'btn:clear': '지우기'
+                    }
+                });
+
+                pickr.on('change', (color, source, instance) => {
+                    // Update state
+                    const hex = color.toHEXA().toString();
+                    state.colors[key] = hex;
+                    // Apply button color immediately
+                    pickr.applyColor();
+                    // Redraw canvas
+                    updateCanvas();
+                }).on('swatchselect', (color) => {
+                    const hex = color.toHEXA().toString();
+                    state.colors[key] = hex;
+                    pickr.setColor(hex); // Update picker internal state
+                    updateCanvas();
+                }).on('save', (color, instance) => {
+                    pickr.hide();
+                });
+
+                return pickr;
+            };
+
+            state.pickrs.text = createPickr('#textColorPicker', state.colors.text, 'text');
+            state.pickrs.bgMain = createPickr('#bgColorMainPicker', state.colors.bgMain, 'bgMain');
+            state.pickrs.bgSub = createPickr('#bgColorSubPicker', state.colors.bgSub, 'bgSub');
+        }
+
         function loadLogos() {
-            // In a real app, we might lazy load these or load only selected.
-            // For now, we just prepare the object. Actual loading happens if we had valid URLs.
-            // Since I don't have all real URLs, I will handle missing images gracefully in draw.
             for (const [key, url] of Object.entries(LOGO_URLS)) {
                 const img = new Image();
                 img.crossOrigin = "Anonymous"; 
                 img.src = url;
-                // We don't wait for them all, just cache them.
                 state.logoImages[key] = img;
             }
         }
@@ -588,7 +663,7 @@
             });
 
             // Style Inputs
-            ['canvasRatio', 'fontSelect', 'textColor', 'bgColorMain', 'bgColorSub', 'useGradient', 'fontSize', 'lineHeight', 'padding', 'logoSize', 'overlayOpacity', 'bgImageScale'].forEach(id => {
+            ['canvasRatio', 'fontSelect', 'useGradient', 'fontSize', 'lineHeight', 'padding', 'logoSize', 'overlayOpacity', 'bgImageScale'].forEach(id => {
                 const el = document.getElementById(id);
                 el.addEventListener('input', (e) => {
                     // Update value displays
@@ -604,11 +679,6 @@
                          if(val > 0) text = `어둡게 ${val}%`;
                          document.getElementById('overlayValueText').innerText = text;
                     }
-                    
-                    // Update Color Previews
-                    if(id === 'textColor') document.getElementById('textColorPreview').style.backgroundColor = e.target.value;
-                    if(id === 'bgColorMain') document.getElementById('bgColorMainPreview').style.backgroundColor = e.target.value;
-                    if(id === 'bgColorSub') document.getElementById('bgColorSubPreview').style.backgroundColor = e.target.value;
 
                     // Toggle Sub Color visibility
                     if(id === 'useGradient') {
@@ -626,7 +696,7 @@
                 });
             });
 
-            // Radio Groups (Align, Linebreak, ImageFit, ImagePosition)
+            // Radio Groups
             document.querySelectorAll('input[name="align"], input[name="linebreak"], input[name="imageFit"], input[name="imagePosition"]').forEach(el => {
                 el.addEventListener('change', updateCanvas);
             });
@@ -653,9 +723,6 @@
 
             state.canvas.width = width;
             state.canvas.height = height;
-            
-            // Adjust CSS max-width/height to keep aspect ratio in view
-            // (Handled by object-contain class in HTML, but good to ensure reset)
         }
 
         function handleImageUpload(e) {
@@ -693,15 +760,17 @@
         }
 
         function applyPreset(main, sub, text, isGradient) {
-            document.getElementById('bgColorMain').value = main;
-            document.getElementById('bgColorSub').value = sub;
-            document.getElementById('textColor').value = text;
+            // Update State
+            state.colors.bgMain = main;
+            state.colors.bgSub = sub;
+            state.colors.text = text;
+
+            // Update Pickrs
+            if(state.pickrs.text) state.pickrs.text.setColor(text);
+            if(state.pickrs.bgMain) state.pickrs.bgMain.setColor(main);
+            if(state.pickrs.bgSub) state.pickrs.bgSub.setColor(sub);
+
             document.getElementById('useGradient').checked = isGradient;
-            
-            // Update Color Previews
-            document.getElementById('bgColorMainPreview').style.backgroundColor = main;
-            document.getElementById('bgColorSubPreview').style.backgroundColor = sub;
-            document.getElementById('textColorPreview').style.backgroundColor = text;
             
             // Trigger visual update for sub color container
             const subContainer = document.getElementById('subColorContainer');
@@ -737,8 +806,8 @@
         function drawBackground(ctx, width, height) {
             // Color / Gradient
             const useGradient = document.getElementById('useGradient').checked;
-            const colorMain = document.getElementById('bgColorMain').value;
-            const colorSub = document.getElementById('bgColorSub').value;
+            const colorMain = state.colors.bgMain;
+            const colorSub = state.colors.bgSub;
 
             if (useGradient) {
                 const gradient = ctx.createLinearGradient(0, 0, width, height);
@@ -756,10 +825,6 @@
             }
 
             // Overlay
-            // range -80 to 80.
-            // < 0 : white overlay (opacity = abs(val)/100)
-            // > 0 : black overlay (opacity = val/100)
-            // = 0 : none
             const overlayVal = parseInt(document.getElementById('overlayOpacity').value);
             
             if (overlayVal !== 0) {
@@ -838,56 +903,35 @@
             const padding = parseInt(document.getElementById('padding').value);
             const align = document.querySelector('input[name="align"]:checked').value;
             const fontFamily = document.getElementById('fontSelect').value;
-            const textColor = document.getElementById('textColor').value;
+            const textColor = state.colors.text;
             const breakMode = document.querySelector('input[name="linebreak"]:checked').value;
 
             ctx.fillStyle = textColor;
             ctx.textBaseline = 'middle';
 
             // 1. Prepare Footer Text (Author | Title)
-            // If empty, don't draw anything.
             let footerText = '';
             if (author && title) footerText = `${author} | ${title}`;
             else if (author) footerText = author;
             else if (title) footerText = title;
-            // else footerText remains empty
 
             let footerHeight = 0;
             if (footerText) {
-                // Footer font size is roughly 40% of main text but capped min/max reasonable
                 const footerFontSize = Math.max(20, fontSize * 0.45); 
-                ctx.font = `300 ${footerFontSize}px '${fontFamily}'`; // Lighter weight for footer
-                footerHeight = footerFontSize * 2.5; // Reserve space at bottom
+                ctx.font = `300 ${footerFontSize}px '${fontFamily}'`;
+                footerHeight = footerFontSize * 2.5; 
             }
 
             // 2. Prepare Main Quote
-            // Calculate available height for quote
-            // Center area: Full Height - (Padding * 2) - FooterHeight (if any)
-            // Actually, we usually center the whole block (Quote + Footer gap).
-            // Let's define the content area.
-            
             const contentWidth = width - (padding * 2);
-            const contentHeight = height - (padding * 2);
             
             ctx.font = `400 ${fontSize}px '${fontFamily}'`;
             const lineHeight = fontSize * lineHeightMultiplier;
             
-            // Wrap Text
             const lines = getLines(ctx, quote, contentWidth, breakMode);
             
-            // Calculate total block height
             const totalTextHeight = lines.length * lineHeight;
             const totalContentHeight = totalTextHeight + (footerText ? (fontSize * 1.0) : 0) + (footerText ? (Math.max(20, fontSize * 0.45)) : 0); 
-            // Gap between quote and footer is roughly 1em (fontSize)
-
-            // Starting Y position to center everything vertically
-            let startY = (height - totalContentHeight) / 2 + (fontSize / 2); 
-            // Adjustment because textBaseline is middle for lines, but we stack them.
-            // Let's use top based logic for easier stacking, then shift.
-            // Actually, let's keep middle baseline logic.
-            // Middle of the block is height/2.
-            // Top of block is (height - totalContentHeight)/2.
-            // First line Y (middle) = Top + lineHeight/2.
             
             let currentY = (height - totalContentHeight) / 2 + (lineHeight / 2);
 
@@ -898,25 +942,9 @@
                     if (align === 'left') x = padding;
                     else if (align === 'center') x = width / 2;
                     else if (align === 'right') x = width - padding;
-                    else if (align === 'justify') {
-                        // For justify, if it's the last line (or single line), treat as left (or center?) usually left.
-                        // But standard justify usually fills width. HTML canvas doesn't support native justify.
-                        // We will implement simple justify or fallback to center for simplicity in this V1.
-                        // Let's fallback to center for now as Canvas Justify is complex script.
-                        // User prompt requested "justify" radio but implementing full justify is hard.
-                        // Let's map justify -> center for now or left. Let's use Center for aesthetic.
-                        // Actually, 'justify' in the radio implies "Align Block".
-                        // Let's just stick to standard aligns. If user selected justify, I will use center for single lines, 
-                        // or maybe I'll try to implement a basic spread. 
-                        // To keep it safe and bug-free: map justify to center or left. 
-                        // Let's use Center as it looks best for quotes.
-                        x = width / 2; 
-                        // Ideally: Custom justify function.
-                    }
+                    else if (align === 'justify') x = width / 2; 
 
                     if (align === 'justify' && lines.length > 1) {
-                         // Simple Justify Hack: Only if not last line? 
-                         // For this snippet, let's just do center to be safe.
                          ctx.textAlign = 'center';
                          ctx.fillText(line, x, currentY);
                     } else {
@@ -930,14 +958,11 @@
 
             // Draw Footer
             if (footerText) {
-                // Gap
-                currentY += (fontSize * 0.5); // Add some gap
+                currentY += (fontSize * 0.5); 
                 
                 const footerFontSize = Math.max(20, fontSize * 0.45);
                 ctx.font = `300 ${footerFontSize}px '${fontFamily}'`;
-                ctx.fillStyle = textColor; // Same color, maybe change opacity?
-                // Let's make footer slightly transparent?
-                // ctx.globalAlpha = 0.8; 
+                ctx.fillStyle = textColor;
                 
                 let footerX;
                  if (align === 'left') footerX = padding;
@@ -946,16 +971,12 @@
 
                 ctx.textAlign = (align === 'justify') ? 'center' : align;
                 ctx.fillText(footerText, footerX, currentY);
-                
-                // Reset alpha
-                // ctx.globalAlpha = 1.0;
             }
         }
 
         function getLines(ctx, text, maxWidth, breakMode) {
             if (!text) return [];
             
-            // Handle explicit newlines first
             const paragraphs = text.split('\n');
             let lines = [];
 
@@ -976,7 +997,6 @@
                     }
                     lines.push(currentLine);
                 } else {
-                    // Char break
                     let currentLine = para[0] || '';
                     for (let i = 1; i < para.length; i++) {
                         const char = para[i];
@@ -999,28 +1019,14 @@
             if (!platform) return;
 
             const logoSize = parseInt(document.getElementById('logoSize').value);
-            const padding = 40; // Fixed padding from edge
-
-            // Check if we have an image
-            // In this simulated environment, we might not have real loaded images for all.
-            // If image fails, we draw text.
-            
-            // NOTE: In the provided script I added placeholder URLs. 
-            // If the user selects a platform, we try to draw the image.
-            
-            // Position: Top Center or Bottom Center? 
-            // Usually logos are at Top Center or Bottom Center.
-            // Let's put it at Top Center for branding.
+            const padding = 40; 
             
             const x = width / 2;
             const y = padding + (logoSize / 2);
             
-            // Draw a placeholder circle/text if image not loaded or broken
-            // But let's try image first.
             const img = state.logoImages[platform];
             
             if (img && img.complete && img.naturalHeight !== 0) {
-                // Draw Image
                 const aspect = img.width / img.height;
                 let dw, dh;
                 if (aspect > 1) {
@@ -1032,10 +1038,9 @@
                 }
                 ctx.drawImage(img, x - dw/2, y - dh/2, dw, dh);
             } else {
-                // Fallback Text Logo
                 ctx.save();
                 ctx.font = `bold ${logoSize/3}px sans-serif`;
-                ctx.fillStyle = document.getElementById('textColor').value; // Use text color
+                ctx.fillStyle = state.colors.text;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.globalAlpha = 0.5;
@@ -1046,11 +1051,8 @@
 
         // --- 6. Export ---
         async function downloadImage() {
-            // Check device
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
-            // Use standard share if iOS
             if (isIOS && navigator.share) {
                  state.canvas.toBlob(async (blob) => {
                     const file = new File([blob], "lumina_quote.png", { type: "image/png" });
@@ -1063,7 +1065,6 @@
                     }
                 });
             } else {
-                // PC / Android -> Download
                 const link = document.createElement('a');
                 link.download = `lumina_quote_${Date.now()}.png`;
                 link.href = state.canvas.toDataURL('image/png');
