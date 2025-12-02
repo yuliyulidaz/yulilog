@@ -621,7 +621,7 @@
 ✅ 직관적 레이아웃으로 변경
 ✅ 제작자 | 캐릭터 : 본문과 함께 정렬, 크기도 본문 폰트에 따라 자동 조절
 ✅ 디테일 컬러 피커 도입
-✅ 배경 이미지 : 오버레이  '밝게(White)' 추가
+✅ 배경 이미지 : 오버레이 ‘밝게(White)’ 추가
 ✅ 배경 이미지 : 이미지 확대 기능 추가
 ✅ 그라데이션 : 이제 방향도 선택 가능
 
@@ -688,9 +688,9 @@
             quoteInput.value = WELCOME_MESSAGE;
             quoteInput.classList.add('text-slate-400'); // Faded text style
 
-            // iOS Check to hide Copy buttons
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            if (isIOS) {
+            // Mobile Check to hide Copy buttons (iOS and Android)
+            const isMobile = /Android|iPad|iPhone|iPod/i.test(navigator.userAgent);
+            if (isMobile) {
                 document.querySelectorAll('.copy-btn').forEach(el => el.style.display = 'none');
                 const divider = document.getElementById('desktop-action-divider');
                 if(divider) divider.style.display = 'none';
