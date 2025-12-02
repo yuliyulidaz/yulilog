@@ -177,7 +177,7 @@
                 </button>
 
                 <!-- Copy Button (Mobile Visible with Text) -->
-                <button onclick="copyImage()" class="md:hidden flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-lg border border-slate-200 dark:border-zinc-700 active:scale-95 transition-transform">
+                <button onclick="copyImage()" class="copy-btn md:hidden flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-lg border border-slate-200 dark:border-zinc-700 active:scale-95 transition-transform">
                     <i class="ph ph-copy text-base"></i>
                     <span>복사</span>
                 </button>
@@ -209,8 +209,8 @@
                         <i class="ph ph-download-simple text-lg"></i>
                         <span>저장</span>
                     </button>
-                    <div class="w-px h-6 bg-slate-200 dark:bg-zinc-600 mx-1"></div>
-                    <button onclick="copyImage()" class="p-2.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-700 rounded-xl transition-colors" title="복사">
+                    <div id="desktop-action-divider" class="w-px h-6 bg-slate-200 dark:bg-zinc-600 mx-1"></div>
+                    <button onclick="copyImage()" class="copy-btn p-2.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-700 rounded-xl transition-colors" title="복사">
                         <i class="ph ph-copy text-xl"></i>
                     </button>
                 </div>
@@ -218,17 +218,16 @@
             </section>
 
             <!-- Left Sidebar (Controls) - Mobile: Bottom (Order 2), Desktop: Left (Order 1) -->
-            <!-- Fixed Layout: Removed flex-1 from aside for mobile stability, using flex-1 on container -->
             <aside class="order-2 md:order-1 w-full md:w-[400px] lg:w-[420px] bg-white dark:bg-dark-panel border-t md:border-t-0 md:border-r border-slate-200 dark:border-dark-border flex flex-col flex-1 md:flex-none md:h-full z-30 md:shadow-none relative overflow-hidden" id="sidebar">
                 
                 <div class="h-full overflow-y-auto custom-scrollbar p-5 space-y-8 pb-10 md:pb-5">
 
-                    <!-- Section: Content (Moved to Top) -->
+                    <!-- Section: Content -->
                     <section class="space-y-4">
                         <div class="flex items-center justify-between">
                             <h2 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">내용 입력</h2>
-                            <button onclick="clearQuote()" class="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1">
-                                <i class="ph ph-trash"></i> 내용 삭제
+                            <button onclick="clearQuoteTextOnly()" class="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1">
+                                <i class="ph ph-eraser"></i> 문구만 지우기
                             </button>
                         </div>
                         
@@ -253,17 +252,24 @@
 
                     <hr class="border-slate-100 dark:border-slate-800">
 
-                    <!-- Section: Canvas Settings (Moved below Content) -->
+                    <!-- Section: Canvas Settings -->
                     <section class="space-y-4">
-                        <h2 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">캔버스 설정</h2>
+                        <h2 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">캔버스 비율</h2>
                         
-                        <div class="space-y-2">
-                            <label class="text-xs font-medium text-slate-500">비율 선택</label>
-                            <select id="canvasRatio" class="w-full appearance-none px-3 py-2.5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                                <option value="1:1">1:1 정방형 (1080x1080) - 인스타/트위터</option>
-                                <option value="4:5">4:5 세로형 (1080x1350) - 인스타 포트레이트</option>
-                                <option value="16:9">16:9 가로형 (1920x1080) - 유튜브/배경화면</option>
-                            </select>
+                        <!-- Ratio Selection: Icons -->
+                        <div class="grid grid-cols-3 gap-3">
+                            <button onclick="setRatio('1:1')" id="btn-ratio-1-1" class="ratio-btn flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all bg-brand-50 dark:bg-slate-800 border-brand-500 dark:border-slate-500 ring-1 ring-brand-500 dark:ring-slate-500">
+                                <div class="w-6 h-6 border-2 border-current rounded-sm"></div>
+                                <span class="text-[10px] font-medium">1:1</span>
+                            </button>
+                            <button onclick="setRatio('4:5')" id="btn-ratio-4-5" class="ratio-btn flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+                                <div class="w-5 h-6 border-2 border-current rounded-sm"></div>
+                                <span class="text-[10px] font-medium">4:5</span>
+                            </button>
+                            <button onclick="setRatio('16:9')" id="btn-ratio-16-9" class="ratio-btn flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+                                <div class="w-8 h-5 border-2 border-current rounded-sm mt-1 mb-0.5"></div>
+                                <span class="text-[10px] font-medium">16:9</span>
+                            </button>
                         </div>
                     </section>
 
@@ -273,20 +279,19 @@
                     <section class="space-y-4">
                         <h2 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">텍스트 스타일</h2>
                         
-                        <!-- Font Family -->
-                        <div class="space-y-1.5">
-                             <div class="relative">
-                                <select id="fontSelect" class="w-full appearance-none pl-3 pr-10 py-2.5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all cursor-pointer">
-                                    <option value="Noto Serif KR">Noto Serif KR (명조)</option>
-                                    <option value="KoPub Batang">KoPub 바탕 (독서용 명조)</option>
-                                    <option value="Nanum Myeongjo">나눔명조</option>
-                                    <option value="Pretendard">Pretendard (모던 고딕)</option>
-                                    <option value="Noto Sans KR">Noto Sans KR (고딕)</option>
-                                    <option value="Nanum Gothic">나눔고딕</option>
-                                </select>
-                                <div class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                                    <i class="ph ph-caret-down"></i>
-                                </div>
+                        <!-- Font Family Selection -->
+                        <div class="space-y-2">
+                            <!-- Serif Group -->
+                            <div class="grid grid-cols-3 gap-2">
+                                <button onclick="setFont('Noto Serif KR')" class="font-btn p-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active-font" data-font="Noto Serif KR" style="font-family: 'Noto Serif KR', serif;">Noto Serif</button>
+                                <button onclick="setFont('KoPub Batang')" class="font-btn p-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" data-font="KoPub Batang" style="font-family: 'KoPub Batang', serif;">KoPub 바탕</button>
+                                <button onclick="setFont('Nanum Myeongjo')" class="font-btn p-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" data-font="Nanum Myeongjo" style="font-family: 'Nanum Myeongjo', serif;">나눔명조</button>
+                            </div>
+                            <!-- Sans-Serif Group -->
+                            <div class="grid grid-cols-3 gap-2">
+                                <button onclick="setFont('Pretendard')" class="font-btn p-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" data-font="Pretendard" style="font-family: 'Pretendard', sans-serif;">Pretendard</button>
+                                <button onclick="setFont('Noto Sans KR')" class="font-btn p-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" data-font="Noto Sans KR" style="font-family: 'Noto Sans KR', sans-serif;">Noto Sans</button>
+                                <button onclick="setFont('Nanum Gothic')" class="font-btn p-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all" data-font="Nanum Gothic" style="font-family: 'Nanum Gothic', sans-serif;">나눔고딕</button>
                             </div>
                         </div>
 
@@ -419,38 +424,48 @@
                                 </div>
                                 <div class="space-y-2">
                                     <label class="text-xs font-medium text-slate-500">방향</label>
-                                    <div class="relative">
-                                        <select id="gradDirection" class="w-full appearance-none pl-3 pr-10 py-2.5 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all cursor-pointer">
-                                            <option value="to bottom">상 → 하 (↓)</option>
-                                            <option value="to top">하 → 상 (↑)</option>
-                                            <option value="to right">좌 → 우 (→)</option>
-                                            <option value="to left">우 → 좌 (←)</option>
-                                            <option value="to bottom right">좌상 → 우하 (↘)</option>
-                                            <option value="to top right">좌하 → 우상 (↗)</option>
-                                            <option value="to bottom left">우상 → 좌하 (↙)</option>
-                                            <option value="to top left">우하 → 좌상 (↖)</option>
-                                        </select>
-                                        <div class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                                            <i class="ph ph-caret-down"></i>
-                                        </div>
+                                    <!-- Direction Grid Icons -->
+                                    <div class="grid grid-cols-4 gap-2">
+                                        <!-- Top Row -->
+                                        <button onclick="setDirection('to bottom')" class="dir-btn h-9 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center justify-center text-slate-500" data-dir="to bottom" title="상 → 하"><i class="ph ph-arrow-down"></i></button>
+                                        <button onclick="setDirection('to top')" class="dir-btn h-9 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center justify-center text-slate-500" data-dir="to top" title="하 → 상"><i class="ph ph-arrow-up"></i></button>
+                                        <button onclick="setDirection('to right')" class="dir-btn h-9 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center justify-center text-slate-500" data-dir="to right" title="좌 → 우"><i class="ph ph-arrow-right"></i></button>
+                                        <button onclick="setDirection('to left')" class="dir-btn h-9 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center justify-center text-slate-500" data-dir="to left" title="우 → 좌"><i class="ph ph-arrow-left"></i></button>
+                                        
+                                        <!-- Bottom Row -->
+                                        <button onclick="setDirection('to bottom right')" class="dir-btn h-9 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center justify-center text-slate-500 active-dir bg-brand-50 dark:bg-slate-800 border-brand-500 dark:border-slate-500 text-brand-600 dark:text-brand-400" data-dir="to bottom right" title="좌상 → 우하"><i class="ph ph-arrow-down-right"></i></button>
+                                        <button onclick="setDirection('to top right')" class="dir-btn h-9 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center justify-center text-slate-500" data-dir="to top right" title="좌하 → 우상"><i class="ph ph-arrow-up-right"></i></button>
+                                        <button onclick="setDirection('to bottom left')" class="dir-btn h-9 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center justify-center text-slate-500" data-dir="to bottom left" title="우상 → 좌하"><i class="ph ph-arrow-down-left"></i></button>
+                                        <button onclick="setDirection('to top left')" class="dir-btn h-9 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center justify-center text-slate-500" data-dir="to top left" title="우하 → 좌상"><i class="ph ph-arrow-up-left"></i></button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- 5. Color Presets (Mixed Solid & Gradient) -->
-                        <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
-                            <!-- Gradients -->
-                            <button onclick="setPreset('gradient', '#a18cd1', '#fbc2eb', '#ffffff')" class="w-8 h-8 rounded-full border border-slate-200 shadow-sm flex-shrink-0" style="background: linear-gradient(to bottom right, #a18cd1, #fbc2eb)" title="Dreamy Purple"></button>
-                            <button onclick="setPreset('gradient', '#89f7fe', '#66a6ff', '#ffffff')" class="w-8 h-8 rounded-full border border-slate-200 shadow-sm flex-shrink-0" style="background: linear-gradient(to bottom right, #89f7fe, #66a6ff)" title="Ocean Blue"></button>
-                            <button onclick="setPreset('gradient', '#ff9a9e', '#fecfef', '#ffffff')" class="w-8 h-8 rounded-full border border-slate-200 shadow-sm flex-shrink-0" style="background: linear-gradient(to bottom right, #ff9a9e, #fecfef)" title="Peach Love"></button>
-                            <button onclick="setPreset('gradient', '#fdfbfb', '#ebedee', '#333333')" class="w-8 h-8 rounded-full border border-slate-200 shadow-sm flex-shrink-0" style="background: linear-gradient(to bottom right, #fdfbfb, #ebedee)" title="Cloudy White"></button>
-                            <button onclick="setPreset('gradient', '#434343', '#000000', '#ffffff')" class="w-8 h-8 rounded-full border border-slate-200 shadow-sm flex-shrink-0" style="background: linear-gradient(to bottom right, #434343, #000000)" title="Midnight"></button>
-                            <button onclick="setPreset('gradient', '#667eea', '#764ba2', '#ffffff')" class="w-8 h-8 rounded-full border border-slate-200 shadow-sm flex-shrink-0" style="background: linear-gradient(to bottom right, #667eea, #764ba2)" title="Deep Purple"></button>
-                            <!-- Solids -->
-                             <button onclick="setPreset('solid', '#1a1a1a', null, '#ffffff')" class="w-8 h-8 rounded-full bg-slate-900 border border-slate-200 shadow-sm flex-shrink-0" title="Dark Solid"></button>
-                            <button onclick="setPreset('solid', '#ffffff', null, '#1a1a1a')" class="w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm flex-shrink-0" title="Light Solid"></button>
-                            <button onclick="setPreset('solid', '#fff1f2', null, '#881337')" class="w-8 h-8 rounded-full bg-[#fff1f2] border border-slate-200 shadow-sm flex-shrink-0" title="Rose Solid"></button>
+                        <!-- 5. Color Presets (Split: Solid vs Gradient) -->
+                        <div class="pt-1">
+                            <!-- Gradient Palette -->
+                            <div id="gradientPalette" class="flex gap-2 overflow-x-auto no-scrollbar py-1">
+                                <button onclick="setPreset('gradient', '#a18cd1', '#fbc2eb', '#4A4A4A')" class="w-8 h-8 rounded-full border border-slate-200 shadow-sm flex-shrink-0" style="background: linear-gradient(to bottom right, #a18cd1, #fbc2eb)" title="Dreamy Purple"></button>
+                                <button onclick="setPreset('gradient', '#0f2027', '#203a43', '#ffffff')" class="w-8 h-8 rounded-full border border-slate-200 shadow-sm flex-shrink-0" style="background: linear-gradient(to bottom right, #0f2027, #2c5364)" title="Deep Sea"></button>
+                                <button onclick="setPreset('gradient', '#232526', '#414345', '#ffffff')" class="w-8 h-8 rounded-full border border-slate-200 shadow-sm flex-shrink-0" style="background: linear-gradient(to bottom right, #232526, #414345)" title="Midnight"></button>
+                                <button onclick="setPreset('gradient', '#4b1248', '#f0c27b', '#ffffff')" class="w-8 h-8 rounded-full border border-slate-200 shadow-sm flex-shrink-0" style="background: linear-gradient(to bottom right, #4b1248, #f0c27b)" title="Sunset"></button>
+                                <button onclick="setPreset('gradient', '#141E30', '#243B55', '#ffffff')" class="w-8 h-8 rounded-full border border-slate-200 shadow-sm flex-shrink-0" style="background: linear-gradient(to bottom right, #141E30, #243B55)" title="Royal Blue"></button>
+                                <button onclick="setPreset('gradient', '#1a2a6c', '#b21f1f', '#ffffff')" class="w-8 h-8 rounded-full border border-slate-200 shadow-sm flex-shrink-0" style="background: linear-gradient(to bottom right, #1a2a6c, #b21f1f)" title="Mystic"></button>
+                                <button onclick="setPreset('gradient', '#000000', '#434343', '#ffffff')" class="w-8 h-8 rounded-full border border-slate-200 shadow-sm flex-shrink-0" style="background: linear-gradient(to bottom right, #000000, #434343)" title="Charcoal"></button>
+                            </div>
+                            
+                            <!-- Solid Palette (Hidden initially if gradient is default) -->
+                            <div id="solidPalette" class="flex gap-2 overflow-x-auto no-scrollbar py-1 hidden">
+                                <button onclick="setPreset('solid', '#E6E6FA', null, '#000000')" class="w-8 h-8 rounded-full bg-[#E6E6FA] border border-slate-200 shadow-sm flex-shrink-0" title="Lavender"></button>
+                                <button onclick="setPreset('solid', '#000000', null, '#ffffff')" class="w-8 h-8 rounded-full bg-black border border-slate-200 shadow-sm flex-shrink-0" title="Black"></button>
+                                <button onclick="setPreset('solid', '#1a1a1a', null, '#ffffff')" class="w-8 h-8 rounded-full bg-[#1a1a1a] border border-slate-200 shadow-sm flex-shrink-0" title="Dark Gray"></button>
+                                <button onclick="setPreset('solid', '#1e293b', null, '#ffffff')" class="w-8 h-8 rounded-full bg-[#1e293b] border border-slate-200 shadow-sm flex-shrink-0" title="Slate"></button>
+                                <button onclick="setPreset('solid', '#312e81', null, '#ffffff')" class="w-8 h-8 rounded-full bg-[#312e81] border border-slate-200 shadow-sm flex-shrink-0" title="Indigo"></button>
+                                <button onclick="setPreset('solid', '#4a044e', null, '#ffffff')" class="w-8 h-8 rounded-full bg-[#4a044e] border border-slate-200 shadow-sm flex-shrink-0" title="Fuchsia"></button>
+                                <button onclick="setPreset('solid', '#365314', null, '#ffffff')" class="w-8 h-8 rounded-full bg-[#365314] border border-slate-200 shadow-sm flex-shrink-0" title="Olive"></button>
+                                <button onclick="setPreset('solid', '#881337', null, '#ffffff')" class="w-8 h-8 rounded-full bg-[#881337] border border-slate-200 shadow-sm flex-shrink-0" title="Rose"></button>
+                            </div>
                         </div>
 
                         <!-- 6. Background Image -->
@@ -564,7 +579,7 @@
                     
                     <!-- Footer Info -->
                     <footer class="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-400 dark:text-slate-500 space-y-4 pb-8">
-                         <!-- Sister Site Link (Moved Here) -->
+                         <!-- Sister Site Link -->
                         <a href="https://yuliyulidaz.github.io/yulipage/" target="_blank" class="block w-full p-3 bg-brand-50/50 dark:bg-brand900/10 border border-brand-100 dark:border-brand-800/30 rounded-xl hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-all group">
                             <div class="flex items-center gap-2 text-brand-600 dark:text-brand-400 font-bold mb-0.5">
                                 <i class="ph ph-file-text text-lg"></i>
@@ -574,7 +589,7 @@
                         </a>
                         
                         <div>
-                            <h3 class="font-bold text-slate-500 dark:text-slate-400 mb-1">📖 발췌 문구 생성기 v1.3.0</h3>
+                            <h3 class="font-bold text-slate-500 dark:text-slate-400 mb-1">📖 발췌 문구 생성기 v1.3.1</h3>
                             <p>본 사이트는 어떠한 개인정보도 수집하지 않습니다.<br>모든 작업은 귀하의 브라우저에서만 이루어집니다.</p>
                         </div>
                         
@@ -600,6 +615,19 @@
     <!-- Scripts -->
     <script>
         // --- 1. State Management & Constants ---
+        
+        const WELCOME_MESSAGE = `⚡️ 업데이트 완료! 
+
+✅ 직관적 레이아웃으로 변경
+✅ 제작자 | 캐릭터 : 본문과 함께 정렬, 크기도 본문 폰트에 따라 자동 조절
+✅ 디테일 컬러 피커 도입
+✅ 배경 이미지 : 오버레이  '밝게(White)' 추가
+✅ 배경 이미지 : 이미지 확대 기능 추가
+✅ 그라데이션 : 이제 방향도 선택 가능
+
+⚠️이 공지는 내용입력 클릭 시 자동 삭제!
+`;
+
         const state = {
             canvas: null,
             ctx: null,
@@ -611,11 +639,14 @@
             // Colors managed by state now (synced with Pickr)
             bgType: 'gradient', // Default to Gradient
             gradDirection: 'to bottom right',
+            canvasRatio: '1:1',
+            fontFamily: 'Noto Serif KR',
+            isWelcomeActive: true, // Track if welcome message is being shown
             colors: {
-                text: '#ffffff',
+                text: '#4A4A4A', // Default Text Color Changed to Dark Grey for Dreamy Purple
                 bgMain: '#E6E6FA', // Default Solid Color: Lavender
-                gradStart: '#a18cd1', // Default Gradient Start
-                gradEnd: '#fbc2eb',   // Default Gradient End
+                gradStart: '#a18cd1', // Default Gradient Start (Dreamy Purple)
+                gradEnd: '#fbc2eb',   // Default Gradient End (Dreamy Purple)
             },
             pickrs: {}
         };
@@ -647,8 +678,23 @@
             loadLogos();
             bindEvents();
             
-            // Set default gradient direction in select
-            document.getElementById('gradDirection').value = state.gradDirection;
+            // Set default styling in UI
+            updateRatioUI();
+            updateFontUI();
+            updateDirectionUI();
+
+            // Set Welcome Message
+            const quoteInput = document.getElementById('quote');
+            quoteInput.value = WELCOME_MESSAGE;
+            quoteInput.classList.add('text-slate-400'); // Faded text style
+
+            // iOS Check to hide Copy buttons
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (isIOS) {
+                document.querySelectorAll('.copy-btn').forEach(el => el.style.display = 'none');
+                const divider = document.getElementById('desktop-action-divider');
+                if(divider) divider.style.display = 'none';
+            }
 
             // Font Loading Fix: Wait for fonts to load before drawing
             document.fonts.ready.then(() => {
@@ -691,7 +737,7 @@
                     swatches: [
                         '#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22c55e', '#06b6d4',
                         '#3b82f6', '#6366f1', '#8b5cf6', '#d946ef', '#f43f5e', '#000000', '#ffffff',
-                        '#e0c3fc', '#8ec5fc', '#ff9a9e', '#fecfef', '#a18cd1', '#fbc2eb'
+                        '#1a1a1a', '#0f2027', '#4b1248', '#203a43', '#2c5364', '#f0c27b'
                     ],
                     components: {
                         preview: true,
@@ -701,7 +747,7 @@
                             hex: true,
                             input: true,
                             save: true,
-                            cancel: true // 취소 버튼 활성화
+                            cancel: true // 취소 버튼
                         }
                     },
                     i18n: {
@@ -711,51 +757,52 @@
                     }
                 });
 
-                // 열릴 때 현재 색상 저장 (취소 시 복구용)
+                // 열릴 때 색상 저장
                 pickr.on('show', (color, instance) => {
                     initialColor = state.colors[key];
                 });
 
-                // 색상 변경 시 (드래그 등) - 미리보기만 적용 (applyColor 호출 X)
+                // 색상 변경 시 (드래그 등) - 즉시 반영
                 pickr.on('change', (color, source, instance) => {
                     const hex = color.toHEXA().toString();
                     state.colors[key] = hex;
-                    // pickr.applyColor(); // <-- 제거: 버튼 업데이트로 인한 DOM 변경/포커스 문제 방지
-                    updateCanvas();     // 캔버스 미리보기 갱신
+                    updateCanvas();     
                 });
 
-                // 확인 버튼 클릭 시
+                // 저장 버튼 클릭
                 pickr.on('save', (color, instance) => {
                     const hex = color.toHEXA().toString();
                     state.colors[key] = hex;
-                    
-                    // Force update button color silently to avoid re-triggering logic
-                    instance.applyColor(true); 
-                    
-                    // Close popup asynchronously to bypass any event blocking
-                    setTimeout(() => {
-                        instance.hide();
-                    }, 0);
+                    instance.applyColor(true); // 버튼 색상 업데이트
+                    instance.hide();
                 });
 
-                // 취소 버튼 클릭 시
+                // 취소 버튼 클릭 시 - 이전 색으로 복구
                 pickr.on('cancel', (instance) => {
-                    // 색상 원상복구
                     state.colors[key] = initialColor;
-                    // Pickr 내부 색상도 되돌리기 (Silent)
                     pickr.setColor(initialColor, true); 
-                    // 캔버스 다시 그리기
                     updateCanvas();
-                    instance.hide(); // 창 닫기
+                    instance.hide();
+                });
+                
+                // 창이 닫힐 때 (저장, 취소, 외부클릭 모두 포함)
+                pickr.on('hide', (instance) => {
+                     // 핵심 수정: 창이 닫힐 때 현재 피커의 색상을 버튼에 강제 적용하여
+                     // "외부 클릭 시에도 색상이 선택된 상태"로 만듦.
+                     // (취소 버튼을 눌렀을 때는 위 'cancel' 이벤트에서 이미 원복했으므로 괜찮음)
+                     const currentColor = instance.getColor().toHEXA().toString();
+                     // 만약 취소 버튼을 눌러서 닫힌게 아니라면 (외부 클릭 등)
+                     if (state.colors[key] === currentColor) {
+                        instance.applyColor(true);
+                     }
                 });
 
                 // 팔레트(Swatch) 클릭 시
                 pickr.on('swatchselect', (color) => {
                     const hex = color.toHEXA().toString();
                     state.colors[key] = hex;
-                    pickr.setColor(hex); // UI 업데이트 (여기서는 내부적으로 처리되므로 OK)
+                    pickr.setColor(hex); 
                     updateCanvas();
-                    // hide() 호출하지 않음 (계속 선택 가능하도록)
                 });
 
                 return pickr;
@@ -783,12 +830,25 @@
         // --- 3. Event Binding ---
         function bindEvents() {
             // Text Inputs
-            ['quote', 'author', 'title'].forEach(id => {
-                document.getElementById(id).addEventListener('input', updateCanvas);
+            const quoteInput = document.getElementById('quote');
+            
+            // Handle Welcome Message Auto-Clear on Focus
+            quoteInput.addEventListener('focus', function() {
+                if (state.isWelcomeActive) {
+                    state.isWelcomeActive = false;
+                    this.value = '';
+                    this.classList.remove('text-slate-400'); // Restore normal color
+                    updateCanvas();
+                }
             });
 
+            quoteInput.addEventListener('input', updateCanvas);
+            
+            document.getElementById('author').addEventListener('input', updateCanvas);
+            document.getElementById('title').addEventListener('input', updateCanvas);
+
             // Style Inputs
-            ['canvasRatio', 'fontSelect', 'fontSize', 'lineHeight', 'padding', 'logoSize', 'overlayOpacity', 'bgImageScale'].forEach(id => {
+            ['fontSize', 'lineHeight', 'padding', 'logoSize', 'overlayOpacity', 'bgImageScale'].forEach(id => {
                 const el = document.getElementById(id);
                 el.addEventListener('input', (e) => {
                     // Update value displays
@@ -804,9 +864,6 @@
                          if(val > 0) text = `어둡게 ${val}%`;
                          document.getElementById('overlayValueText').innerText = text;
                     }
-
-                    if(id === 'canvasRatio') resizeCanvas();
-                    
                     updateCanvas();
                 });
             });
@@ -820,25 +877,9 @@
             document.querySelectorAll('input[name="bgMode"]').forEach(el => {
                 el.addEventListener('change', (e) => {
                     state.bgType = e.target.value;
-                    
-                    const solidPanel = document.getElementById('solidColorPanel');
-                    const gradPanel = document.getElementById('gradientColorPanel');
-                    
-                    if (state.bgType === 'solid') {
-                        solidPanel.classList.remove('hidden');
-                        gradPanel.classList.add('hidden');
-                    } else {
-                        solidPanel.classList.add('hidden');
-                        gradPanel.classList.remove('hidden');
-                    }
+                    togglePaletteVisibility();
                     updateCanvas();
                 });
-            });
-            
-            // Gradient Direction
-            document.getElementById('gradDirection').addEventListener('change', (e) => {
-                state.gradDirection = e.target.value;
-                updateCanvas();
             });
 
             // Platform Select
@@ -851,15 +892,103 @@
             document.getElementById('bgImageUpload').addEventListener('change', handleImageUpload);
         }
 
-        // --- 4. Logic ---
+        // --- 4. Logic Functions (Updated) ---
         
+        function setRatio(ratio) {
+            state.canvasRatio = ratio;
+            updateRatioUI();
+            resizeCanvas();
+            updateCanvas();
+        }
+
+        function updateRatioUI() {
+            // Remove active classes
+            document.querySelectorAll('.ratio-btn').forEach(btn => {
+                btn.classList.remove('bg-brand-50', 'dark:bg-slate-800', 'border-brand-500', 'dark:border-slate-500', 'ring-1', 'ring-brand-500', 'dark:ring-slate-500');
+            });
+            // Add active class
+            const idMap = { '1:1': 'btn-ratio-1-1', '4:5': 'btn-ratio-4-5', '16:9': 'btn-ratio-16-9' };
+            const activeBtn = document.getElementById(idMap[state.canvasRatio]);
+            if(activeBtn) {
+                activeBtn.classList.add('bg-brand-50', 'dark:bg-slate-800', 'border-brand-500', 'dark:border-slate-500', 'ring-1', 'ring-brand-500', 'dark:ring-slate-500');
+            }
+        }
+
+        function setFont(fontName) {
+            state.fontFamily = fontName;
+            updateFontUI();
+            
+            // Improved Font Loading:
+            // Explicitly load the font string before updating canvas to prevent "double click" issue.
+            // Construct a font string similar to what is used in drawContent
+            let fontWeight = '400';
+            if (fontName === 'Noto Serif KR' || fontName === 'KoPub Batang') fontWeight = '300';
+            else if (fontName === 'Noto Sans KR' || fontName === 'Pretendard') fontWeight = '200';
+            
+            const fontString = `${fontWeight} 40px '${fontName}'`;
+            
+            document.fonts.load(fontString).then(() => {
+                updateCanvas();
+            }).catch(() => {
+                 // Fallback if load fails (or already loaded)
+                 updateCanvas();
+            });
+            
+            // Safety redraw for stubborn browsers
+            setTimeout(updateCanvas, 100);
+        }
+
+        function updateFontUI() {
+            document.querySelectorAll('.font-btn').forEach(btn => {
+                if(btn.dataset.font === state.fontFamily) {
+                    btn.classList.add('bg-brand-50', 'dark:bg-slate-800', 'border-brand-500', 'dark:border-slate-500', 'text-brand-600', 'dark:text-brand-400', 'ring-1', 'ring-brand-500', 'dark:ring-slate-500');
+                } else {
+                    btn.classList.remove('bg-brand-50', 'dark:bg-slate-800', 'border-brand-500', 'dark:border-slate-500', 'text-brand-600', 'dark:text-brand-400', 'ring-1', 'ring-brand-500', 'dark:ring-slate-500');
+                }
+            });
+        }
+
+        function setDirection(direction) {
+            state.gradDirection = direction;
+            updateDirectionUI();
+            updateCanvas();
+        }
+
+        function updateDirectionUI() {
+            document.querySelectorAll('.dir-btn').forEach(btn => {
+                if(btn.dataset.dir === state.gradDirection) {
+                    btn.classList.add('active-dir', 'bg-brand-50', 'dark:bg-slate-800', 'border-brand-500', 'dark:border-slate-500', 'text-brand-600', 'dark:text-brand-400');
+                } else {
+                    btn.classList.remove('active-dir', 'bg-brand-50', 'dark:bg-slate-800', 'border-brand-500', 'dark:border-slate-500', 'text-brand-600', 'dark:text-brand-400');
+                }
+            });
+        }
+
+        function togglePaletteVisibility() {
+            const solidPanel = document.getElementById('solidColorPanel');
+            const gradPanel = document.getElementById('gradientColorPanel');
+            const solidPalette = document.getElementById('solidPalette');
+            const gradPalette = document.getElementById('gradientPalette');
+
+            if (state.bgType === 'solid') {
+                solidPanel.classList.remove('hidden');
+                gradPanel.classList.add('hidden');
+                solidPalette.classList.remove('hidden');
+                gradPalette.classList.add('hidden');
+            } else {
+                solidPanel.classList.add('hidden');
+                gradPanel.classList.remove('hidden');
+                solidPalette.classList.add('hidden');
+                gradPalette.classList.remove('hidden');
+            }
+        }
+
         function resizeCanvas() {
-            const ratio = document.getElementById('canvasRatio').value;
             let width = 1080;
             let height = 1080;
 
-            if (ratio === '4:5') height = 1350;
-            else if (ratio === '16:9') { width = 1920; height = 1080; }
+            if (state.canvasRatio === '4:5') height = 1350;
+            else if (state.canvasRatio === '16:9') { width = 1920; height = 1080; }
 
             state.canvas.width = width;
             state.canvas.height = height;
@@ -897,10 +1026,12 @@
             updateCanvas();
         }
         
-        function clearQuote() {
-            document.getElementById('quote').value = '';
-            document.getElementById('author').value = '';
-            document.getElementById('title').value = '';
+        function clearQuoteTextOnly() {
+            const quoteInput = document.getElementById('quote');
+            quoteInput.value = '';
+            state.isWelcomeActive = false;
+            quoteInput.classList.remove('text-slate-400');
+            // Author and Title are preserved
             updateCanvas();
         }
 
@@ -911,20 +1042,17 @@
             if (type === 'solid') {
                 state.colors.bgMain = color1;
                 document.querySelector('input[name="bgMode"][value="solid"]').checked = true;
-                document.getElementById('solidColorPanel').classList.remove('hidden');
-                document.getElementById('gradientColorPanel').classList.add('hidden');
                 if(state.pickrs.bgMain) state.pickrs.bgMain.setColor(color1, true);
             } else {
                 state.colors.gradStart = color1;
                 state.colors.gradEnd = color2;
                 document.querySelector('input[name="bgMode"][value="gradient"]').checked = true;
-                document.getElementById('solidColorPanel').classList.add('hidden');
-                document.getElementById('gradientColorPanel').classList.remove('hidden');
                 if(state.pickrs.gradStart) state.pickrs.gradStart.setColor(color1, true);
                 if(state.pickrs.gradEnd) state.pickrs.gradEnd.setColor(color2, true);
             }
 
             if(state.pickrs.text) state.pickrs.text.setColor(textColor, true);
+            togglePaletteVisibility();
             updateCanvas();
         }
 
@@ -1074,7 +1202,7 @@
             const lineHeightMultiplier = parseFloat(document.getElementById('lineHeight').value);
             const padding = parseInt(document.getElementById('padding').value);
             const align = document.querySelector('input[name="align"]:checked').value;
-            const fontFamily = document.getElementById('fontSelect').value;
+            const fontFamily = state.fontFamily; // Use state, not select
             const breakMode = document.querySelector('input[name="linebreak"]:checked').value;
             const logoSize = parseInt(document.getElementById('logoSize').value);
 
