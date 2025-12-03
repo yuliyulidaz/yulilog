@@ -177,6 +177,17 @@
         .animate-tip {
             animation: tip-flash 0.3s ease-in-out;
         }
+
+        /* Mobile Editor Modal Animation */
+        #mobile-editor-modal {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #mobile-editor-modal.hidden-modal {
+            transform: translateY(100%);
+        }
+        #mobile-editor-modal.visible-modal {
+            transform: translateY(0);
+        }
     </style>
 <script type="importmap">
 {
@@ -258,7 +269,7 @@
 
                     <!-- Section: Content -->
                     <section class="space-y-4">
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-center justify-between flex-wrap gap-2">
                             <div class="flex items-center gap-2">
                                 <h2 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">내용 입력</h2>
                                 <!-- Indentation Toggle -->
@@ -267,13 +278,19 @@
                                     <span id="text-indent">들여쓰기 OFF</span>
                                 </button>
                             </div>
-                            <button onclick="clearQuoteTextOnly()" class="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1">
-                                <i class="ph ph-eraser"></i> 문구만 지우기
-                            </button>
+                            <div class="flex gap-2">
+                                <button onclick="openMobileEditor()" class="md:hidden text-xs text-brand-600 hover:text-brand-700 font-medium flex items-center gap-1 bg-brand-50 px-2 py-1 rounded-md">
+                                    <i class="ph ph-arrows-out-simple"></i> 크게 입력
+                                </button>
+                                <button onclick="clearQuoteTextOnly()" class="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1 px-2 py-1">
+                                    <i class="ph ph-eraser"></i> 지우기
+                                </button>
+                            </div>
                         </div>
                         
                         <div class="relative group">
-                            <textarea id="quote" placeholder="여기에 문구를 입력하세요..." class="w-full h-32 p-4 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all text-sm leading-relaxed placeholder:text-slate-400"></textarea>
+                            <!-- Added overflow-y-auto and overscroll-y-contain for Android Scroll -->
+                            <textarea id="quote" placeholder="여기에 문구를 입력하세요..." class="w-full h-32 p-4 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all text-sm leading-relaxed placeholder:text-slate-400 overflow-y-auto overscroll-y-contain"></textarea>
                             <div class="absolute bottom-3 right-3 text-slate-400 pointer-events-none">
                                 <i class="ph ph-pencil-simple"></i>
                             </div>
@@ -705,7 +722,7 @@
                         </a>
                         
                         <div>
-                            <h3 class="font-bold text-slate-500 dark:text-slate-400 mb-1">📖 발췌 문구 생성기 v1.3.1</h3>
+                            <h3 class="font-bold text-slate-500 dark:text-slate-400 mb-1">📖 발췌 문구 생성기 v1.4.0 (Mobile UX)</h3>
                             <p>본 사이트는 어떠한 개인정보도 수집하지 않습니다.<br>모든 작업은 귀하의 브라우저에서만 이루어집니다.</p>
                         </div>
                         
@@ -728,6 +745,37 @@
         </main>
     </div>
 
+    <!-- Mobile Full-Screen Editor Modal -->
+    <div id="mobile-editor-modal" class="fixed inset-0 z-[100] bg-white dark:bg-zinc-950 hidden-modal flex flex-col">
+        <!-- Header -->
+        <div class="h-14 border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between px-4 bg-white dark:bg-zinc-950 flex-shrink-0">
+            <span class="font-bold text-lg text-slate-800 dark:text-slate-100">텍스트 입력</span>
+            <button onclick="closeMobileEditor()" class="flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 text-white text-sm font-bold rounded-lg shadow-sm active:scale-95 transition-transform">
+                <i class="ph ph-check text-lg"></i>
+                <span>완료</span>
+            </button>
+        </div>
+        
+        <!-- Editor Body -->
+        <div class="flex-1 overflow-y-auto p-4 space-y-6">
+            <div class="space-y-2">
+                <label class="text-sm font-medium text-slate-500">본문 내용</label>
+                <textarea id="mobile-quote-input" class="w-full h-64 p-4 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all text-base leading-relaxed placeholder:text-slate-400" placeholder="여기에 문구를 입력하세요..."></textarea>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-slate-500">제작자</label>
+                    <input type="text" id="mobile-author-input" class="w-full px-4 py-3 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all" placeholder="제작자">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-slate-500">캐릭터/제목</label>
+                    <input type="text" id="mobile-title-input" class="w-full px-4 py-3 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all" placeholder="캐릭터/제목">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script>
         // --- 1. State Management & Constants ---
@@ -742,6 +790,7 @@
 ✅ 텍스트 양쪽 정렬(Justify) 완벽 지원
 ✅ 모바일 롱 프레스 가속 & 숫자 직접 입력
 ✅ [NEW] 문단 들여쓰기 (Indentation) ON/OFF 기능
+✅ [NEW] 모바일 집중 입력 모드 (전체 화면 에디터) 추가!
 
 ⚠️이 공지는 내용입력 클릭 시 자동 삭제!
 `;
@@ -1283,6 +1332,57 @@
             }
             if(state.pickrs.text) state.pickrs.text.setColor(textColor);
             togglePaletteVisibility();
+            updateCanvas();
+        }
+
+        // --- NEW: Mobile Editor Logic ---
+        function openMobileEditor() {
+            const modal = document.getElementById('mobile-editor-modal');
+            const mainQuote = document.getElementById('quote');
+            const mainAuthor = document.getElementById('author');
+            const mainTitle = document.getElementById('title');
+            
+            const mobileQuote = document.getElementById('mobile-quote-input');
+            const mobileAuthor = document.getElementById('mobile-author-input');
+            const mobileTitle = document.getElementById('mobile-title-input');
+
+            // Sync values from main to mobile
+            mobileQuote.value = mainQuote.value;
+            mobileAuthor.value = mainAuthor.value;
+            mobileTitle.value = mainTitle.value;
+
+            // Show Modal
+            modal.classList.remove('hidden-modal');
+            modal.classList.add('visible-modal');
+
+            // Handle Welcome Active State removal if opening editor
+            if (state.isWelcomeActive) {
+                state.isWelcomeActive = false;
+                mobileQuote.value = ''; // Clear welcome text for fresh input
+                mainQuote.classList.remove('text-slate-400');
+            }
+        }
+
+        function closeMobileEditor() {
+            const modal = document.getElementById('mobile-editor-modal');
+            const mainQuote = document.getElementById('quote');
+            const mainAuthor = document.getElementById('author');
+            const mainTitle = document.getElementById('title');
+            
+            const mobileQuote = document.getElementById('mobile-quote-input');
+            const mobileAuthor = document.getElementById('mobile-author-input');
+            const mobileTitle = document.getElementById('mobile-title-input');
+
+            // Sync values from mobile to main
+            mainQuote.value = mobileQuote.value;
+            mainAuthor.value = mobileAuthor.value;
+            mainTitle.value = mobileTitle.value;
+
+            // Hide Modal
+            modal.classList.remove('visible-modal');
+            modal.classList.add('hidden-modal');
+
+            // Trigger Update
             updateCanvas();
         }
 
