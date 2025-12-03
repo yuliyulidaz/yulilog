@@ -143,6 +143,40 @@
             z-index: 9999 !important;
             font-family: 'Pretendard', sans-serif !important;
         }
+
+        /* --- New Mobile Input Styling --- */
+        /* Hide Spinners */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+            background: transparent;
+            text-align: center;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-weight: 700;
+            outline: none;
+            width: 3rem;
+        }
+        /* Button Active State for Long Press */
+        .btn-pressing {
+            background-color: #e2e8f0 !important;
+            transform: scale(0.95);
+        }
+        .dark .btn-pressing {
+            background-color: #3f3f46 !important;
+        }
+        /* Tip Animation */
+        @keyframes tip-flash {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.05); filter: brightness(1.1); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+        .animate-tip {
+            animation: tip-flash 0.3s ease-in-out;
+        }
     </style>
 <script type="importmap">
 {
@@ -225,7 +259,14 @@
                     <!-- Section: Content -->
                     <section class="space-y-4">
                         <div class="flex items-center justify-between">
-                            <h2 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">내용 입력</h2>
+                            <div class="flex items-center gap-2">
+                                <h2 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">내용 입력</h2>
+                                <!-- Indentation Toggle -->
+                                <button onclick="toggleIndentation()" id="btn-indent" class="flex items-center gap-1 text-[10px] font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors py-0.5 px-2 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
+                                    <i class="ph ph-text-indent" id="icon-indent"></i>
+                                    <span id="text-indent">들여쓰기 OFF</span>
+                                </button>
+                            </div>
                             <button onclick="clearQuoteTextOnly()" class="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1">
                                 <i class="ph ph-eraser"></i> 문구만 지우기
                             </button>
@@ -341,8 +382,76 @@
                             </div>
                         </div>
 
-                        <!-- Sliders -->
-                        <div class="space-y-5 pt-2">
+                        <!-- 
+                          RESPONSIVE CONTROLS:
+                          1. Desktop/Tablet (md:block): Sliders
+                          2. Mobile (md:hidden): Button Steppers (2x2 Grid) with Input
+                        -->
+
+                        <!-- MOBILE VIEW: Button Steppers (2x2 Grid) -->
+                        <div class="md:hidden space-y-2 pt-2">
+                             <!-- NEW: Tip Location (Above Grid) with ID for animation -->
+                             <div id="mobile-tip-container" class="text-center transition-opacity duration-300 opacity-70">
+                                <p class="text-[10px] text-brand-600 dark:text-brand-400 flex items-center justify-center gap-1 font-medium bg-brand-50 dark:bg-brand-900/30 py-1 px-2 rounded-full inline-flex">
+                                    <i class="ph ph-lightbulb text-brand-500"></i>
+                                    <span>Tip: 버튼을 꾹 누르면 빠르게 조절돼요</span>
+                                </p>
+                             </div>
+
+                             <div class="grid grid-cols-2 gap-3">
+                                <!-- Card 1: Font Size -->
+                                <div class="bg-slate-50 dark:bg-black/20 p-3 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
+                                    <label class="text-xs font-medium text-slate-500 mb-2">글자 크기</label>
+                                    <div class="flex items-center justify-between bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-1">
+                                        <button id="btn-minus-fontSize" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-brand-600 rounded select-none"><i class="ph ph-minus"></i></button>
+                                        <div class="flex items-center gap-0.5">
+                                            <input type="number" id="input-mobile-fontSize" class="text-brand-600 text-sm">
+                                            <span class="text-xs text-slate-400 font-medium">px</span>
+                                        </div>
+                                        <button id="btn-plus-fontSize" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-brand-600 rounded select-none"><i class="ph ph-plus"></i></button>
+                                    </div>
+                                </div>
+                                <!-- Card 2: Line Height -->
+                                <div class="bg-slate-50 dark:bg-black/20 p-3 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
+                                    <label class="text-xs font-medium text-slate-500 mb-2">줄 간격</label>
+                                    <div class="flex items-center justify-between bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-1">
+                                        <button id="btn-minus-lineHeight" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-brand-600 rounded select-none"><i class="ph ph-minus"></i></button>
+                                        <div class="flex items-center gap-0.5">
+                                            <input type="number" id="input-mobile-lineHeight" class="text-brand-600 text-sm" step="0.1">
+                                            <span class="text-xs text-slate-400 font-medium">x</span>
+                                        </div>
+                                        <button id="btn-plus-lineHeight" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-brand-600 rounded select-none"><i class="ph ph-plus"></i></button>
+                                    </div>
+                                </div>
+                                <!-- Card 3: Paragraph Spacing -->
+                                <div class="bg-slate-50 dark:bg-black/20 p-3 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
+                                    <label class="text-xs font-medium text-slate-500 mb-2">문단 간격</label>
+                                    <div class="flex items-center justify-between bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-1">
+                                        <button id="btn-minus-paraSpacing" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-brand-600 rounded select-none"><i class="ph ph-minus"></i></button>
+                                        <div class="flex items-center gap-0.5">
+                                            <input type="number" id="input-mobile-paraSpacing" class="text-brand-600 text-sm">
+                                            <span class="text-xs text-slate-400 font-medium">px</span>
+                                        </div>
+                                        <button id="btn-plus-paraSpacing" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-brand-600 rounded select-none"><i class="ph ph-plus"></i></button>
+                                    </div>
+                                </div>
+                                <!-- Card 4: Padding -->
+                                <div class="bg-slate-50 dark:bg-black/20 p-3 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
+                                    <label class="text-xs font-medium text-slate-500 mb-2">여백</label>
+                                    <div class="flex items-center justify-between bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-1">
+                                        <button id="btn-minus-padding" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-brand-600 rounded select-none"><i class="ph ph-minus"></i></button>
+                                        <div class="flex items-center gap-0.5">
+                                            <input type="number" id="input-mobile-padding" class="text-brand-600 text-sm">
+                                            <span class="text-xs text-slate-400 font-medium">px</span>
+                                        </div>
+                                        <button id="btn-plus-padding" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-brand-600 rounded select-none"><i class="ph ph-plus"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DESKTOP VIEW: Sliders (Existing) -->
+                        <div class="hidden md:block space-y-5 pt-2">
                             <div class="relative">
                                 <div class="flex justify-between text-xs mb-2">
                                     <span class="text-slate-500">글자 크기</span>
@@ -626,13 +735,13 @@
         const WELCOME_MESSAGE = `⚡️ 업데이트 완료! 
         
 ✅ 직관적 레이아웃으로 변경
-✅ 제작자 | 캐릭터 : 본문과 함께 정렬, 크기도 본문 폰트에 따라 자동 조절
+✅ 제작자 | 캐릭터 : 본문과 함께 정렬
 ✅ 디테일 컬러 피커 도입
-✅ 배경 이미지 : 오버레이 ‘밝게(White)’ 추가
-✅ 배경 이미지 : 이미지 확대 기능 추가
-✅ 그라데이션 : 이제 방향도 선택 가능
-✅ 문단 간격 조절 기능 추가 (줄 간격과 별도)
+✅ 배경 이미지 : 오버레이 및 확대 기능
+✅ 그라데이션 : 방향 선택 가능
 ✅ 텍스트 양쪽 정렬(Justify) 완벽 지원
+✅ 모바일 롱 프레스 가속 & 숫자 직접 입력
+✅ [NEW] 문단 들여쓰기 (Indentation) ON/OFF 기능
 
 ⚠️이 공지는 내용입력 클릭 시 자동 삭제!
 `;
@@ -650,6 +759,7 @@
             gradDirection: 'to bottom right',
             canvasRatio: '1:1',
             fontFamily: 'Noto Serif KR',
+            indentation: false, // New Indentation State
             isWelcomeActive: true, // Track if welcome message is being shown
             colors: {
                 text: '#4A4A4A', // Default Text Color Changed to Dark Grey for Dreamy Purple
@@ -705,16 +815,160 @@
                 if(divider) divider.style.display = 'none';
             }
 
-            // Font Loading Fix: Wait for fonts to load before drawing
+            // Init Mobile Steppers (Long Press + Direct Input)
+            setupMobileSteppers();
+
+            // Font Loading Fix
             document.fonts.ready.then(() => {
                 updateCanvas();
             });
-            // Fallback: Redraw after short delay to ensure fonts are applied
             setTimeout(updateCanvas, 500);
-            setTimeout(updateCanvas, 1000);
             
-            updateCanvas(); // Initial draw attempt
+            updateCanvas(); // Initial draw
         });
+
+        // --- NEW: Mobile Stepper Logic with Long Press & Direct Input ---
+        function setupMobileSteppers() {
+            // Configuration for each control
+            const controls = [
+                { key: 'fontSize', step: 1, min: 30, max: 80 },
+                { key: 'lineHeight', step: 0.1, min: 1.2, max: 2.0 },
+                { key: 'paraSpacing', step: 5, min: 0, max: 100 },
+                { key: 'padding', step: 10, min: 50, max: 200 }
+            ];
+
+            controls.forEach(ctrl => {
+                attachStepperEvents(ctrl.key, ctrl.step, ctrl.min, ctrl.max);
+            });
+        }
+
+        function attachStepperEvents(key, step, min, max) {
+            const minusBtn = document.getElementById(`btn-minus-${key}`);
+            const plusBtn = document.getElementById(`btn-plus-${key}`);
+            const inputMobile = document.getElementById(`input-mobile-${key}`);
+            const sliderDesktop = document.getElementById(key); // The hidden slider is the source of truth
+
+            // Sync: Desktop Slider -> Mobile Input
+            sliderDesktop.addEventListener('input', (e) => {
+                inputMobile.value = e.target.value;
+            });
+            
+            // Init value
+            inputMobile.value = sliderDesktop.value;
+
+            // Sync: Mobile Input Direct Change -> Desktop Slider
+            inputMobile.addEventListener('change', (e) => {
+                let val = parseFloat(e.target.value);
+                if (isNaN(val)) val = parseFloat(sliderDesktop.value);
+                if (val < min) val = min;
+                if (val > max) val = max;
+                
+                // Update Desktop Slider
+                sliderDesktop.value = val;
+                inputMobile.value = val; // Reflect corrected value
+                
+                // Trigger canvas update via slider event
+                sliderDesktop.dispatchEvent(new Event('input'));
+            });
+
+            // Long Press Logic Variables
+            let pressTimer = null;
+            let pressInterval = null;
+            let pressSpeed = 200; // Start speed
+            let pressCount = 0;
+
+            const updateValue = (delta) => {
+                let current = parseFloat(sliderDesktop.value);
+                let next = current + delta;
+                
+                // Round for float precision
+                if (step < 1) next = Math.round(next * 10) / 10;
+                
+                if (next >= min && next <= max) {
+                    sliderDesktop.value = next;
+                    inputMobile.value = next;
+                    sliderDesktop.dispatchEvent(new Event('input'));
+                }
+            };
+
+            const startPress = (btn, delta) => {
+                // Visual Feedback
+                btn.classList.add('btn-pressing');
+                
+                // Tip Animation Trigger
+                const tipContainer = document.getElementById('mobile-tip-container');
+                if (tipContainer) {
+                    tipContainer.classList.remove('animate-tip');
+                    void tipContainer.offsetWidth; // Trigger reflow
+                    tipContainer.classList.add('animate-tip');
+                    tipContainer.classList.remove('opacity-70');
+                    tipContainer.classList.add('opacity-100');
+                }
+
+                // Immediate update
+                updateValue(delta);
+
+                // Reset speed logic
+                pressSpeed = 200; 
+                pressCount = 0;
+
+                // Delay before rapid fire
+                pressTimer = setTimeout(() => {
+                    pressInterval = setInterval(() => {
+                        updateValue(delta);
+                        pressCount++;
+                        
+                        // Acceleration: Every 5 steps, speed up until max speed
+                        if (pressCount % 5 === 0 && pressSpeed > 50) {
+                            clearInterval(pressInterval);
+                            pressSpeed = Math.max(50, pressSpeed - 30);
+                            pressInterval = setInterval(() => {
+                                updateValue(delta);
+                                pressCount++;
+                            }, pressSpeed);
+                        }
+                    }, pressSpeed);
+                }, 400); // 400ms delay before auto-repeat
+            };
+
+            const stopPress = (btn) => {
+                btn.classList.remove('btn-pressing');
+                clearTimeout(pressTimer);
+                clearInterval(pressInterval);
+                pressTimer = null;
+                pressInterval = null;
+                
+                // Reset Tip Opacity
+                const tipContainer = document.getElementById('mobile-tip-container');
+                if(tipContainer) {
+                    tipContainer.classList.remove('opacity-100');
+                    tipContainer.classList.add('opacity-70');
+                }
+            };
+
+            // Bind Events (Touch + Mouse)
+            const bindBtn = (btn, delta) => {
+                // Touch
+                btn.addEventListener('touchstart', (e) => {
+                    e.preventDefault(); // Prevent ghost click
+                    startPress(btn, delta);
+                });
+                btn.addEventListener('touchend', () => stopPress(btn));
+                btn.addEventListener('touchcancel', () => stopPress(btn));
+
+                // Mouse
+                btn.addEventListener('mousedown', (e) => {
+                    startPress(btn, delta);
+                });
+                btn.addEventListener('mouseup', () => stopPress(btn));
+                btn.addEventListener('mouseleave', () => stopPress(btn));
+            };
+
+            bindBtn(minusBtn, -step);
+            bindBtn(plusBtn, step);
+        }
+
+        // --- Existing Functions ---
 
         function initTheme() {
             if (state.isDarkMode) {
@@ -766,45 +1020,28 @@
                     }
                 });
 
-                // 열릴 때 색상 저장
-                pickr.on('show', (color, instance) => {
-                    initialColor = state.colors[key];
-                });
-
-                // 색상 변경 시 (드래그 등) - 즉시 반영
+                pickr.on('show', (color, instance) => { initialColor = state.colors[key]; });
                 pickr.on('change', (color, source, instance) => {
                     const hex = color.toHEXA().toString();
                     state.colors[key] = hex;
                     updateCanvas();     
                 });
-
-                // 저장 버튼 클릭
                 pickr.on('save', (color, instance) => {
                     const hex = color.toHEXA().toString();
                     state.colors[key] = hex;
-                    instance.applyColor(true); // 버튼 색상 업데이트
+                    instance.applyColor(true);
                     instance.hide();
                 });
-
-                // 취소 버튼 클릭 시 - 이전 색으로 복구
                 pickr.on('cancel', (instance) => {
                     state.colors[key] = initialColor;
                     pickr.setColor(initialColor, true); 
                     updateCanvas();
                     instance.hide();
                 });
-                
-                // 창이 닫힐 때 (저장, 취소, 외부클릭 모두 포함)
                 pickr.on('hide', (instance) => {
-                     // 핵심 수정: 창이 닫힐 때 현재 피커의 색상을 버튼에 강제 적용하여
-                     // "외부 클릭 시에도 색상이 선택된 상태"로 만듦.
                      const currentColor = instance.getColor().toHEXA().toString();
-                     if (state.colors[key] === currentColor) {
-                        instance.applyColor(true);
-                     }
+                     if (state.colors[key] === currentColor) instance.applyColor(true);
                 });
-
-                // 팔레트(Swatch) 클릭 시
                 pickr.on('swatchselect', (color) => {
                     const hex = color.toHEXA().toString();
                     state.colors[key] = hex;
@@ -827,44 +1064,38 @@
                 img.crossOrigin = "Anonymous"; 
                 img.src = url;
                 state.logoImages[key] = img;
-                // Redraw when loaded if this is the selected platform
-                img.onload = () => {
-                    if (state.platform === key) updateCanvas();
-                };
+                img.onload = () => { if (state.platform === key) updateCanvas(); };
             }
         }
 
         // --- 3. Event Binding ---
         function bindEvents() {
-            // Text Inputs
             const quoteInput = document.getElementById('quote');
-            
-            // Handle Welcome Message Auto-Clear on Focus
             quoteInput.addEventListener('focus', function() {
                 if (state.isWelcomeActive) {
                     state.isWelcomeActive = false;
                     this.value = '';
-                    this.classList.remove('text-slate-400'); // Restore normal color
+                    this.classList.remove('text-slate-400');
                     updateCanvas();
                 }
             });
-
             quoteInput.addEventListener('input', updateCanvas);
             
             document.getElementById('author').addEventListener('input', updateCanvas);
             document.getElementById('title').addEventListener('input', updateCanvas);
 
-            // Style Inputs
+            // Desktop Sliders Events
             ['fontSize', 'lineHeight', 'paraSpacing', 'padding', 'logoSize', 'overlayOpacity', 'bgImageScale'].forEach(id => {
                 const el = document.getElementById(id);
                 el.addEventListener('input', (e) => {
-                    // Update value displays
+                    // Update Text Labels
                     if(id === 'fontSize') document.getElementById('fontSizeValue').innerText = e.target.value;
                     if(id === 'lineHeight') document.getElementById('lineHeightValue').innerText = e.target.value;
                     if(id === 'paraSpacing') document.getElementById('paraSpacingValue').innerText = e.target.value;
                     if(id === 'padding') document.getElementById('paddingValue').innerText = e.target.value;
                     if(id === 'logoSize') document.getElementById('logoSizeValue').innerText = e.target.value;
                     if(id === 'bgImageScale') document.getElementById('scaleValue').innerText = e.target.value;
+                    
                     if(id === 'overlayOpacity') {
                          const val = parseInt(e.target.value);
                          let text = "원본";
@@ -876,12 +1107,10 @@
                 });
             });
 
-            // Radio Groups
             document.querySelectorAll('input[name="align"], input[name="linebreak"], input[name="imageFit"], input[name="imagePosition"]').forEach(el => {
                 el.addEventListener('change', updateCanvas);
             });
             
-            // Background Mode Toggle
             document.querySelectorAll('input[name="bgMode"]').forEach(el => {
                 el.addEventListener('change', (e) => {
                     state.bgType = e.target.value;
@@ -890,17 +1119,15 @@
                 });
             });
 
-            // Platform Select
             document.getElementById('platformSelect').addEventListener('change', (e) => {
                 state.platform = e.target.value;
                 updateCanvas();
             });
 
-            // Image Upload
             document.getElementById('bgImageUpload').addEventListener('change', handleImageUpload);
         }
 
-        // --- 4. Logic Functions (Updated) ---
+        // --- Logic Functions ---
         
         function setRatio(ratio) {
             state.canvasRatio = ratio;
@@ -910,11 +1137,9 @@
         }
 
         function updateRatioUI() {
-            // Remove active classes
             document.querySelectorAll('.ratio-btn').forEach(btn => {
                 btn.classList.remove('bg-brand-50', 'dark:bg-slate-800', 'border-brand-500', 'dark:border-slate-500', 'ring-1', 'ring-brand-500', 'dark:ring-slate-500');
             });
-            // Add active class
             const idMap = { '1:1': 'btn-ratio-1-1', '4:5': 'btn-ratio-4-5', '16:9': 'btn-ratio-16-9' };
             const activeBtn = document.getElementById(idMap[state.canvasRatio]);
             if(activeBtn) {
@@ -925,18 +1150,11 @@
         function setFont(fontName) {
             state.fontFamily = fontName;
             updateFontUI();
-            
             let fontWeight = '400';
             if (fontName === 'Noto Serif KR' || fontName === 'KoPub Batang') fontWeight = '300';
             else if (fontName === 'Noto Sans KR' || fontName === 'Pretendard') fontWeight = '200';
-            
             const fontString = `${fontWeight} 40px '${fontName}'`;
-            
-            document.fonts.load(fontString).then(() => {
-                updateCanvas();
-            }).catch(() => {
-                 updateCanvas();
-            });
+            document.fonts.load(fontString).then(() => { updateCanvas(); }).catch(() => { updateCanvas(); });
             setTimeout(updateCanvas, 100);
         }
 
@@ -988,10 +1206,8 @@
         function resizeCanvas() {
             let width = 1080;
             let height = 1080;
-
             if (state.canvasRatio === '4:5') height = 1350;
             else if (state.canvasRatio === '16:9') { width = 1920; height = 1080; }
-
             state.canvas.width = width;
             state.canvas.height = height;
         }
@@ -999,7 +1215,6 @@
         function handleImageUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = (event) => {
                 const img = new Image();
@@ -1020,11 +1235,8 @@
             state.bgImageName = null;
             document.getElementById('bgImageUpload').value = '';
             document.getElementById('imageControlPanel').classList.add('hidden');
-            
-            // Reset Overlay Settings
             document.getElementById('overlayOpacity').value = 0;
             document.getElementById('overlayValueText').innerText = "원본";
-            
             updateCanvas();
         }
         
@@ -1033,36 +1245,43 @@
             quoteInput.value = '';
             state.isWelcomeActive = false;
             quoteInput.classList.remove('text-slate-400');
-            // Author and Title are preserved
+            updateCanvas();
+        }
+
+        // New Indentation Toggle Function
+        function toggleIndentation() {
+            state.indentation = !state.indentation;
+            const btn = document.getElementById('btn-indent');
+            const text = document.getElementById('text-indent');
+            
+            if (state.indentation) {
+                btn.classList.remove('text-slate-400');
+                btn.classList.add('text-brand-600', 'bg-brand-50', 'dark:bg-brand-900/30', 'border-brand-200', 'dark:border-brand-800');
+                btn.classList.remove('bg-slate-50', 'dark:bg-slate-800');
+                text.innerText = "들여쓰기 ON";
+            } else {
+                btn.classList.add('text-slate-400', 'bg-slate-50', 'dark:bg-slate-800');
+                btn.classList.remove('text-brand-600', 'bg-brand-50', 'dark:bg-brand-900/30', 'border-brand-200', 'dark:border-brand-800');
+                text.innerText = "들여쓰기 OFF";
+            }
             updateCanvas();
         }
 
         function setPreset(type, color1, color2, textColor) {
             state.bgType = type;
             state.colors.text = textColor;
-            
             if (type === 'solid') {
                 state.colors.bgMain = color1;
                 document.querySelector('input[name="bgMode"][value="solid"]').checked = true;
-                if(state.pickrs.bgMain) {
-                    state.pickrs.bgMain.setColor(color1); 
-                }
+                if(state.pickrs.bgMain) state.pickrs.bgMain.setColor(color1); 
             } else {
                 state.colors.gradStart = color1;
                 state.colors.gradEnd = color2;
                 document.querySelector('input[name="bgMode"][value="gradient"]').checked = true;
-                if(state.pickrs.gradStart) {
-                    state.pickrs.gradStart.setColor(color1);
-                }
-                if(state.pickrs.gradEnd) {
-                    state.pickrs.gradEnd.setColor(color2);
-                }
+                if(state.pickrs.gradStart) state.pickrs.gradStart.setColor(color1);
+                if(state.pickrs.gradEnd) state.pickrs.gradEnd.setColor(color2);
             }
-
-            if(state.pickrs.text) {
-                state.pickrs.text.setColor(textColor);
-            }
-            
+            if(state.pickrs.text) state.pickrs.text.setColor(textColor);
             togglePaletteVisibility();
             updateCanvas();
         }
@@ -1073,20 +1292,13 @@
             const ctx = state.ctx;
             const width = state.canvas.width;
             const height = state.canvas.height;
-
-            // Clear
             ctx.clearRect(0, 0, width, height);
-
-            // 1. Background
             drawBackground(ctx, width, height);
-
-            // 2. Content (Text + Logo)
             drawContent(ctx, width, height);
         }
 
         function normalizeColor(color) {
             if (!color) return '#000000';
-            // Check for 8-digit hex (e.g. #RRGGBBAA)
             if (/^#[0-9A-F]{8}$/i.test(color)) {
                 const r = parseInt(color.slice(1, 3), 16);
                 const g = parseInt(color.slice(3, 5), 16);
@@ -1098,17 +1310,12 @@
         }
 
         function drawBackground(ctx, width, height) {
-            // Force reset alpha to prevent ghosting
             ctx.globalAlpha = 1;
-            
             if (state.bgType === 'solid') {
-                // Color Only
                 let colorMain = normalizeColor(state.colors.bgMain);
                 ctx.fillStyle = colorMain;
             } else {
-                // Gradient Mode
                 let x0 = 0, y0 = 0, x1 = 0, y1 = 0;
-                
                 switch(state.gradDirection) {
                     case 'to bottom': y1 = height; break;
                     case 'to top': y0 = height; y1 = 0; break;
@@ -1119,33 +1326,20 @@
                     case 'to bottom left': x0 = width; y1 = height; break;
                     case 'to top left': x0 = width; y0 = height; break;
                 }
-                
                 const grad = ctx.createLinearGradient(x0, y0, x1, y1);
                 grad.addColorStop(0, normalizeColor(state.colors.gradStart));
                 grad.addColorStop(1, normalizeColor(state.colors.gradEnd));
                 ctx.fillStyle = grad;
             }
-            
-            // Always fill the rect
             ctx.fillRect(0, 0, width, height);
 
-            // Background Image
-            if (state.bgImage) {
-                drawImage(ctx, width, height);
-            }
+            if (state.bgImage) drawImage(ctx, width, height);
 
-            // Overlay
             const overlayVal = parseInt(document.getElementById('overlayOpacity').value);
-            
             if (overlayVal !== 0) {
                 ctx.save();
-                if (overlayVal < 0) {
-                    // Light (White)
-                    ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(overlayVal) / 100})`;
-                } else {
-                    // Dark (Black)
-                    ctx.fillStyle = `rgba(0, 0, 0, ${overlayVal / 100})`;
-                }
+                if (overlayVal < 0) ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(overlayVal) / 100})`;
+                else ctx.fillStyle = `rgba(0, 0, 0, ${overlayVal / 100})`;
                 ctx.fillRect(0, 0, width, height);
                 ctx.restore();
             }
@@ -1160,38 +1354,22 @@
 
             let sWidth = img.width;
             let sHeight = img.height;
-            
-            // Calculate draw dimensions based on fit mode (base size)
             let dWidth, dHeight;
             const imgRatio = sWidth / sHeight;
             const canvasRatio = width / height;
 
             if (fit === 'cover') {
-                if (imgRatio > canvasRatio) {
-                    dHeight = height;
-                    dWidth = height * imgRatio;
-                } else {
-                    dWidth = width;
-                    dHeight = width / imgRatio;
-                }
-            } else { // contain
-                 if (imgRatio > canvasRatio) {
-                    dWidth = width;
-                    dHeight = width / imgRatio;
-                } else {
-                    dHeight = height;
-                    dWidth = height * imgRatio;
-                }
+                if (imgRatio > canvasRatio) { dHeight = height; dWidth = height * imgRatio; } 
+                else { dWidth = width; dHeight = width / imgRatio; }
+            } else { 
+                 if (imgRatio > canvasRatio) { dWidth = width; dHeight = width / imgRatio; } 
+                 else { dHeight = height; dWidth = height * imgRatio; }
             }
-
-            // Apply Scale
             dWidth *= scale;
             dHeight *= scale;
 
-            // Calculate Position
             let dx, dy;
             const [vPos, hPos] = position.split('-');
-
             if (hPos === 'left') dx = 0;
             else if (hPos === 'center') dx = (width - dWidth) / 2;
             else if (hPos === 'right') dx = width - dWidth;
@@ -1211,46 +1389,36 @@
             
             const fontSize = parseInt(document.getElementById('fontSize').value);
             const lineHeightMultiplier = parseFloat(document.getElementById('lineHeight').value);
-            const paraSpacing = parseInt(document.getElementById('paraSpacing').value); // New Parameter
+            const paraSpacing = parseInt(document.getElementById('paraSpacing').value); 
             const padding = parseInt(document.getElementById('padding').value);
             const align = document.querySelector('input[name="align"]:checked').value;
-            const fontFamily = state.fontFamily; // Use state, not select
+            const fontFamily = state.fontFamily; 
             const breakMode = document.querySelector('input[name="linebreak"]:checked').value;
             const logoSize = parseInt(document.getElementById('logoSize').value);
+            
+            // Indentation Logic: Use fontSize if active, else 0
+            const indentSize = state.indentation ? fontSize : 0; 
 
             ctx.fillStyle = state.colors.text;
             ctx.textBaseline = 'middle';
 
-            // --- Footer Metrics (Increased Size) ---
             const footerFontSize = Math.max(24, fontSize * 0.8);
             const footerLineHeight = footerFontSize * 1.5;
 
-            // --- Quote Calculation ---
-            // Determine font weight based on family for the thinnest look (Thin/Light Application)
-            // Modified weights as requested (+100)
-            let fontWeight = 400; // Default
-            if (fontFamily === 'Noto Serif KR') fontWeight = 300;       // Light (was 200)
-            else if (fontFamily === 'Noto Sans KR') fontWeight = 200;    // ExtraLight (was 100)
-            else if (fontFamily === 'Pretendard') fontWeight = 200;      // ExtraLight (was 100)
-            else if (fontFamily === 'KoPub Batang') fontWeight = 300;    // Light
+            let fontWeight = 400; 
+            if (fontFamily === 'Noto Serif KR') fontWeight = 300;       
+            else if (fontFamily === 'Noto Sans KR') fontWeight = 200;    
+            else if (fontFamily === 'Pretendard') fontWeight = 200;      
+            else if (fontFamily === 'KoPub Batang') fontWeight = 300;    
             
             ctx.font = `${fontWeight} ${fontSize}px '${fontFamily}'`;
             const contentWidth = width - (padding * 2);
-            
             const lineHeight = fontSize * lineHeightMultiplier;
-            // Get lines with metadata about wrapping
-            const lines = getLines(ctx, quote, contentWidth, breakMode);
+            const lines = getLines(ctx, quote, contentWidth, breakMode, indentSize);
             
-            // --- Vertical Layout ---
-            // Calculate total height including paragraph spacing
             let quoteBlockHeight = lines.length * lineHeight;
-            
-            // Add spacing for each paragraph break (lines where isSoftBreak is false)
-            // But don't add spacing after the very last line
             lines.forEach((line, i) => {
-                if (!line.isSoftBreak && i < lines.length - 1) {
-                    quoteBlockHeight += paraSpacing;
-                }
+                if (!line.isSoftBreak && i < lines.length - 1) quoteBlockHeight += paraSpacing;
             });
 
             const hasFooterText = !!(author || title);
@@ -1259,129 +1427,85 @@
             
             let currentY = (height - totalContentHeight) / 2 + (lineHeight / 2);
 
-            // --- Draw Quote ---
             if (quote) {
                 lines.forEach((lineObj, index) => {
                     const lineText = lineObj.text;
-                    // Only apply full justification if selected AND it's a soft break (not end of paragraph)
                     const isJustify = align === 'justify' && lineObj.isSoftBreak;
+                    
+                    // Determine X position based on indentation
+                    let currentPadding = padding;
+                    let currentLineWidth = contentWidth;
+                    
+                    if (lineObj.isParaStart && state.indentation) {
+                        currentPadding += indentSize;
+                        currentLineWidth -= indentSize;
+                    }
 
                     if (isJustify) {
-                        drawJustifiedTextLine(ctx, lineText, padding, currentY, contentWidth);
+                        drawJustifiedTextLine(ctx, lineText, currentPadding, currentY, currentLineWidth);
                     } else {
-                        // Standard alignment for left/center/right OR last line of justify (which should be left)
                         let x;
-                        if (align === 'justify') {
-                             // Last line of justify is typically left-aligned
-                             x = padding; 
-                             ctx.textAlign = 'left';
-                        } else if (align === 'left') {
-                            x = padding;
-                            ctx.textAlign = 'left';
-                        } else if (align === 'center') {
-                            x = width / 2;
-                            ctx.textAlign = 'center';
-                        } else if (align === 'right') {
-                            x = width - padding;
-                            ctx.textAlign = 'right';
-                        }
+                        if (align === 'justify') { x = currentPadding; ctx.textAlign = 'left'; } 
+                        else if (align === 'left') { x = currentPadding; ctx.textAlign = 'left'; } 
+                        else if (align === 'center') { x = width / 2; ctx.textAlign = 'center'; } 
+                        else if (align === 'right') { x = width - padding; ctx.textAlign = 'right'; }
                         ctx.fillText(lineText, x, currentY);
                     }
-                    
-                    // Advance Y
                     currentY += lineHeight;
-                    
-                    // Add Paragraph Spacing if it's a hard break (and not the last line)
-                    if (!lineObj.isSoftBreak && index < lines.length - 1) {
-                        currentY += paraSpacing;
-                    }
+                    if (!lineObj.isSoftBreak && index < lines.length - 1) currentY += paraSpacing;
                 });
             }
 
-            // --- Draw Footer Text (Fixed to Pretendard, Mixed Styles) ---
             if (hasFooterText) {
-                // Adjust Y back for footer (because last loop added lineHeight)
-                // We need currentY to be at the start of footer line
-                // Logic: currentY is now at (lastLineY + lineHeight [+ paraSpacing? no, checked in loop]).
-                // Actually, let's just use the calculated height offset.
-                
-                // Recalculate exact Y position for footer based on start Y + block height + spacing
                 const startY = (height - totalContentHeight) / 2;
                 currentY = startY + quoteBlockHeight + spacing + (footerLineHeight / 2);
                 
-                // Prepare parts
                 const authorPart = author || '';
                 const separator = (author && title) ? ' | ' : '';
                 const titlePart = title || '';
 
-                // Force Fonts to Pretendard
                 const footerFontFamily = 'Pretendard';
                 const fontNormal = `200 ${footerFontSize}px '${footerFontFamily}'`;
                 const fontBold = `400 ${footerFontSize}px '${footerFontFamily}'`;
 
-                // Measure widths
                 ctx.font = fontNormal;
                 const wAuthor = ctx.measureText(authorPart).width;
                 const wSep = ctx.measureText(separator).width;
                 ctx.font = fontBold;
                 const wTitle = ctx.measureText(titlePart).width;
-                
                 const totalFooterWidth = wAuthor + wSep + wTitle;
 
-                // Calculate Start X
                 let startX;
-                // If Justify, align footer to left (same as left align)
-                if (align === 'left' || align === 'justify') {
-                    startX = padding;
-                } else if (align === 'center') {
-                    startX = (width - totalFooterWidth) / 2;
-                } else if (align === 'right') {
-                    startX = width - padding - totalFooterWidth;
-                }
+                if (align === 'left' || align === 'justify') startX = padding;
+                else if (align === 'center') startX = (width - totalFooterWidth) / 2;
+                else if (align === 'right') startX = width - padding - totalFooterWidth;
 
-                // Draw Parts
-                ctx.textAlign = 'left'; // Always draw left-to-right from startX
-                
-                // 1. Author (Normal)
+                ctx.textAlign = 'left';
                 ctx.font = fontNormal;
                 ctx.fillText(authorPart, startX, currentY);
-                
-                // 2. Separator (Normal)
                 ctx.fillText(separator, startX + wAuthor, currentY);
-
-                // 3. Title (Bold)
                 ctx.font = fontBold;
                 ctx.fillText(titlePart, startX + wAuthor + wSep, currentY);
             }
 
-            // --- Draw Logo (Fixed Position: Bottom Right) ---
             const logoImg = platform ? state.logoImages[platform] : null;
             if (logoImg && logoImg.complete && logoImg.naturalHeight !== 0) {
                 const radius = logoSize / 2;
-                const margin = 60; // Fixed margin from edges
-                
-                // Absolute Position: Bottom Right
+                const margin = 60; 
                 const logoX = width - margin - radius;
                 const logoY = height - margin - radius;
 
                 ctx.save();
-                
-                // Apply 20% Transparency (80% Opacity)
                 ctx.globalAlpha = 0.8;
-                
                 ctx.beginPath();
                 ctx.arc(logoX, logoY, radius, 0, Math.PI * 2);
                 ctx.closePath();
                 ctx.clip();
                 
-                // Image fitting (cover)
                 const aspect = logoImg.width / logoImg.height;
                 let sw, sh, sx, sy;
-                if (aspect > 1) {
-                    sh = logoImg.height; sw = sh; sx = (logoImg.width - sw) / 2; sy = 0;
-                } else {
-                    sw = logoImg.width; sh = sw; sx = 0; sy = (logoImg.height - sh) / 2;
-                }
+                if (aspect > 1) { sh = logoImg.height; sw = sh; sx = (logoImg.width - sw) / 2; sy = 0; } 
+                else { sw = logoImg.width; sh = sw; sx = 0; sy = (logoImg.height - sh) / 2; }
 
                 ctx.drawImage(logoImg, sx, sy, sw, sh, logoX - radius, logoY - radius, logoSize, logoSize);
                 ctx.restore();
@@ -1390,14 +1514,8 @@
 
         function drawJustifiedTextLine(ctx, text, x, y, width) {
             const words = text.split(' ');
-            // Handle case with no spaces (e.g. single long word or char break mode without spaces)
-            if (words.length <= 1) {
-                ctx.textAlign = 'left';
-                ctx.fillText(text, x, y);
-                return;
-            }
+            if (words.length <= 1) { ctx.textAlign = 'left'; ctx.fillText(text, x, y); return; }
             
-            // Calculate total width of words
             const totalWordWidth = words.reduce((acc, word) => acc + ctx.measureText(word).width, 0);
             const totalSpace = width - totalWordWidth;
             const spaceWidth = totalSpace / (words.length - 1);
@@ -1407,71 +1525,62 @@
             words.forEach((word, index) => {
                 ctx.fillText(word, currentX, y);
                 currentX += ctx.measureText(word).width;
-                if (index < words.length - 1) {
-                    currentX += spaceWidth;
-                }
+                if (index < words.length - 1) currentX += spaceWidth;
             });
         }
 
-        function getLines(ctx, text, maxWidth, breakMode) {
+        function getLines(ctx, text, maxWidth, breakMode, indentSize) {
             if (!text) return [];
-            
             const paragraphs = text.split('\n');
             let lines = [];
-
             paragraphs.forEach(para => {
+                let isParaStart = true;
+                
+                // Effective width for the first line is reduced by indentation
+                let currentMaxWidth = maxWidth - (isParaStart ? indentSize : 0);
+
                 if (breakMode === 'word') {
                     const words = para.split(' ');
                     let currentLine = words[0];
-
                     for (let i = 1; i < words.length; i++) {
                         const word = words[i];
                         const width = ctx.measureText(currentLine + " " + word).width;
-                        if (width < maxWidth) {
-                            currentLine += " " + word;
-                        } else {
-                            // Line wrapped (soft break)
-                            lines.push({ text: currentLine, isSoftBreak: true });
-                            currentLine = word;
+                        if (width < currentMaxWidth) {
+                             currentLine += " " + word;
+                        } else { 
+                            lines.push({ text: currentLine, isSoftBreak: true, isParaStart: isParaStart }); 
+                            currentLine = word; 
+                            isParaStart = false; // Next lines are not start of paragraph
+                            currentMaxWidth = maxWidth; // Reset width for subsequent lines
                         }
                     }
-                    // End of paragraph (hard break)
-                    lines.push({ text: currentLine, isSoftBreak: false });
+                    lines.push({ text: currentLine, isSoftBreak: false, isParaStart: isParaStart });
                 } else {
-                    // Char mode
                     let currentLine = para[0] || '';
                     for (let i = 1; i < para.length; i++) {
                         const char = para[i];
                         const width = ctx.measureText(currentLine + char).width;
-                        if (width < maxWidth) {
-                            currentLine += char;
-                        } else {
-                            // Line wrapped (soft break)
-                            lines.push({ text: currentLine, isSoftBreak: true });
+                        if (width < currentMaxWidth) {
+                             currentLine += char;
+                        } else { 
+                            lines.push({ text: currentLine, isSoftBreak: true, isParaStart: isParaStart }); 
                             currentLine = char;
+                            isParaStart = false; 
+                            currentMaxWidth = maxWidth;
                         }
                     }
-                    // End of paragraph (hard break)
-                    lines.push({ text: currentLine, isSoftBreak: false });
+                    lines.push({ text: currentLine, isSoftBreak: false, isParaStart: isParaStart });
                 }
             });
             return lines;
         }
 
-        // --- 6. Export ---
         async function downloadImage() {
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            
             if (isIOS && navigator.share) {
                  state.canvas.toBlob(async (blob) => {
                     const file = new File([blob], "lumina_quote.png", { type: "image/png" });
-                    try {
-                        await navigator.share({
-                            files: [file],
-                        });
-                    } catch (err) {
-                        console.log("Share failed or canceled", err);
-                    }
+                    try { await navigator.share({ files: [file], }); } catch (err) { console.log("Share failed or canceled", err); }
                 });
             } else {
                 const link = document.createElement('a');
@@ -1484,12 +1593,8 @@
         function copyImage() {
             state.canvas.toBlob(blob => {
                 const item = new ClipboardItem({ "image/png": blob });
-                navigator.clipboard.write([item]).then(() => {
-                    alert('클립보드에 복사되었습니다!');
-                }).catch(err => {
-                    console.error('복사 실패:', err);
-                    alert('복사에 실패했습니다.');
-                });
+                navigator.clipboard.write([item]).then(() => { alert('클립보드에 복사되었습니다!'); })
+                .catch(err => { console.error('복사 실패:', err); alert('복사에 실패했습니다.'); });
             });
         }
     </script>
