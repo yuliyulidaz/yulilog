@@ -1294,9 +1294,10 @@
 
                 // Calculate Start X
                 let startX;
-                if (align === 'left') {
+                // If Justify, align footer to left (same as left align)
+                if (align === 'left' || align === 'justify') {
                     startX = padding;
-                } else if (align === 'center' || align === 'justify') {
+                } else if (align === 'center') {
                     startX = (width - totalFooterWidth) / 2;
                 } else if (align === 'right') {
                     startX = width - padding - totalFooterWidth;
