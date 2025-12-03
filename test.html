@@ -176,7 +176,7 @@
                     <i class="ph ph-moon text-xl"></i>
                 </button>
 
-                <!-- Copy Button (Mobile Visible with Text) -->
+                <!-- Copy Button (Mobile Visible with Text - HIDDEN on iOS/Android) -->
                 <button onclick="copyImage()" class="copy-btn md:hidden flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-lg border border-slate-200 dark:border-zinc-700 active:scale-95 transition-transform">
                     <i class="ph ph-copy text-base"></i>
                     <span>복사</span>
@@ -589,7 +589,7 @@
                         </a>
                         
                         <div>
-                            <h3 class="font-bold text-slate-500 dark:text-slate-400 mb-1">📖 발췌 문구 생성기 v1.3.0</h3>
+                            <h3 class="font-bold text-slate-500 dark:text-slate-400 mb-1">📖 발췌 문구 생성기 v1.3.1</h3>
                             <p>본 사이트는 어떠한 개인정보도 수집하지 않습니다.<br>모든 작업은 귀하의 브라우저에서만 이루어집니다.</p>
                         </div>
                         
@@ -618,12 +618,11 @@
         
         const WELCOME_MESSAGE = `⚡️ 업데이트 완료! 
 
-✅ 직관적 레이아웃으로 변경
-✅ 제작자 | 캐릭터 : 본문과 함께 정렬, 크기도 본문 폰트에 따라 자동 조절
-✅ 디테일 컬러 피커 도입
+✅ 텍스트 양쪽 정렬(Justify) 완벽 지원
+✅ 팔레트 색상 선택 동기화 개선
+✅ 제작자 | 캐릭터 : 본문과 함께 정렬
 ✅ 배경 이미지 : 오버레이 ‘밝게(White)’ 추가
-✅ 배경 이미지 : 이미지 확대 기능 추가
-✅ 그라데이션 : 이제 방향도 선택 가능
+✅ 그라데이션 : 방향 선택 가능
 
 ⚠️이 공지는 내용입력 클릭 시 자동 삭제!
 `;
@@ -789,9 +788,7 @@
                 pickr.on('hide', (instance) => {
                      // 핵심 수정: 창이 닫힐 때 현재 피커의 색상을 버튼에 강제 적용하여
                      // "외부 클릭 시에도 색상이 선택된 상태"로 만듦.
-                     // (취소 버튼을 눌렀을 때는 위 'cancel' 이벤트에서 이미 원복했으므로 괜찮음)
                      const currentColor = instance.getColor().toHEXA().toString();
-                     // 만약 취소 버튼을 눌러서 닫힌게 아니라면 (외부 클릭 등)
                      if (state.colors[key] === currentColor) {
                         instance.applyColor(true);
                      }
@@ -918,9 +915,6 @@
             state.fontFamily = fontName;
             updateFontUI();
             
-            // Improved Font Loading:
-            // Explicitly load the font string before updating canvas to prevent "double click" issue.
-            // Construct a font string similar to what is used in drawContent
             let fontWeight = '400';
             if (fontName === 'Noto Serif KR' || fontName === 'KoPub Batang') fontWeight = '300';
             else if (fontName === 'Noto Sans KR' || fontName === 'Pretendard') fontWeight = '200';
@@ -930,11 +924,8 @@
             document.fonts.load(fontString).then(() => {
                 updateCanvas();
             }).catch(() => {
-                 // Fallback if load fails (or already loaded)
                  updateCanvas();
             });
-            
-            // Safety redraw for stubborn browsers
             setTimeout(updateCanvas, 100);
         }
 
@@ -1042,16 +1033,25 @@
             if (type === 'solid') {
                 state.colors.bgMain = color1;
                 document.querySelector('input[name="bgMode"][value="solid"]').checked = true;
-                if(state.pickrs.bgMain) state.pickrs.bgMain.setColor(color1, true);
+                if(state.pickrs.bgMain) {
+                    state.pickrs.bgMain.setColor(color1); 
+                }
             } else {
                 state.colors.gradStart = color1;
                 state.colors.gradEnd = color2;
                 document.querySelector('input[name="bgMode"][value="gradient"]').checked = true;
-                if(state.pickrs.gradStart) state.pickrs.gradStart.setColor(color1, true);
-                if(state.pickrs.gradEnd) state.pickrs.gradEnd.setColor(color2, true);
+                if(state.pickrs.gradStart) {
+                    state.pickrs.gradStart.setColor(color1);
+                }
+                if(state.pickrs.gradEnd) {
+                    state.pickrs.gradEnd.setColor(color2);
+                }
             }
 
-            if(state.pickrs.text) state.pickrs.text.setColor(textColor, true);
+            if(state.pickrs.text) {
+                state.pickrs.text.setColor(textColor);
+            }
+            
             togglePaletteVisibility();
             updateCanvas();
         }
@@ -1226,6 +1226,7 @@
             const contentWidth = width - (padding * 2);
             
             const lineHeight = fontSize * lineHeightMultiplier;
+            // Get lines with metadata about wrapping
             const lines = getLines(ctx, quote, contentWidth, breakMode);
             
             // --- Vertical Layout ---
@@ -1238,19 +1239,31 @@
 
             // --- Draw Quote ---
             if (quote) {
-                lines.forEach(line => {
-                    let x;
-                    if (align === 'left') x = padding;
-                    else if (align === 'center') x = width / 2;
-                    else if (align === 'right') x = width - padding;
-                    else if (align === 'justify') x = width / 2; 
+                lines.forEach(lineObj => {
+                    const lineText = lineObj.text;
+                    // Only apply full justification if selected AND it's a soft break (not end of paragraph)
+                    const isJustify = align === 'justify' && lineObj.isSoftBreak;
 
-                    if (align === 'justify' && lines.length > 1) {
-                         ctx.textAlign = 'center';
-                         ctx.fillText(line, x, currentY);
+                    if (isJustify) {
+                        drawJustifiedTextLine(ctx, lineText, padding, currentY, contentWidth);
                     } else {
-                        ctx.textAlign = align === 'justify' ? 'center' : align;
-                        ctx.fillText(line, x, currentY);
+                        // Standard alignment for left/center/right OR last line of justify (which should be left)
+                        let x;
+                        if (align === 'justify') {
+                             // Last line of justify is typically left-aligned
+                             x = padding; 
+                             ctx.textAlign = 'left';
+                        } else if (align === 'left') {
+                            x = padding;
+                            ctx.textAlign = 'left';
+                        } else if (align === 'center') {
+                            x = width / 2;
+                            ctx.textAlign = 'center';
+                        } else if (align === 'right') {
+                            x = width - padding;
+                            ctx.textAlign = 'right';
+                        }
+                        ctx.fillText(lineText, x, currentY);
                     }
                     currentY += lineHeight;
                 });
@@ -1338,6 +1351,31 @@
             }
         }
 
+        function drawJustifiedTextLine(ctx, text, x, y, width) {
+            const words = text.split(' ');
+            // Handle case with no spaces (e.g. single long word or char break mode without spaces)
+            if (words.length <= 1) {
+                ctx.textAlign = 'left';
+                ctx.fillText(text, x, y);
+                return;
+            }
+            
+            // Calculate total width of words
+            const totalWordWidth = words.reduce((acc, word) => acc + ctx.measureText(word).width, 0);
+            const totalSpace = width - totalWordWidth;
+            const spaceWidth = totalSpace / (words.length - 1);
+            
+            let currentX = x;
+            ctx.textAlign = 'left';
+            words.forEach((word, index) => {
+                ctx.fillText(word, currentX, y);
+                currentX += ctx.measureText(word).width;
+                if (index < words.length - 1) {
+                    currentX += spaceWidth;
+                }
+            });
+        }
+
         function getLines(ctx, text, maxWidth, breakMode) {
             if (!text) return [];
             
@@ -1355,12 +1393,15 @@
                         if (width < maxWidth) {
                             currentLine += " " + word;
                         } else {
-                            lines.push(currentLine);
+                            // Line wrapped (soft break)
+                            lines.push({ text: currentLine, isSoftBreak: true });
                             currentLine = word;
                         }
                     }
-                    lines.push(currentLine);
+                    // End of paragraph (hard break)
+                    lines.push({ text: currentLine, isSoftBreak: false });
                 } else {
+                    // Char mode
                     let currentLine = para[0] || '';
                     for (let i = 1; i < para.length; i++) {
                         const char = para[i];
@@ -1368,11 +1409,13 @@
                         if (width < maxWidth) {
                             currentLine += char;
                         } else {
-                            lines.push(currentLine);
+                            // Line wrapped (soft break)
+                            lines.push({ text: currentLine, isSoftBreak: true });
                             currentLine = char;
                         }
                     }
-                    lines.push(currentLine);
+                    // End of paragraph (hard break)
+                    lines.push({ text: currentLine, isSoftBreak: false });
                 }
             });
             return lines;
