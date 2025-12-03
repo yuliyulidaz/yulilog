@@ -188,6 +188,11 @@
         #mobile-editor-modal.visible-modal {
             transform: translateY(0);
         }
+        
+        /* Transition for Textarea height expansion */
+        textarea#quote {
+            transition: height 0.3s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
     </style>
 <script type="importmap">
 {
@@ -277,6 +282,11 @@
                                     <i class="ph ph-text-indent" id="icon-indent"></i>
                                     <span id="text-indent">들여쓰기 OFF</span>
                                 </button>
+                                <!-- Desktop Expand Toggle -->
+                                <button onclick="toggleDesktopEditorSize()" id="btn-expand-editor" class="hidden md:flex items-center gap-1 text-[10px] font-medium text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors py-0.5 px-2 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 group" title="입력창 크기 조절">
+                                    <i class="ph ph-arrows-vertical" id="icon-expand"></i>
+                                    <span class="group-hover:text-brand-600 dark:group-hover:text-brand-400">크게</span>
+                                </button>
                             </div>
                             <div class="flex gap-2">
                                 <button onclick="openMobileEditor()" class="md:hidden text-xs text-brand-600 hover:text-brand-700 font-medium flex items-center gap-1 bg-brand-50 px-2 py-1 rounded-md">
@@ -289,8 +299,8 @@
                         </div>
                         
                         <div class="relative group">
-                            <!-- Added overflow-y-auto and overscroll-y-contain for Android Scroll -->
-                            <textarea id="quote" placeholder="여기에 문구를 입력하세요..." class="w-full h-32 p-4 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all text-sm leading-relaxed placeholder:text-slate-400 overflow-y-auto overscroll-y-contain"></textarea>
+                            <!-- Added resize-y for manual resizing on desktop -->
+                            <textarea id="quote" placeholder="여기에 문구를 입력하세요..." class="w-full h-32 p-4 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-slate-700 rounded-xl resize-y focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all text-sm leading-relaxed placeholder:text-slate-400 overflow-y-auto overscroll-y-contain"></textarea>
                             <div class="absolute bottom-3 right-3 text-slate-400 pointer-events-none">
                                 <i class="ph ph-pencil-simple"></i>
                             </div>
@@ -722,7 +732,7 @@
                         </a>
                         
                         <div>
-                            <h3 class="font-bold text-slate-500 dark:text-slate-400 mb-1">📖 발췌 문구 생성기 v1.4.0 (Mobile UX)</h3>
+                            <h3 class="font-bold text-slate-500 dark:text-slate-400 mb-1">📖 발췌 문구 생성기 v1.4.2 (Mobile Enhanced)</h3>
                             <p>본 사이트는 어떠한 개인정보도 수집하지 않습니다.<br>모든 작업은 귀하의 브라우저에서만 이루어집니다.</p>
                         </div>
                         
@@ -780,19 +790,18 @@
     <script>
         // --- 1. State Management & Constants ---
         
-        const WELCOME_MESSAGE = `⚡️ 업데이트 완료! (v1.4.0)  
-[오류수정] 
-  텍스트 양쪽 정렬 완벽 지원
-  
-[통합 NEW]
-  문단 들여쓰기 ON/OFF 기능
-  문단 간격 조절 기능
-  
-[모바일 NEW]
-  전체화면 내용 편집 '크게 입력'
-  글자크기, 줄 간격 등을 +/-를 꾹 눌러 간편하게 조절되도록 변경 (숫자 입력 가능)
+        const WELCOME_MESSAGE = `⚡️ 업데이트 완료! (v1.4.3)
 
-⁋ 이 공지는 내용 입력칸 클릭 시 자동 삭제
+✅ [NEW] PC 입력창 확장 기능 (드래그 & 원터치)        
+✅ [NEW] 모바일 집중 입력 모드 (전체 화면 에디터)
+✅ [NEW] 문단 첫 줄 들여쓰기 (ON/OFF)
+✅ 모바일 : 버튼을 꾹~ 누르면 초고속 조절! (숫자 터치 입력도 OK)
+✅ 텍스트 양쪽 정렬(Justify) 완벽 지원
+✅ 제작자/캐릭터 정보 자동 정렬
+✅ 배경 이미지 오버레이 & 확대/이동 자유 자재
+✅ 그라데이션 방향 선택 & 디테일 컬러 피커
+
+💡 Tip: 내용 입력창을 누르면 이 메세지는 사라져요!
 `;
 
         const state = {
@@ -809,6 +818,7 @@
             canvasRatio: '1:1',
             fontFamily: 'Noto Serif KR',
             indentation: false, // New Indentation State
+            isEditorExpanded: false, // Desktop Editor Expansion State
             isWelcomeActive: true, // Track if welcome message is being shown
             colors: {
                 text: '#4A4A4A', // Default Text Color Changed to Dark Grey for Dreamy Purple
@@ -1314,6 +1324,25 @@
                 text.innerText = "들여쓰기 OFF";
             }
             updateCanvas();
+        }
+        
+        // Desktop Editor Expand Toggle
+        function toggleDesktopEditorSize() {
+            const textarea = document.getElementById('quote');
+            const icon = document.getElementById('icon-expand');
+            state.isEditorExpanded = !state.isEditorExpanded;
+            
+            if (state.isEditorExpanded) {
+                textarea.classList.remove('h-32');
+                textarea.classList.add('h-96');
+                icon.classList.remove('ph-arrows-vertical');
+                icon.classList.add('ph-arrows-in-simple');
+            } else {
+                textarea.classList.remove('h-96');
+                textarea.classList.add('h-32');
+                icon.classList.remove('ph-arrows-in-simple');
+                icon.classList.add('ph-arrows-vertical');
+            }
         }
 
         function setPreset(type, color1, color2, textColor) {
