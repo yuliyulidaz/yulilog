@@ -282,16 +282,19 @@
                                     <i class="ph ph-text-indent" id="icon-indent"></i>
                                     <span id="text-indent">들여쓰기 OFF</span>
                                 </button>
-                                <!-- Desktop Expand Toggle -->
-                                <button onclick="toggleDesktopEditorSize()" id="btn-expand-editor" class="hidden md:flex items-center gap-1 text-[10px] font-medium text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors py-0.5 px-2 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 group" title="입력창 크기 조절">
-                                    <i class="ph ph-arrows-vertical" id="icon-expand"></i>
-                                    <span class="group-hover:text-brand-600 dark:group-hover:text-brand-400">크게</span>
-                                </button>
                             </div>
                             <div class="flex gap-2">
+                                <!-- Mobile Expand -->
                                 <button onclick="openMobileEditor()" class="md:hidden text-xs text-brand-600 hover:text-brand-700 font-medium flex items-center gap-1 bg-brand-50 px-2 py-1 rounded-md">
                                     <i class="ph ph-arrows-out-simple"></i> 크게 입력
                                 </button>
+
+                                <!-- Desktop Expand Toggle (Moved here) -->
+                                <button onclick="toggleDesktopEditorSize()" id="btn-expand-editor" class="hidden md:flex text-xs text-brand-600 hover:text-brand-700 font-medium items-center gap-1 bg-brand-50 hover:bg-brand-100 dark:bg-brand-900/30 dark:hover:bg-brand-900/50 px-2 py-1 rounded-md transition-colors group" title="입력창 크기 조절">
+                                    <i class="ph ph-arrows-vertical" id="icon-expand"></i>
+                                    <span>크게 입력</span>
+                                </button>
+
                                 <button onclick="clearQuoteTextOnly()" class="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1 px-2 py-1">
                                     <i class="ph ph-eraser"></i> 지우기
                                 </button>
