@@ -735,7 +735,7 @@
                         </a>
                         
                         <div>
-                            <h3 class="font-bold text-slate-500 dark:text-slate-400 mb-1">📖 발췌 문구 생성기 v1.4.0</h3>
+                            <h3 class="font-bold text-slate-500 dark:text-slate-400 mb-1">📖 발췌 문구 생성기 v1.4.1 (Mobile Enhanced)</h3>
                             <p>본 사이트는 어떠한 개인정보도 수집하지 않습니다.<br>모든 작업은 귀하의 브라우저에서만 이루어집니다.</p>
                         </div>
                         
@@ -793,7 +793,7 @@
     <script>
         // --- 1. State Management & Constants ---
         
-        const WELCOME_MESSAGE = `⚡️ 업데이트 완료! (v1.4.0)
+        const WELCOME_MESSAGE = `⚡️ 업데이트 완료! (v1.4.1)
 [오류 수정]
   양쪽정렬 완벽 지원
 [PC/모바일 공통]
@@ -1105,7 +1105,7 @@
                 pickr.on('swatchselect', (color) => {
                     const hex = color.toHEXA().toString();
                     state.colors[key] = hex;
-                    pickr.setColor(hex); 
+                    // Removed pickr.setColor(hex) to prevent the picker from closing
                     updateCanvas();
                 });
 
