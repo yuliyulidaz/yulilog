@@ -273,32 +273,38 @@
                 <div class="h-full overflow-y-auto custom-scrollbar p-5 space-y-8 pb-10 md:pb-5">
 
                     <!-- Section: Content -->
-                    <section class="space-y-4">
-                        <div class="flex items-center justify-between flex-wrap gap-2">
-                            <div class="flex items-center gap-2">
-                                <h2 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">내용 입력</h2>
-                                <!-- Indentation Toggle -->
-                                <button onclick="toggleIndentation()" id="btn-indent" class="flex items-center gap-1 text-[10px] font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors py-0.5 px-2 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
-                                    <i class="ph ph-text-indent" id="icon-indent"></i>
-                                    <span id="text-indent">들여쓰기 OFF</span>
-                                </button>
-                            </div>
-                            <div class="flex gap-2">
-                                <!-- Mobile Expand -->
-                                <button onclick="openMobileEditor()" class="md:hidden text-xs text-brand-600 hover:text-brand-700 font-medium flex items-center gap-1 bg-brand-50 px-2 py-1 rounded-md">
-                                    <i class="ph ph-arrows-out-simple"></i> 크게 입력
-                                </button>
+                    <section class="space-y-3">
+                        <h2 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">내용 입력</h2>
+                        
+                        <!-- Toolbar Row -->
+                        <div class="flex flex-wrap items-center gap-2">
+                             <!-- Indentation Toggle -->
+                             <button onclick="toggleIndentation()" id="btn-indent" class="flex items-center gap-1 text-[10px] font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors py-1 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
+                                <i class="ph ph-text-indent" id="icon-indent"></i>
+                                <span id="text-indent">들여쓰기 OFF</span>
+                            </button>
+                            
+                            <!-- Smart Quote Toggle -->
+                            <button onclick="toggleQuoteStyle()" id="btn-quote-toggle" class="flex items-center gap-1 text-[10px] font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors py-1 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
+                                <i class="ph ph-quotes"></i>
+                                <span id="text-quote-toggle">둥근 따옴표 자동 변환</span>
+                            </button>
 
-                                <!-- Desktop Expand Toggle (Moved here) -->
-                                <button onclick="toggleDesktopEditorSize()" id="btn-expand-editor" class="hidden md:flex text-xs text-brand-600 hover:text-brand-700 font-medium items-center gap-1 bg-brand-50 hover:bg-brand-100 dark:bg-brand-900/30 dark:hover:bg-brand-900/50 px-2 py-1 rounded-md transition-colors group" title="입력창 크기 조절">
-                                    <i class="ph ph-arrows-vertical" id="icon-expand"></i>
-                                    <span>크게 입력</span>
-                                </button>
+                             <!-- Mobile Expand -->
+                             <button onclick="openMobileEditor()" class="md:hidden text-[10px] text-brand-600 hover:text-brand-700 font-medium flex items-center gap-1 bg-brand-50 border border-brand-100 px-2.5 py-1 rounded-lg">
+                                <i class="ph ph-arrows-out-simple"></i> 크게 입력
+                            </button>
 
-                                <button onclick="clearQuoteTextOnly()" class="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1 px-2 py-1">
-                                    <i class="ph ph-eraser"></i> 지우기
-                                </button>
-                            </div>
+                            <!-- Desktop Expand Toggle -->
+                            <button onclick="toggleDesktopEditorSize()" id="btn-expand-editor" class="hidden md:flex text-[10px] text-brand-600 hover:text-brand-700 font-medium items-center gap-1 bg-brand-50 hover:bg-brand-100 dark:bg-brand-900/30 dark:hover:bg-brand-900/50 border border-brand-100 dark:border-brand-800 px-2.5 py-1 rounded-lg transition-colors group" title="입력창 크기 조절">
+                                <i class="ph ph-arrows-vertical" id="icon-expand"></i>
+                                <span>크게 입력</span>
+                            </button>
+
+                            <!-- Clear Button -->
+                            <button onclick="clearQuoteTextOnly()" class="text-red-500 hover:text-red-600 flex items-center justify-center bg-red-50 hover:bg-red-100 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 w-[26px] h-[26px] rounded-lg transition-colors ml-auto" title="지우기">
+                                <i class="ph ph-trash text-sm"></i>
+                            </button>
                         </div>
                         
                         <div class="relative group">
@@ -592,6 +598,9 @@
                         <div class="pt-1">
                             <!-- Gradient Palette -->
                             <div id="gradientPalette" class="flex gap-2 overflow-x-auto no-scrollbar py-1">
+                                <!-- NEW Default Gradient: Neon Sunset -->
+                                <button onclick="setPreset('gradient', '#ec4447', '#8c5af2', '#ffffff')" class="w-8 h-8 rounded-full border border-slate-200 shadow-sm flex-shrink-0" style="background: linear-gradient(to bottom right, #ec4447, #8c5af2)" title="Neon Sunset"></button>
+                                
                                 <button onclick="setPreset('gradient', '#a18cd1', '#fbc2eb', '#4A4A4A')" class="w-8 h-8 rounded-full border border-slate-200 shadow-sm flex-shrink-0" style="background: linear-gradient(to bottom right, #a18cd1, #fbc2eb)" title="Dreamy Purple"></button>
                                 <button onclick="setPreset('gradient', '#0f2027', '#203a43', '#ffffff')" class="w-8 h-8 rounded-full border border-slate-200 shadow-sm flex-shrink-0" style="background: linear-gradient(to bottom right, #0f2027, #2c5364)" title="Deep Sea"></button>
                                 <button onclick="setPreset('gradient', '#232526', '#414345', '#ffffff')" class="w-8 h-8 rounded-full border border-slate-200 shadow-sm flex-shrink-0" style="background: linear-gradient(to bottom right, #232526, #414345)" title="Midnight"></button>
@@ -735,7 +744,7 @@
                         </a>
                         
                         <div>
-                            <h3 class="font-bold text-slate-500 dark:text-slate-400 mb-1">📖 발췌 문구 생성기 v1.4.1 (Mobile Enhanced)</h3>
+                            <h3 class="font-bold text-slate-500 dark:text-slate-400 mb-1">📖 발췌 문구 생성기 v1.4.2</h3>
                             <p>본 사이트는 어떠한 개인정보도 수집하지 않습니다.<br>모든 작업은 귀하의 브라우저에서만 이루어집니다.</p>
                         </div>
                         
@@ -793,16 +802,15 @@
     <script>
         // --- 1. State Management & Constants ---
         
-        const WELCOME_MESSAGE = `⚡️ 업데이트 완료! (v1.4.1)
-[오류 수정]
-  양쪽정렬 완벽 지원
-[PC/모바일 공통]
-  내용 입력창 확장 기능 추가
-  들여쓰기 추가 (ON/OFF)
-  문단간격 조절기능 추가
-[모바일only]
-  글자크기, 줄간격, 문단간격, 여백을 +/-버튼으로 변경. 꾹 누르면 빠르게, 한 번씩 누르면 섬세하게 조절
-💡Tip:내용 입력창을 누르면 이 메세지는 퐁!
+        const WELCOME_MESSAGE = `⚡️ 251209 업데이트 완료! (v1.4.2)
+[NEW] 설정 자동 저장
+  - 글꼴 설정, 배경 색상, 플랙폼 아이콘 최근 설정을 자동 기억합니다.
+  (본문 내용은 절대로 저장되지 않습니다)
+
+[NEW] 따옴표 자동 변환
+  - 둥근 따옴표(" " ↔️ “ ”) 자동 변환 기능 추가
+
+  💡내용 입력 창을 누르면 이 메세지는 퐁!
 `;
 
         const state = {
@@ -819,13 +827,14 @@
             canvasRatio: '1:1',
             fontFamily: 'Noto Serif KR',
             indentation: false, // New Indentation State
+            isCurlyQuotes: false, // New Quote Style State
             isEditorExpanded: false, // Desktop Editor Expansion State
             isWelcomeActive: true, // Track if welcome message is being shown
             colors: {
-                text: '#4A4A4A', // Default Text Color Changed to Dark Grey for Dreamy Purple
+                text: '#ffffff', // Default Text Color White for Neon Sunset
                 bgMain: '#E6E6FA', // Default Solid Color: Lavender
-                gradStart: '#a18cd1', // Default Gradient Start (Dreamy Purple)
-                gradEnd: '#fbc2eb',   // Default Gradient End (Dreamy Purple)
+                gradStart: '#ec4447', // New Default Gradient Start (Neon Sunset)
+                gradEnd: '#8c5af2',   // New Default Gradient End (Neon Sunset)
             },
             pickrs: {}
         };
@@ -852,6 +861,7 @@
         // --- 2. Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
+            loadSettings(); // Load persisted settings
             initCanvas();
             initColorPickers();
             loadLogos();
@@ -861,7 +871,8 @@
             updateRatioUI();
             updateFontUI();
             updateDirectionUI();
-
+            togglePaletteVisibility(); // Ensure correct palette shows based on loaded type
+            
             // Set Welcome Message
             const quoteInput = document.getElementById('quote');
             quoteInput.value = WELCOME_MESSAGE;
@@ -883,9 +894,109 @@
                 updateCanvas();
             });
             setTimeout(updateCanvas, 500);
+
+            // FIX: Ensure canvas is resized to match restored settings (e.g. 4:5)
+            resizeCanvas();
             
             updateCanvas(); // Initial draw
         });
+
+        // --- NEW: Persistence Logic ---
+        function saveSettings() {
+            // Collect settings to save (excluding content)
+            const settings = {
+                bgType: state.bgType,
+                gradDirection: state.gradDirection,
+                canvasRatio: state.canvasRatio,
+                fontFamily: state.fontFamily,
+                indentation: state.indentation,
+                colors: state.colors,
+                platform: state.platform,
+                styles: {
+                    fontSize: document.getElementById('fontSize').value,
+                    lineHeight: document.getElementById('lineHeight').value,
+                    paraSpacing: document.getElementById('paraSpacing').value,
+                    padding: document.getElementById('padding').value,
+                    align: document.querySelector('input[name="align"]:checked').value,
+                    linebreak: document.querySelector('input[name="linebreak"]:checked').value,
+                    logoSize: document.getElementById('logoSize').value,
+                    overlayOpacity: document.getElementById('overlayOpacity').value,
+                    bgImageScale: document.getElementById('bgImageScale').value,
+                }
+            };
+            localStorage.setItem('geminiNexusSettings', JSON.stringify(settings));
+        }
+
+        let saveTimeout;
+        function debouncedSaveSettings() {
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(saveSettings, 1000); // Save after 1 second of inactivity
+        }
+
+        function loadSettings() {
+            const saved = localStorage.getItem('geminiNexusSettings');
+            if (saved) {
+                try {
+                    const settings = JSON.parse(saved);
+                    // Restore State
+                    if (settings.bgType) state.bgType = settings.bgType;
+                    if (settings.gradDirection) state.gradDirection = settings.gradDirection;
+                    if (settings.canvasRatio) state.canvasRatio = settings.canvasRatio;
+                    if (settings.fontFamily) state.fontFamily = settings.fontFamily;
+                    if (settings.indentation !== undefined) state.indentation = settings.indentation;
+                    if (settings.colors) state.colors = { ...state.colors, ...settings.colors };
+                    if (settings.platform) state.platform = settings.platform;
+
+                    // Restore UI Elements (Styles)
+                    if (settings.styles) {
+                        if(settings.styles.fontSize) document.getElementById('fontSize').value = settings.styles.fontSize;
+                        if(settings.styles.lineHeight) document.getElementById('lineHeight').value = settings.styles.lineHeight;
+                        if(settings.styles.paraSpacing) document.getElementById('paraSpacing').value = settings.styles.paraSpacing;
+                        if(settings.styles.padding) document.getElementById('padding').value = settings.styles.padding;
+                        if(settings.styles.logoSize) document.getElementById('logoSize').value = settings.styles.logoSize;
+                        if(settings.styles.overlayOpacity) document.getElementById('overlayOpacity').value = settings.styles.overlayOpacity;
+                        if(settings.styles.bgImageScale) document.getElementById('bgImageScale').value = settings.styles.bgImageScale;
+                        
+                        if(settings.styles.align) {
+                            const rb = document.querySelector(`input[name="align"][value="${settings.styles.align}"]`);
+                            if(rb) rb.checked = true;
+                        }
+                        if(settings.styles.linebreak) {
+                            const rb = document.querySelector(`input[name="linebreak"][value="${settings.styles.linebreak}"]`);
+                            if(rb) rb.checked = true;
+                        }
+                    }
+
+                    // Restore BG Mode Radio
+                    const bgRb = document.querySelector(`input[name="bgMode"][value="${state.bgType}"]`);
+                    if(bgRb) bgRb.checked = true;
+
+                    // Restore Platform Select
+                    const platSel = document.getElementById('platformSelect');
+                    if(platSel) platSel.value = state.platform;
+
+                    // Restore Indentation UI
+                    updateIndentationUI();
+
+                    // Update Labels
+                    document.getElementById('fontSizeValue').innerText = document.getElementById('fontSize').value;
+                    document.getElementById('lineHeightValue').innerText = document.getElementById('lineHeight').value;
+                    document.getElementById('paraSpacingValue').innerText = document.getElementById('paraSpacing').value;
+                    document.getElementById('paddingValue').innerText = document.getElementById('padding').value;
+                    document.getElementById('logoSizeValue').innerText = document.getElementById('logoSize').value;
+                    document.getElementById('scaleValue').innerText = document.getElementById('bgImageScale').value;
+                    
+                    const overlayVal = parseInt(document.getElementById('overlayOpacity').value);
+                    let text = "원본";
+                    if(overlayVal < 0) text = `밝게 ${Math.abs(overlayVal)}%`;
+                    if(overlayVal > 0) text = `어둡게 ${val}%`;
+                    document.getElementById('overlayValueText').innerText = text;
+
+                } catch (e) {
+                    console.error("Failed to load settings", e);
+                }
+            }
+        }
 
         // --- NEW: Mobile Stepper Logic with Long Press & Direct Input ---
         function setupMobileSteppers() {
@@ -1105,7 +1216,6 @@
                 pickr.on('swatchselect', (color) => {
                     const hex = color.toHEXA().toString();
                     state.colors[key] = hex;
-                    // Removed pickr.setColor(hex) to prevent the picker from closing
                     updateCanvas();
                 });
 
@@ -1311,6 +1421,11 @@
         // New Indentation Toggle Function
         function toggleIndentation() {
             state.indentation = !state.indentation;
+            updateIndentationUI();
+            updateCanvas();
+        }
+
+        function updateIndentationUI() {
             const btn = document.getElementById('btn-indent');
             const text = document.getElementById('text-indent');
             
@@ -1324,9 +1439,46 @@
                 btn.classList.remove('text-brand-600', 'bg-brand-50', 'dark:bg-brand-900/30', 'border-brand-200', 'dark:border-brand-800');
                 text.innerText = "들여쓰기 OFF";
             }
-            updateCanvas();
         }
         
+        // --- NEW: Smart Quote Toggle Function ---
+        function toggleQuoteStyle() {
+            const textarea = document.getElementById('quote');
+            let text = textarea.value;
+            const btn = document.getElementById('btn-quote-toggle');
+            const btnText = document.getElementById('text-quote-toggle');
+
+            if (!state.isCurlyQuotes) {
+                // Convert Straight to Curly
+                // " at start or after space/bracket -> “
+                text = text.replace(/(^|[\s\(\[\{])"/g, "$1“");
+                // Remaining " -> ”
+                text = text.replace(/"/g, "”");
+                
+                // ' at start or after space/bracket -> ‘
+                text = text.replace(/(^|[\s\(\[\{])'/g, "$1‘");
+                // Remaining ' -> ’
+                text = text.replace(/'/g, "’");
+                
+                state.isCurlyQuotes = true;
+                btnText.innerText = "직선 따옴표 자동 변환";
+                btn.classList.add('text-brand-600', 'bg-brand-50', 'dark:bg-brand-900/30');
+                btn.classList.remove('text-slate-400', 'bg-slate-50');
+            } else {
+                // Convert Curly to Straight
+                text = text.replace(/[“”]/g, '"');
+                text = text.replace(/[‘’]/g, "'");
+                
+                state.isCurlyQuotes = false;
+                btnText.innerText = "둥근 따옴표 자동 변환";
+                btn.classList.remove('text-brand-600', 'bg-brand-50', 'dark:bg-brand-900/30');
+                btn.classList.add('text-slate-400', 'bg-slate-50');
+            }
+            
+            textarea.value = text;
+            updateCanvas();
+        }
+
         // Desktop Editor Expand Toggle
         function toggleDesktopEditorSize() {
             const textarea = document.getElementById('quote');
@@ -1418,6 +1570,7 @@
 
         // --- 5. Drawing Core ---
         function updateCanvas() {
+            debouncedSaveSettings(); // Trigger save logic on update
             if (!state.ctx) return;
             const ctx = state.ctx;
             const width = state.canvas.width;
@@ -1587,6 +1740,10 @@
             }
 
             if (hasFooterText) {
+                // Footer Alignment Logic: Follow alignment unless Justify, then Left
+                let footerAlign = align;
+                if(align === 'justify') footerAlign = 'left';
+
                 const startY = (height - totalContentHeight) / 2;
                 currentY = startY + quoteBlockHeight + spacing + (footerLineHeight / 2);
                 
@@ -1606,11 +1763,11 @@
                 const totalFooterWidth = wAuthor + wSep + wTitle;
 
                 let startX;
-                if (align === 'left' || align === 'justify') startX = padding;
-                else if (align === 'center') startX = (width - totalFooterWidth) / 2;
-                else if (align === 'right') startX = width - padding - totalFooterWidth;
+                if (footerAlign === 'left') startX = padding;
+                else if (footerAlign === 'center') startX = (width - totalFooterWidth) / 2;
+                else if (footerAlign === 'right') startX = width - padding - totalFooterWidth;
 
-                ctx.textAlign = 'left';
+                ctx.textAlign = 'left'; // Always draw left-aligned from startX
                 ctx.font = fontNormal;
                 ctx.fillText(authorPart, startX, currentY);
                 ctx.fillText(separator, startX + wAuthor, currentY);
