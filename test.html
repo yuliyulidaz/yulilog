@@ -302,8 +302,8 @@
                             </button>
 
                             <!-- Clear Button -->
-                            <button onclick="clearQuoteTextOnly()" class="text-[10px] text-red-500 hover:text-red-600 font-medium flex items-center gap-1 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 px-2.5 py-1 rounded-lg transition-colors ml-auto">
-                                <i class="ph ph-eraser"></i> 지우기
+                            <button onclick="clearQuoteTextOnly()" class="text-red-500 hover:text-red-600 flex items-center justify-center bg-red-50 hover:bg-red-100 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 w-[26px] h-[26px] rounded-lg transition-colors ml-auto" title="지우기">
+                                <i class="ph ph-trash text-sm"></i>
                             </button>
                         </div>
                         
@@ -993,7 +993,7 @@
                     const overlayVal = parseInt(document.getElementById('overlayOpacity').value);
                     let text = "원본";
                     if(overlayVal < 0) text = `밝게 ${Math.abs(overlayVal)}%`;
-                    if(overlayVal > 0) text = `어둡게 ${overlayVal}%`;
+                    if(overlayVal > 0) text = `어둡게 ${val}%`;
                     document.getElementById('overlayValueText').innerText = text;
 
                 } catch (e) {
