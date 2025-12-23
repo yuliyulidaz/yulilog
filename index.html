@@ -744,7 +744,7 @@
                         </a>
                         
                         <div>
-                            <h3 class="font-bold text-slate-500 dark:text-slate-400 mb-1">📖 발췌 문구 생성기 v1.4.2</h3>
+                            <h3 class="font-bold text-slate-500 dark:text-slate-400 mb-1">📖 발췌 문구 생성기 v1.4.3</h3>
                             <p>본 사이트는 어떠한 개인정보도 수집하지 않습니다.<br>모든 작업은 귀하의 브라우저에서만 이루어집니다.</p>
                         </div>
                         
@@ -802,14 +802,11 @@
     <script>
         // --- 1. State Management & Constants ---
         
-        const WELCOME_MESSAGE = `⚡️ 251209 업데이트 완료! (v1.4.2)
+        const WELCOME_MESSAGE = `⚡️ 251223 업데이트 완료! (v1.4.3)
         
-[NEW] 설정 자동 저장
-  - 글꼴 설정, 배경 색상, 플랙폼 아이콘 최근 설정을 자동 기억합니다.
-  (본문 내용은 절대로 저장되지 않습니다)
+[오류수정] 이미지 오버레이 적용 후 재 접속 시, 이미지가 없어도 오버레이가 적용되던 현상을 수정했습니다.
 
-[NEW] 따옴표 자동 변환
-  - 둥근 따옴표(" " ↔️ “ ”) 자동 변환 기능 추가
+[시즌인사] 종종 이걸 사용한 당신의 글을 우연히 트위터에서 만날 때마다 아주 기쁘답니다. 제겐 크리스마스 선물이나 다름 없어요. 메리 크리스마스. 낯선 분들.
 
   💡내용 입력 창을 누르면 이 메세지는 퐁!
 `;
@@ -1617,15 +1614,18 @@
             }
             ctx.fillRect(0, 0, width, height);
 
-            if (state.bgImage) drawImage(ctx, width, height);
+            if (state.bgImage) {
+                drawImage(ctx, width, height);
 
-            const overlayVal = parseInt(document.getElementById('overlayOpacity').value);
-            if (overlayVal !== 0) {
-                ctx.save();
-                if (overlayVal < 0) ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(overlayVal) / 100})`;
-                else ctx.fillStyle = `rgba(0, 0, 0, ${overlayVal / 100})`;
-                ctx.fillRect(0, 0, width, height);
-                ctx.restore();
+                const overlayOpacityInput = document.getElementById('overlayOpacity');
+                const overlayVal = overlayOpacityInput ? parseInt(overlayOpacityInput.value) : 0;
+                if (overlayVal !== 0) {
+                    ctx.save();
+                    if (overlayVal < 0) ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(overlayVal) / 100})`;
+                    else ctx.fillStyle = `rgba(0, 0, 0, ${overlayVal / 100})`;
+                    ctx.fillRect(0, 0, width, height);
+                    ctx.restore();
+                }
             }
         }
 
