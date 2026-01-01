@@ -93,6 +93,10 @@
             box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
             z-index: 50;
         }
+        
+        /* [수정] 메타 모드일 때 내부 스크롤바 wrapper의 패딩(p-5) 제거 */
+        body.mode-meta .custom-scrollbar { padding: 0 !important; }
+
         /* 메타 모드일 때 숨길 것들 */
         body.mode-meta .top-menu-bar,
         body.mode-meta .input-wrapper, 
@@ -376,7 +380,8 @@
         [authorInput, titleInput].forEach(el => {
             el.addEventListener('focus', () => {
                 setMode('mode-meta');
-                setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+                // [수정] scrollIntoView 제거! 이것 때문에 커서가 위로 튀는 현상 발생함
+                // setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
             });
         });
 
