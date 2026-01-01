@@ -80,7 +80,7 @@
         body.mode-quote #sub-inputs { display: none !important; }
 
 
-        /* B. [수정됨] 제작자/제목 입력 모드 (Metadata Mode) - 높이 최소화 */
+        /* B. [수정됨] 제작자/제목 입력 모드 (Metadata Mode) - 높이 극도로 최소화 */
         body.mode-meta #preview-area { display: flex; filter: blur(2px); opacity: 0.5; pointer-events: none; }
         body.mode-meta #bottom-nav { display: none !important; }
         body.mode-meta #edit-area {
@@ -88,7 +88,7 @@
             height: auto !important; /* 내용물만큼만 */
             min-height: 0 !important; /* 최소 높이 제거 */
             margin-top: 0; 
-            padding-bottom: 10px; /* 하단 패딩 최소화 */
+            padding-bottom: 0; /* 하단 패딩 제거 (sub-inputs에서 처리) */
             border-radius: 24px 24px 0 0;
             box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
             z-index: 50;
@@ -99,12 +99,16 @@
         body.mode-meta #keyboard-toolbar,
         body.mode-meta #modal-delete-btn { display: none !important; }
         
-        /* 메타 모드일 때 보일 것들 */
+        /* 메타 모드일 때 보일 것들 - 패딩 대폭 축소 */
         body.mode-meta #sub-inputs { 
             display: block !important; 
-            padding: 25px 20px 15px 20px; /* 패딩 조정: 상단 25, 좌우 20, 하단 15 */
+            padding: 15px 16px 5px 16px; /* [수정] 위 15px, 아래 5px로 아주 타이트하게 */
         }
-        body.mode-meta #meta-confirm-row { display: flex !important; }
+        body.mode-meta #meta-confirm-row { 
+            display: flex !important; 
+            margin-top: 8px; /* 버튼 위 간격도 축소 */
+            padding-bottom: 10px; /* 버튼 아래 최소 여백 */
+        }
 
 
         /* UI 요소 스타일 */
