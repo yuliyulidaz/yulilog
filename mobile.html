@@ -85,17 +85,23 @@
         body.mode-meta #bottom-nav { display: none !important; }
         body.mode-meta #edit-area {
             position: fixed; bottom: 0; left: 0; right: 0;
-            height: auto !important; /* 내용물만큼만 */
-            min-height: 0 !important; /* 최소 높이 제거 */
+            /* 높이를 자동으로, 최소 높이 없음 */
+            height: auto !important; 
+            min-height: 0 !important;
             margin-top: 0; 
-            padding-bottom: 0; /* 하단 패딩 제거 (sub-inputs에서 처리) */
+            padding-bottom: 0; 
             border-radius: 24px 24px 0 0;
             box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
             z-index: 50;
         }
         
-        /* [수정] 메타 모드일 때 내부 스크롤바 wrapper의 패딩(p-5) 제거 */
-        body.mode-meta .custom-scrollbar { padding: 0 !important; }
+        /* [중요] 메타 모드일 때 내부 요소들의 높이 강제 초기화 (흰 여백 제거의 핵심) */
+        body.mode-meta .custom-scrollbar, 
+        body.mode-meta #panel-text { 
+            height: auto !important; 
+            flex: none !important; 
+            padding: 0 !important; 
+        }
 
         /* 메타 모드일 때 숨길 것들 */
         body.mode-meta .top-menu-bar,
@@ -106,12 +112,12 @@
         /* 메타 모드일 때 보일 것들 - 패딩 대폭 축소 */
         body.mode-meta #sub-inputs { 
             display: block !important; 
-            padding: 15px 16px 0px 16px; /* [수정] 위 15px, 아래 5px로 아주 타이트하게 */
+            padding: 15px 16px 0px 16px; /* 위 15px, 아래 0px */
         }
         body.mode-meta #meta-confirm-row { 
             display: flex !important; 
-            margin-top: 8px; /* 버튼 위 간격도 축소 */
-            padding-bottom: 0px; /* 버튼 아래 최소 여백 */
+            margin-top: 8px; 
+            padding-bottom: 5px; /* 버튼 아래 최소 여백 */
         }
 
 
@@ -330,7 +336,8 @@
             <button onclick="toggleInfoModal()" class="w-full mt-4 py-3 bg-slate-100 dark:bg-zinc-800 font-bold rounded-xl text-sm">닫기</button>
         </div>
     </div>
-        <script type="module">
+
+    <script type="module">
         import { drawBackground, drawContent } from './draw.js';
         import { downloadImage, copyImage, normalizeColor } from './utils.js';
         import { WELCOME_MESSAGE, LOGO_URLS } from './constants.js';
@@ -363,7 +370,6 @@
         const authorInput = document.getElementById('author');
         const titleInput = document.getElementById('title');
 
-        // 모드 스위칭 로직
         function setMode(mode) {
             document.body.classList.remove('mode-quote', 'mode-meta');
             if (mode) document.body.classList.add(mode);
@@ -379,13 +385,13 @@
         [authorInput, titleInput].forEach(el => {
             el.addEventListener('focus', () => {
                 setMode('mode-meta');
-                // ★★★ [수정됨] 범인 제거! (강제 스크롤 코드 삭제) ★★★
+                // 강제 스크롤 코드 삭제됨
             });
         });
 
         window.blurInputs = () => {
             document.activeElement.blur();
-            setMode(null); // 모든 모드 해제
+            setMode(null);
         };
 
         window.toggleSettings = () => {
@@ -544,6 +550,5 @@
             window.downloadImage = () => downloadImage(state.canvas); window.copyImage = () => copyImage(state.canvas);
         });
     </script>
-
 </body>
 </html>
