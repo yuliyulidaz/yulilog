@@ -45,36 +45,46 @@
         .panel-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ★★★ 키보드 모드 스타일 수정 (높이 절반) ★★★ */
-        /* 미리보기 영역을 완전히 숨기지 않고 높이만 0으로 줄여서 애니메이션 효과 (필요시 높이 조정 가능) */
-        body.keyboard-mode #preview-area { 
-            display: none; /* 공간 확보를 위해 숨김 (요청하신 대로 입력창만 반 띄우려면 여기를 flex 등으로 바꿔야 함) */
-        } 
+        /* ★★★ 키보드 모드 스타일 수정 (반창/바텀시트 스타일) ★★★ */
         
-        /* 하단 탭 메뉴 숨김 */
+        /* 1. 미리보기 영역: 숨기지 않고 흐리게 유지 */
+        body.keyboard-mode #preview-area { 
+            display: flex; 
+            filter: blur(2px); /* 블러 처리 */
+            opacity: 0.5;      /* 반투명 */
+            pointer-events: none; /* 클릭 방지 */
+        }
+        
+        /* 2. 하단 탭 메뉴: 숨김 */
         body.keyboard-mode #bottom-nav { display: none !important; }
         
-        /* 편집 영역 스타일: 화면의 절반만 차지하도록 수정 */
+        /* 3. 편집 영역: 화면 하단에 반만 올라오게 설정 */
         body.keyboard-mode #edit-area { 
-            height: 50dvh !important; /* ★ 높이를 화면 절반으로 강제 설정 */
-            margin-top: auto; /* 화면 아래쪽으로 붙임 */
-            border-radius: 20px 20px 0 0; /* 둥근 모서리 부활 */
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: auto;       /* 높이 자동 (내용물만큼) */
+            min-height: 50%;    /* 최소 화면의 반 */
+            max-height: 80%;    /* 너무 길어지면 스크롤 */
+            margin-top: 0; 
+            border-radius: 24px 24px 0 0; /* 둥근 모서리 */
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.2); /* 그림자 */
             display: flex;
             flex-direction: column;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.2); /* 그림자 추가로 팝업 느낌 */
             z-index: 50;
-        } 
+        }
         
-        /* 배경 딤드 처리 (선택사항: 뒤에 있는게 살짝 비치게) */
+        /* 배경 딤드(어둡게) 처리 */
         body.keyboard-mode::before {
             content: '';
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.4);
             z-index: 40;
             backdrop-filter: blur(2px);
         }
-
+        
         body.keyboard-mode #panel-text {
             display: flex !important;
             flex-direction: column;
@@ -92,6 +102,7 @@
         body.keyboard-mode #quote {
             flex: 1; 
             height: auto !important;
+            min-height: 150px; /* 최소 높이 확보 */
             border: none;
             border-radius: 0;
             background: transparent;
