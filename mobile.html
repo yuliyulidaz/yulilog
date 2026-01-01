@@ -44,7 +44,7 @@
         .panel-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- [기능 1] 백드롭 (배경 클릭시 닫기용) --- */
+        /* --- [기능 1] 백드롭 --- */
         #kb-backdrop {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.4); 
@@ -54,13 +54,13 @@
         }
         body.mode-quote #kb-backdrop, body.mode-meta #kb-backdrop { display: block; opacity: 1; }
 
-        /* --- 편집 영역 (Bottom Sheet) 공통 --- */
+        /* --- 편집 영역 (Bottom Sheet) --- */
         #edit-area { 
             position: relative; z-index: 10; 
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            /* [수정] transition 제거! (키보드 올라올 때 위치 계산 오류 방지) */
         }
 
-        /* A. 본문 입력 모드 (Quote Mode) - 60% 높이 */
+        /* A. 본문 입력 모드 (Quote Mode) */
         body.mode-quote #preview-area { display: flex; filter: blur(2px); opacity: 0.5; pointer-events: none; }
         body.mode-quote #bottom-nav { display: none !important; }
         body.mode-quote #edit-area { 
@@ -75,19 +75,17 @@
         body.mode-quote #quote { height: 100% !important; border: none; font-size: 1.1rem; line-height: 1.6; }
         body.mode-quote #keyboard-toolbar { display: flex !important; }
         body.mode-quote #modal-delete-btn { display: flex !important; }
-        /* 본문 모드일 때 숨길 것들 */
         body.mode-quote .top-menu-bar, 
         body.mode-quote #sub-inputs { display: none !important; }
 
 
-        /* B. [수정됨] 제작자/제목 입력 모드 (Metadata Mode) - 높이 극도로 최소화 */
+        /* B. 제작자/제목 입력 모드 (Metadata Mode) */
         body.mode-meta #preview-area { display: flex; filter: blur(2px); opacity: 0.5; pointer-events: none; }
         body.mode-meta #bottom-nav { display: none !important; }
         body.mode-meta #edit-area {
             position: fixed; bottom: 0; left: 0; right: 0;
-            /* 높이를 자동으로, 최소 높이 없음 */
             height: auto !important; 
-            min-height: 0 !important;
+            min-height: 0 !important; 
             margin-top: 0; 
             padding-bottom: 0; 
             border-radius: 24px 24px 0 0;
@@ -95,29 +93,21 @@
             z-index: 50;
         }
         
-        /* [중요] 메타 모드일 때 내부 요소들의 높이 강제 초기화 (흰 여백 제거의 핵심) */
-        body.mode-meta .custom-scrollbar, 
-        body.mode-meta #panel-text { 
-            height: auto !important; 
-            flex: none !important; 
-            padding: 0 !important; 
-        }
+        body.mode-meta .custom-scrollbar { padding: 0 !important; }
 
-        /* 메타 모드일 때 숨길 것들 */
         body.mode-meta .top-menu-bar,
         body.mode-meta .input-wrapper, 
         body.mode-meta #keyboard-toolbar,
         body.mode-meta #modal-delete-btn { display: none !important; }
         
-        /* 메타 모드일 때 보일 것들 - 패딩 대폭 축소 */
         body.mode-meta #sub-inputs { 
             display: block !important; 
-            padding: 15px 16px 0px 16px; /* 위 15px, 아래 0px */
+            padding: 15px 16px 0px 16px; 
         }
         body.mode-meta #meta-confirm-row { 
             display: flex !important; 
             margin-top: 8px; 
-            padding-bottom: 5px; /* 버튼 아래 최소 여백 */
+            padding-bottom: 5px; 
         }
 
 
@@ -243,8 +233,8 @@
 
                 <div id="sub-inputs" class="space-y-4">
                     <div class="grid grid-cols-2 gap-3">
-                        <input type="text" id="author" placeholder="제작자" class="w-full px-4 py-3 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                        <input type="text" id="title" placeholder="캐릭터/제목" class="w-full px-4 py-3 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <input type="text" id="author" placeholder="제작자" class="w-full px-4 py-3 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <input type="text" id="title" placeholder="캐릭터/제목" class="w-full px-4 py-3 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-brand-500">
                     </div>
                     <div id="meta-confirm-row" class="hidden justify-end mt-2">
                         <button onclick="blurInputs()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-sm active:scale-95 transition-transform">확인</button>
@@ -370,6 +360,7 @@
         const authorInput = document.getElementById('author');
         const titleInput = document.getElementById('title');
 
+        // 모드 스위칭 로직
         function setMode(mode) {
             document.body.classList.remove('mode-quote', 'mode-meta');
             if (mode) document.body.classList.add(mode);
@@ -385,13 +376,13 @@
         [authorInput, titleInput].forEach(el => {
             el.addEventListener('focus', () => {
                 setMode('mode-meta');
-                // 강제 스크롤 코드 삭제됨
+                // 강제 스크롤 및 줌인 방지를 위해 추가 로직 제거됨
             });
         });
 
         window.blurInputs = () => {
             document.activeElement.blur();
-            setMode(null);
+            setMode(null); // 모든 모드 해제
         };
 
         window.toggleSettings = () => {
