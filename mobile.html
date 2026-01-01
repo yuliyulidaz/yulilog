@@ -10,8 +10,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300&family=Noto+Sans+KR:wght@200&family=Nanum+Myeongjo&family=Nanum+Gothic&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/earlyaccess/kopubbatang.css">
-    
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+    <link rel="stylesheet" href="style.css?v=2.0">
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -30,11 +34,6 @@
         }
     </script>
 
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css"/>
-    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
-    <link rel="stylesheet" href="style.css?v=2.0">
-
     <style>
         body { overscroll-behavior: none; }
         
@@ -45,123 +44,87 @@
         .panel-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ★★★ 키보드 모드 스타일 (FIXED 포지션 적용으로 가려짐 해결) ★★★ */
-        
-        body.keyboard-mode #preview-area { 
-            display: flex; 
-            filter: blur(2px);
-            opacity: 0.5;
-            pointer-events: none;
-        }
-        
+        /* 키보드 모드: 입력창 + 하단 메뉴 스타일 */
+        body.keyboard-mode #preview-area { display: flex; filter: blur(2px); opacity: 0.5; pointer-events: none; }
         body.keyboard-mode #bottom-nav { display: none !important; }
         
         body.keyboard-mode #edit-area { 
-            position: fixed; /* absolute -> fixed 로 변경 (뷰포트 기준 고정) */
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 60%; /* 높이 설정 */
+            position: fixed; /* 화면 하단 고정 */
+            bottom: 0; left: 0; right: 0;
+            height: 60%; /* 적절한 높이 확보 */
             min-height: 320px;
             margin-top: 0; 
             border-radius: 24px 24px 0 0;
             box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
-            display: flex;
-            flex-direction: column;
-            z-index: 999; /* z-index 최상위로 올림 */
+            display: flex; flex-direction: column;
+            z-index: 999;
             transition: height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
         body.keyboard-mode::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.4);
-            z-index: 50;
-            backdrop-filter: blur(2px);
+            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4); z-index: 50; backdrop-filter: blur(2px);
         }
         
-        body.keyboard-mode #panel-text {
-            display: flex !important;
-            flex-direction: column;
-            height: 100%;
-            padding: 0 !important;
-        }
-
-        body.keyboard-mode .input-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 24px 20px 0 20px; 
-        }
-
-        body.keyboard-mode #quote {
-            flex: 1; 
-            height: auto !important;
-            min-height: 100px;
-            border: none;
-            border-radius: 0;
-            background: transparent;
-            padding: 0;
-            font-size: 1.1rem; 
-            line-height: 1.6;
+        body.keyboard-mode #panel-text { display: flex !important; flex-direction: column; height: 100%; padding: 0 !important; }
+        body.keyboard-mode .input-wrapper { flex: 1; display: flex; flex-direction: column; padding: 24px 20px 0 20px; }
+        body.keyboard-mode #quote { 
+            flex: 1; height: auto !important; min-height: 100px;
+            border: none; border-radius: 0; background: transparent; padding: 0;
+            font-size: 1.1rem; line-height: 1.6;
         }
         
-        /* ★ 툴바 하단 여백 추가 (아이폰 홈바 회피) ★ */
+        /* ★★★ 붉은 영역: 하단 메뉴바 스타일 ★★★ */
         body.keyboard-mode #keyboard-toolbar { 
             display: flex !important;
-            padding-bottom: calc(env(safe-area-inset-bottom) + 20px); /* 안전 영역 + 20px 추가 */
-            padding-top: 12px;
-            background: white;
-        }
-        .dark body.keyboard-mode #keyboard-toolbar {
-            background: #18181b;
-        }
-
-        /* ★ 삭제 버튼 (키보드 모드일 때 우측 상단 표시) ★ */
-        #top-delete-btn { display: none; }
-        body.keyboard-mode #top-delete-btn { 
-            display: flex; 
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            z-index: 1000;
-        }
-        
-        .tool-btn {
-            display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            /* 아이폰 하단 바 안전 영역 확보 */
+            padding-bottom: calc(env(safe-area-inset-bottom) + 12px); 
+            background: white;
+            border-top: 1px solid #f1f5f9;
+        }
+        .dark body.keyboard-mode #keyboard-toolbar { background: #18181b; border-top-color: #27272a; }
+
+        /* 메뉴 버튼 스타일 (아이콘 + 텍스트) */
+        .menu-btn {
+            display: flex; align-items: center; gap: 4px;
             padding: 8px 12px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 500;
+            border-radius: 8px;
+            font-size: 12px; font-weight: 500;
+            color: #64748b;
+            background: #f8fafc;
             transition: all 0.2s;
-            white-space: nowrap;
         }
-        .tool-btn.active {
-            background-color: #eff6ff;
-            color: #2563eb;
-            border: 1px solid #dbeafe;
+        .dark .menu-btn { background: #27272a; color: #a1a1aa; }
+        
+        .menu-btn.active { background: #eff6ff; color: #2563eb; border: 1px solid #dbeafe; }
+        .dark .menu-btn.active { background: #172554; color: #60a5fa; border-color: #1e40af; }
+
+        /* 삭제 버튼 (빨강) */
+        .delete-btn {
+            padding: 8px;
+            border-radius: 8px;
+            color: #ef4444;
+            background: #fef2f2;
         }
-        .dark .tool-btn.active {
-            background-color: #1e3a8a;
-            color: #93c5fd;
-            border: 1px solid #1d4ed8;
+        .dark .delete-btn { background: #450a0a; color: #f87171; }
+
+        /* 완료 버튼 (파랑) */
+        .done-btn {
+            background: #2563eb; color: white;
+            padding: 8px 16px; border-radius: 8px;
+            font-size: 13px; font-weight: 700;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
         }
 
+        /* 유리 버튼 (상단용) */
         .glass-btn {
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-        .dark .glass-btn {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-        }
+        .dark .glass-btn { background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); color: white; }
     </style>
 </head>
 <body class="h-[100dvh] bg-slate-50 dark:bg-black text-slate-900 dark:text-slate-100 flex flex-col overflow-hidden">
@@ -191,10 +154,6 @@
 
     <div id="edit-area" class="flex-1 bg-white dark:bg-dark-panel relative flex flex-col min-h-0 border-t border-slate-100 dark:border-zinc-800 rounded-t-2xl -mt-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-10 transition-all duration-300">
         
-        <button id="top-delete-btn" onclick="clearQuoteTextOnly()" class="text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 p-2 rounded-lg transition-colors">
-            <i class="ph ph-trash text-lg"></i>
-        </button>
-
         <div class="flex-1 overflow-y-auto custom-scrollbar p-5 pb-20">
             
             <div id="panel-text" class="panel-section active space-y-4 h-full">
@@ -203,21 +162,32 @@
                     <div id="input-tip" class="text-[10px] text-slate-400 text-right mt-1 px-1">입력창을 누르면 전체화면으로 바뀝니다</div>
                 </div>
 
-                <div id="keyboard-toolbar" class="hidden w-full border-t border-slate-200 dark:border-zinc-800 items-center justify-between px-3 mt-auto">
-                    <div class="flex items-center gap-1 overflow-x-auto no-scrollbar">
-                        <button onclick="toggleIndentation()" id="kb-btn-indent" class="tool-btn text-slate-500 dark:text-slate-400 flex-shrink-0">
-                            <i class="ph ph-text-indent text-lg mr-1"></i><span class="text-xs">들여쓰기</span>
+                <div id="keyboard-toolbar" class="hidden w-full">
+                    
+                    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                        <button onclick="clearQuoteTextOnly()" class="delete-btn flex-shrink-0" title="전체 삭제">
+                            <i class="ph ph-trash text-lg"></i>
                         </button>
                         
-                        <button onclick="toggleQuoteStyle()" id="kb-btn-quote" class="tool-btn text-slate-500 dark:text-slate-400 flex-shrink-0">
-                            <i class="ph ph-quotes text-lg mr-1"></i><span class="text-xs">따옴표</span>
+                        <div class="w-px h-4 bg-slate-200 dark:bg-zinc-700 mx-1 flex-shrink-0"></div>
+
+                        <button onclick="toggleIndentation()" id="kb-btn-indent" class="menu-btn flex-shrink-0">
+                            <i class="ph ph-text-indent text-lg"></i>
+                            <span>들여쓰기</span>
+                        </button>
+                        
+                        <button onclick="toggleQuoteStyle()" id="kb-btn-quote" class="menu-btn flex-shrink-0">
+                            <i class="ph ph-quotes text-lg"></i>
+                            <span>따옴표</span>
                         </button>
 
-                        <button onclick="pasteFromClipboard()" class="tool-btn text-slate-500 dark:text-slate-400 flex-shrink-0">
-                            <i class="ph ph-clipboard-text text-lg mr-1"></i><span class="text-xs">붙여넣기</span>
+                        <button onclick="pasteFromClipboard()" class="menu-btn flex-shrink-0">
+                            <i class="ph ph-clipboard-text text-lg"></i>
+                            <span>붙여넣기</span>
                         </button>
                     </div>
-                    <button onclick="blurInputs()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm px-4 py-2 rounded-xl shadow-sm active:scale-95 transition-transform flex-shrink-0 ml-2">완료</button>
+
+                    <button onclick="blurInputs()" class="done-btn flex-shrink-0 ml-3">완료</button>
                 </div>
 
                 <div id="sub-inputs" class="space-y-4">
@@ -230,18 +200,9 @@
 
             <div id="panel-ratio" class="panel-section space-y-4">
                  <div class="grid grid-cols-3 gap-3">
-                    <button onclick="setRatio('1:1')" id="btn-ratio-1-1" class="ratio-btn flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900">
-                        <div class="w-6 h-6 border-2 border-current rounded-sm"></div>
-                        <span class="text-xs font-medium">1:1</span>
-                    </button>
-                    <button onclick="setRatio('4:5')" id="btn-ratio-4-5" class="ratio-btn flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-slate-200 dark:border-zinc-700">
-                        <div class="w-5 h-6 border-2 border-current rounded-sm"></div>
-                        <span class="text-xs font-medium">4:5</span>
-                    </button>
-                    <button onclick="setRatio('16:9')" id="btn-ratio-16-9" class="ratio-btn flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-slate-200 dark:border-zinc-700">
-                        <div class="w-8 h-5 border-2 border-current rounded-sm mt-1 mb-0.5"></div>
-                        <span class="text-xs font-medium">16:9</span>
-                    </button>
+                    <button onclick="setRatio('1:1')" id="btn-ratio-1-1" class="ratio-btn flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900"><div class="w-6 h-6 border-2 border-current rounded-sm"></div><span class="text-xs font-medium">1:1</span></button>
+                    <button onclick="setRatio('4:5')" id="btn-ratio-4-5" class="ratio-btn flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-slate-200 dark:border-zinc-700"><div class="w-5 h-6 border-2 border-current rounded-sm"></div><span class="text-xs font-medium">4:5</span></button>
+                    <button onclick="setRatio('16:9')" id="btn-ratio-16-9" class="ratio-btn flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-slate-200 dark:border-zinc-700"><div class="w-8 h-5 border-2 border-current rounded-sm mt-1 mb-0.5"></div><span class="text-xs font-medium">16:9</span></button>
                 </div>
             </div>
 
@@ -470,28 +431,18 @@
             updateCanvas();
         }
 
-        // --- 붙여넣기 기능 추가 ---
         window.pasteFromClipboard = async () => {
             try {
                 const text = await navigator.clipboard.readText();
                 const quote = document.getElementById('quote');
-                
                 const start = quote.selectionStart;
                 const end = quote.selectionEnd;
                 quote.value = quote.value.substring(0, start) + text + quote.value.substring(end);
-                
                 quote.selectionStart = quote.selectionEnd = start + text.length;
-                
-                if (state.isWelcomeActive) {
-                    quote.classList.remove('text-slate-400');
-                    state.isWelcomeActive = false;
-                }
-                
+                if (state.isWelcomeActive) { quote.classList.remove('text-slate-400'); state.isWelcomeActive = false; }
                 updateCanvas();
                 quote.focus();
-            } catch (err) {
-                alert('붙여넣기 권한을 허용해주세요.');
-            }
+            } catch (err) { alert('붙여넣기 권한을 허용해주세요.'); }
         };
 
         function updateCanvas() {
@@ -525,7 +476,6 @@
             bindEvents(); initPickrs(); resizeCanvas();
             for(const [k, url] of Object.entries(LOGO_URLS)) { const img = new Image(); img.crossOrigin="Anonymous"; img.src = url; state.logoImages[k] = img; }
             
-            // 초기 공지글 세팅 (회색)
             const q = document.getElementById('quote');
             q.value = WELCOME_MESSAGE;
             q.classList.add('text-slate-400');
