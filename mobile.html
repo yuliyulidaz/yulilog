@@ -330,8 +330,7 @@
             <button onclick="toggleInfoModal()" class="w-full mt-4 py-3 bg-slate-100 dark:bg-zinc-800 font-bold rounded-xl text-sm">닫기</button>
         </div>
     </div>
-
-    <script type="module">
+        <script type="module">
         import { drawBackground, drawContent } from './draw.js';
         import { downloadImage, copyImage, normalizeColor } from './utils.js';
         import { WELCOME_MESSAGE, LOGO_URLS } from './constants.js';
@@ -380,8 +379,7 @@
         [authorInput, titleInput].forEach(el => {
             el.addEventListener('focus', () => {
                 setMode('mode-meta');
-                // [수정] scrollIntoView 제거! 이것 때문에 커서가 위로 튀는 현상 발생함
-                // setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+                // ★★★ [수정됨] 범인 제거! (강제 스크롤 코드 삭제) ★★★
             });
         });
 
@@ -546,5 +544,6 @@
             window.downloadImage = () => downloadImage(state.canvas); window.copyImage = () => copyImage(state.canvas);
         });
     </script>
+
 </body>
 </html>
