@@ -45,7 +45,7 @@
         .panel-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ★★★ 키보드 모드 스타일 (메뉴 위치 상향 조정) ★★★ */
+        /* ★★★ 키보드 모드 스타일 (메뉴 위치 상향 & 삭제 버튼 이동) ★★★ */
         
         body.keyboard-mode #preview-area { 
             display: flex; 
@@ -61,7 +61,7 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 60%;        /* 높이 살짝 조정 */
+            height: 65%;
             min-height: 300px;
             margin-top: 0; 
             border-radius: 24px 24px 0 0;
@@ -91,7 +91,7 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 20px;
+            padding: 24px 20px; /* 상단 패딩 살짝 늘림 (삭제 버튼 공간) */
         }
 
         body.keyboard-mode #quote {
@@ -106,25 +106,39 @@
             line-height: 1.6;
         }
         
-        /* ★★★ 툴바 스타일 수정: 하단 여백 추가 ★★★ */
+        /* ★ 키보드 툴바: 하단 여백 대폭 추가 ★ */
         body.keyboard-mode #keyboard-toolbar { 
             display: flex !important;
-            /* 아이폰 하단 바 가림 방지를 위한 패딩 */
-            padding-bottom: calc(env(safe-area-inset-bottom) + 15px); 
+            /* 아이폰 홈 바 + 브라우저 하단 바를 피하기 위해 여백 50px 추가 */
+            padding-bottom: calc(env(safe-area-inset-bottom) + 50px); 
             height: auto;
-            padding-top: 10px;
-        } 
+            padding-top: 12px;
+            background: white; /* 배경색 명시 */
+        }
+        .dark body.keyboard-mode #keyboard-toolbar {
+            background: #18181b;
+        }
+
+        /* ★ 삭제 버튼 (키보드 모드일 때 우측 상단 표시) ★ */
+        #top-delete-btn { display: none; }
+        body.keyboard-mode #top-delete-btn { 
+            display: flex; 
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            z-index: 60;
+        }
         
         .tool-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 8px 10px; /* 버튼 간격 조정 */
-            border-radius: 8px;
+            padding: 10px 14px; /* 버튼 터치 영역 확대 */
+            border-radius: 10px;
             font-size: 13px;
             font-weight: 500;
             transition: all 0.2s;
-            white-space: nowrap; /* 줄바꿈 방지 */
+            white-space: nowrap;
         }
         .tool-btn.active {
             background-color: #eff6ff;
@@ -178,6 +192,10 @@
 
     <div id="edit-area" class="flex-1 bg-white dark:bg-dark-panel relative flex flex-col min-h-0 border-t border-slate-100 dark:border-zinc-800 rounded-t-2xl -mt-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-10 transition-all duration-300">
         
+        <button id="top-delete-btn" onclick="clearQuoteTextOnly()" class="text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 p-2 rounded-lg transition-colors">
+            <i class="ph ph-trash text-lg"></i>
+        </button>
+
         <div class="flex-1 overflow-y-auto custom-scrollbar p-5 pb-20">
             
             <div id="panel-text" class="panel-section active space-y-4 h-full">
@@ -186,11 +204,8 @@
                     <div id="input-tip" class="text-[10px] text-slate-400 text-right mt-1 px-1">입력창을 누르면 전체화면으로 바뀝니다</div>
                 </div>
 
-                <div id="keyboard-toolbar" class="hidden w-full bg-slate-50 dark:bg-zinc-900 border-t border-slate-200 dark:border-zinc-800 items-center justify-between px-2 mt-auto">
+                <div id="keyboard-toolbar" class="hidden w-full bg-slate-50 dark:bg-zinc-900 border-t border-slate-200 dark:border-zinc-800 items-center justify-between px-3 mt-auto">
                     <div class="flex items-center gap-1 overflow-x-auto no-scrollbar">
-                        <button onclick="clearQuoteTextOnly()" class="tool-btn text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 flex-shrink-0" title="전체 삭제"><i class="ph ph-trash text-lg"></i></button>
-                        <div class="w-px h-4 bg-slate-300 dark:bg-zinc-700 mx-1 flex-shrink-0"></div>
-                        
                         <button onclick="toggleIndentation()" id="kb-btn-indent" class="tool-btn text-slate-500 dark:text-slate-400 flex-shrink-0">
                             <i class="ph ph-text-indent text-lg mr-1"></i><span class="text-xs">들여쓰기</span>
                         </button>
@@ -203,7 +218,7 @@
                             <i class="ph ph-clipboard-text text-lg mr-1"></i><span class="text-xs">붙여넣기</span>
                         </button>
                     </div>
-                    <button onclick="blurInputs()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm px-4 py-1.5 rounded-full shadow-sm active:scale-95 transition-transform flex-shrink-0 ml-2">완료</button>
+                    <button onclick="blurInputs()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm px-4 py-2 rounded-xl shadow-sm active:scale-95 transition-transform flex-shrink-0 ml-2">완료</button>
                 </div>
 
                 <div id="sub-inputs" class="space-y-4">
@@ -462,22 +477,19 @@
                 const text = await navigator.clipboard.readText();
                 const quote = document.getElementById('quote');
                 
-                // 커서 위치에 붙여넣기
                 const start = quote.selectionStart;
                 const end = quote.selectionEnd;
                 quote.value = quote.value.substring(0, start) + text + quote.value.substring(end);
                 
-                // 커서 위치 업데이트
                 quote.selectionStart = quote.selectionEnd = start + text.length;
                 
-                // 공지글 플래그 해제
                 if (state.isWelcomeActive) {
                     quote.classList.remove('text-slate-400');
                     state.isWelcomeActive = false;
                 }
                 
                 updateCanvas();
-                quote.focus(); // 포커스 유지
+                quote.focus();
             } catch (err) {
                 alert('클립보드 내용을 가져오지 못했습니다. (권한 허용 필요)');
             }
