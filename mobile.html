@@ -105,16 +105,19 @@
 
         /* --- [수정 2, 3] 본문 상단 메뉴 스타일 리파인 (높이 축소, 간격 조정) --- */
         .top-menu-bar {
-            display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; /* 하단 패딩 줄임 */
+            display: flex; gap: 4px; /* 간격 줄임 */
+            overflow-x: auto; padding-bottom: 2px; /* 하단 패딩 더 줄임 */
             -ms-overflow-style: none; scrollbar-width: none;
             align-items: center; /* 수직 중앙 정렬 */
         }
         .top-menu-bar::-webkit-scrollbar { display: none; }
 
         .top-menu-btn { 
-            display: flex; align-items: center; gap: 4px; 
-            padding: 4px 8px; /* [수정 2] 높이 더 줄임 */
-            border-radius: 6px; font-size: 11px; font-weight: 600; 
+            display: flex; align-items: center; gap: 3px; /* 아이콘-텍스트 간격 줄임 */
+            padding: 3px 7px; /* [수정 2] 높이 더더더 줄임 */
+            border-radius: 5px; /* 둥글기 줄임 */
+            font-size: 10.5px; /* 폰트 크기 줄임 */
+            font-weight: 600; 
             color: #64748b; background: #f1f5f9; 
             transition: color 0.2s, background-color 0.2s;
             flex-shrink: 0;
@@ -128,7 +131,7 @@
         .top-delete-icon {
             margin-left: auto; /* 오른쪽 끝으로 보냄 */
             color: #ef4444 !important;
-            padding: 4px; /* 패딩 최소화 */
+            padding: 3px; /* 패딩 최소화 */
             background: transparent !important; border: none !important;
         }
 
@@ -174,16 +177,16 @@
                 
                 <div class="top-menu-bar">
                     <button onclick="toggleIndentation()" id="top-btn-indent" class="top-menu-btn">
-                        <i class="ph ph-text-indent text-lg"></i><span>들여쓰기</span>
+                        <i class="ph ph-text-indent text-sm"></i><span>들여쓰기</span>
                     </button>
                     <button onclick="toggleQuoteStyle()" id="top-btn-quote" class="top-menu-btn">
-                        <i class="ph ph-quotes text-lg"></i><span>따옴표변경</span>
+                        <i class="ph ph-quotes text-sm"></i><span>따옴표변경</span>
                     </button>
                     <button onclick="pasteFromClipboard()" class="top-menu-btn">
-                        <i class="ph ph-clipboard-text text-lg"></i><span>붙여넣기</span>
+                        <i class="ph ph-clipboard-text text-sm"></i><span>붙여넣기</span>
                     </button>
                     <button onclick="clearQuoteTextOnly()" class="top-delete-icon">
-                        <i class="ph ph-trash text-xl"></i>
+                        <i class="ph ph-trash text-base"></i>
                     </button>
                 </div>
 
