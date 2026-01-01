@@ -48,11 +48,44 @@
         .panel-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 키보드 모드 스타일 */
+        /* 키보드 모드 스타일 (배달앱 스타일) */
         body.keyboard-mode #preview-area { display: none; } /* 미리보기 숨김 */
         body.keyboard-mode #bottom-nav { display: none !important; } /* 하단 메뉴 숨김 */
-        body.keyboard-mode #edit-area { height: 100dvh; margin-top: 0; border-radius: 0; } /* 편집 영역 확장 */
-        body.keyboard-mode #keyboard-toolbar { display: flex !important; } /* 완료 바 표시 */
+        
+        body.keyboard-mode #edit-area { 
+            height: 100dvh; 
+            margin-top: 0; 
+            border-radius: 0; 
+            display: flex;
+            flex-direction: column;
+        } 
+        
+        body.keyboard-mode #panel-text {
+            display: flex !important;
+            flex-direction: column;
+            height: 100%;
+            padding-bottom: 0 !important; /* 하단 패딩 제거 */
+        }
+
+        body.keyboard-mode .input-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body.keyboard-mode #quote {
+            flex: 1; /* 남은 공간 모두 차지 */
+            height: auto !important;
+            border: none;
+            border-radius: 0;
+            background: transparent;
+            padding: 20px;
+            font-size: 1.1rem; /* 글자 키우기 */
+        }
+        
+        body.keyboard-mode #keyboard-bar { 
+            display: flex !important; 
+        } 
         
         /* 유리 질감 */
         .glass-btn {
@@ -109,27 +142,30 @@
 
     <div id="edit-area" class="flex-1 bg-white dark:bg-dark-panel relative flex flex-col min-h-0 border-t border-slate-100 dark:border-zinc-800 rounded-t-2xl -mt-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-10 transition-all duration-300">
         
-        <div id="keyboard-toolbar" class="hidden sticky top-0 left-0 w-full h-12 bg-white/95 dark:bg-zinc-900/95 backdrop-blur border-b border-slate-100 dark:border-zinc-800 items-center justify-between px-4 z-50">
-             <span class="text-xs font-bold text-slate-400">내용 입력</span>
-            <button onclick="blurInputs()" class="text-brand-600 dark:text-brand-400 font-bold text-sm px-2 py-1">완료</button>
-        </div>
-
         <div class="flex-1 overflow-y-auto custom-scrollbar p-5 pb-20">
             
-            <div id="panel-text" class="panel-section active space-y-4">
-                <div class="relative group">
+            <div id="panel-text" class="panel-section active space-y-4 h-full">
+                <div class="input-wrapper relative group">
                     <textarea id="quote" placeholder="내용을 입력하세요..." class="w-full h-32 p-4 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all text-base leading-relaxed placeholder:text-slate-400"></textarea>
-                    <div class="text-[10px] text-slate-400 text-right mt-1 px-1">입력창을 누르면 전체화면으로 바뀝니다</div>
+                    <div id="input-tip" class="text-[10px] text-slate-400 text-right mt-1 px-1">입력창을 누르면 전체화면으로 바뀝니다</div>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <input type="text" id="author" placeholder="제작자" class="w-full px-4 py-3 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                    <input type="text" id="title" placeholder="캐릭터/제목" class="w-full px-4 py-3 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+
+                <div id="keyboard-bar" class="hidden w-full h-14 bg-white dark:bg-zinc-900 border-t border-slate-100 dark:border-zinc-800 items-center justify-between px-4 mt-auto">
+                    <span class="text-xs text-slate-400">내용 입력 중...</span>
+                    <button onclick="blurInputs()" class="text-brand-600 dark:text-brand-400 font-bold text-base px-3 py-1.5 active:bg-slate-100 dark:active:bg-zinc-800 rounded-lg">완료</button>
                 </div>
-                 <div class="flex gap-2 overflow-x-auto py-1 no-scrollbar">
-                    <button onclick="toggleIndentation()" id="btn-indent" class="flex-shrink-0 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-zinc-700 text-xs text-slate-500">들여쓰기</button>
-                    <button onclick="toggleQuoteStyle()" id="btn-quote" class="flex-shrink-0 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-zinc-700 text-xs text-slate-500">“따옴표” 변환</button>
-                    <button onclick="clearQuoteTextOnly()" class="flex-shrink-0 px-3 py-1.5 rounded-lg border border-red-200 bg-red-50 text-xs text-red-500">지우기</button>
-                 </div>
+
+                <div id="sub-inputs" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="text" id="author" placeholder="제작자" class="w-full px-4 py-3 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <input type="text" id="title" placeholder="캐릭터/제목" class="w-full px-4 py-3 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                     <div class="flex gap-2 overflow-x-auto py-1 no-scrollbar">
+                        <button onclick="toggleIndentation()" id="btn-indent" class="flex-shrink-0 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-zinc-700 text-xs text-slate-500">들여쓰기</button>
+                        <button onclick="toggleQuoteStyle()" id="btn-quote" class="flex-shrink-0 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-zinc-700 text-xs text-slate-500">“따옴표” 변환</button>
+                        <button onclick="clearQuoteTextOnly()" class="flex-shrink-0 px-3 py-1.5 rounded-lg border border-red-200 bg-red-50 text-xs text-red-500">지우기</button>
+                     </div>
+                </div>
             </div>
 
             <div id="panel-ratio" class="panel-section space-y-4">
@@ -308,11 +344,19 @@
             document.getElementById(`panel-${tabName}`).classList.add('active');
         };
 
-        const inputs = document.querySelectorAll('textarea, input[type="text"]');
+        // --- 키보드 모드 핵심 로직 ---
+        const inputs = document.querySelectorAll('#quote, #author, #title');
+        
         inputs.forEach(el => {
             el.addEventListener('focus', () => {
                 document.body.classList.add('keyboard-mode');
-                // 포커스 시 약간의 지연 후 스크롤 맞춤
+                // 서브 인풋 숨기기 (선택사항 - quote만 집중하려면)
+                if(el.id === 'quote') {
+                    document.getElementById('sub-inputs').style.display = 'none';
+                    document.getElementById('input-tip').style.display = 'none';
+                }
+                
+                // 스크롤 약간 지연 이동
                 setTimeout(() => {
                     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }, 300);
@@ -322,6 +366,9 @@
         window.blurInputs = () => {
             document.activeElement.blur();
             document.body.classList.remove('keyboard-mode');
+            // 서브 인풋 다시 보이기
+            document.getElementById('sub-inputs').style.display = 'block';
+            document.getElementById('input-tip').style.display = 'block';
         };
 
         window.toggleSettings = () => {
@@ -336,14 +383,12 @@
         window.toggleDarkMode = () => {
             document.documentElement.classList.toggle('dark');
             updateThemeIcon();
-            // 로컬 스토리지 저장이 필요하면 추가
             localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
         };
 
         function updateThemeIcon() {
             const isDark = document.documentElement.classList.contains('dark');
             const icon = document.getElementById('theme-icon');
-            // 다크모드면 '해' 아이콘(라이트로 가기), 아니면 '달' 아이콘
             icon.className = isDark ? 'ph ph-sun text-xl text-yellow-400' : 'ph ph-moon text-xl';
         }
 
@@ -481,7 +526,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // 초기 테마 아이콘 설정
             if(localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)){
                 document.documentElement.classList.add('dark');
             }
