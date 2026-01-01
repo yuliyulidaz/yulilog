@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-full antialiased">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+    <title>발췌 문구 생성기 (Mobile)</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300&family=Noto+Sans+KR:wght@200&family=Nanum+Myeongjo&family=Nanum+Gothic&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/earlyaccess/kopubbatang.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Pretendard Variable', 'Pretendard', '-apple-system', 'sans-serif'],
+                        serif: ['Noto Serif KR', 'serif'],
+                    },
+                    colors: {
+                        brand: { 50:'#eff6ff', 500:'#3b82f6', 600:'#2563eb' },
+                        dark: { bg:'#000000', panel:'#18181b', border:'#27272a' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+    <link rel="stylesheet" href="style.css?v=2.0">
+
+    <style>
+        /* 모바일 전용 스타일 오버라이드 */
+        body { overscroll-behavior: none; } /* 당겨서 새로고침 방지 */
+        
+        /* 탭 활성화 애니메이션 */
+        .tab-btn.active { color: #2563eb; }
+        .dark .tab-btn.active { color: #60a5fa; }
+        .tab-indicator { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        /* 패널 전환 애니메이션 */
+        .panel-section { display: none; animation: fadeIn 0.2s ease-out; }
+        .panel-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 키보드 모드 스타일 */
+        body.keyboard-mode #preview-area { height: 0 !important; overflow: hidden; padding: 0; opacity: 0; }
+        body.keyboard-mode #bottom-nav { display: none !important; }
+        body.keyboard-mode #edit-area { flex: 1; height: 100%; }
+        body.keyboard-mode #keyboard-done-btn { display: flex !important; }
+        
+        /* 유리 질감 */
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .dark .glass-btn {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="h-[100dvh] bg-slate-50 dark:bg-black text-slate-900 dark:text-slate-100 flex flex-col overflow-hidden">
+
+    <div id="preview-area" class="relative w-full h-[55%] flex-shrink-0 bg-slate-100 dark:bg-[#09090b] pattern-grid flex items-center justify-center transition-all duration-300 p-6">
+        
+        <button onclick="toggleSettings()" class="glass-btn absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center text-slate-700 dark:text-slate-200 z-20 active:scale-95 transition-transform">
+            <i class="ph ph-gear text-xl"></i>
+        </button>
+
+        <div id="settings-popover" class="hidden absolute top-16 left-4 bg-white/90 dark:bg-zinc-800/90 backdrop-blur rounded-2xl shadow-xl border border-slate-200 dark:border-zinc-700 p-2 z-30 w-48 space-y-1 transform origin-top-left transition-all">
+            <button onclick="toggleDarkMode()" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-zinc-700 flex items-center gap-2 text-sm font-medium">
+                <i class="ph ph-moon"></i> 다크 모드
+            </button>
+            <a href="https://yuliyulidaz.github.io/yulipage/" target="_blank" class="block w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-zinc-700 flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-200">
+                <i class="ph ph-file-text"></i> 내지 생성기
+            </a>
+            <button onclick="toggleInfoModal()" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-zinc-700 flex items-center gap-2 text-sm font-medium text-slate-500">
+                <i class="ph ph-info"></i> 정보 및 저작권
+            </button>
+        </div>
+        <div id="settings-backdrop" onclick="toggleSettings()" class="hidden fixed inset-0 z-20"></div>
+
+        <div class="absolute top-4 right-4 flex gap-2 z-20">
+            <button onclick="copyImage()" class="glass-btn w-10 h-10 rounded-full flex items-center justify-center text-slate-700 dark:text-slate-200 active:scale-95 transition-transform">
+                <i class="ph ph-copy text-xl"></i>
+            </button>
+            <button onclick="downloadImage()" class="glass-btn w-10 h-10 rounded-full flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold active:scale-95 transition-transform">
+                <i class="ph ph-download-simple text-xl"></i>
+            </button>
+        </div>
+
+        <div class="relative shadow-2xl transition-all duration-300" style="max-height: 100%; max-width: 100%;">
+            <canvas id="canvas" class="max-w-full max-h-full object-contain bg-white rounded-sm" style="max-height: 50vh;"></canvas>
+        </div>
+    </div>
+
+    <div id="edit-area" class="flex-1 bg-white dark:bg-dark-panel relative flex flex-col min-h-0 border-t border-slate-100 dark:border-zinc-800 rounded-t-2xl -mt-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-10">
+        
+        <div id="keyboard-done-btn" class="hidden absolute top-0 left-0 w-full h-12 bg-white dark:bg-zinc-900 border-b border-slate-100 dark:border-zinc-800 items-center justify-end px-4 z-50">
+            <button onclick="blurInputs()" class="text-brand-600 font-bold text-sm">완료</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-5 pb-20">
+            
+            <div id="panel-text" class="panel-section active space-y-4">
+                <div class="relative group">
+                    <textarea id="quote" placeholder="내용을 입력하세요..." class="w-full h-32 p-4 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all text-base leading-relaxed placeholder:text-slate-400"></textarea>
+                    <div class="text-[10px] text-slate-400 text-right mt-1 px-1">입력창을 누르면 전체화면으로 바뀝니다</div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="text" id="author" placeholder="제작자" class="w-full px-4 py-3 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    <input type="text" id="title" placeholder="캐릭터/제목" class="w-full px-4 py-3 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+                <div class="flex gap-2 overflow-x-auto py-1 no-scrollbar">
+                    <button onclick="toggleIndentation()" id="btn-indent" class="flex-shrink-0 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-zinc-700 text-xs text-slate-500">들여쓰기</button>
+                    <button onclick="toggleQuoteStyle()" id="btn-quote" class="flex-shrink-0 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-zinc-700 text-xs text-slate-500">“따옴표” 변환</button>
+                    <button onclick="clearQuoteTextOnly()" class="flex-shrink-0 px-3 py-1.5 rounded-lg border border-red-200 bg-red-50 text-xs text-red-500">지우기</button>
+                 </div>
+            </div>
+
+            <div id="panel-ratio" class="panel-section space-y-4">
+                 <div class="grid grid-cols-3 gap-3">
+                    <button onclick="setRatio('1:1')" id="btn-ratio-1-1" class="ratio-btn flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900">
+                        <div class="w-6 h-6 border-2 border-current rounded-sm"></div>
+                        <span class="text-xs font-medium">1:1</span>
+                    </button>
+                    <button onclick="setRatio('4:5')" id="btn-ratio-4-5" class="ratio-btn flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-slate-200 dark:border-zinc-700">
+                        <div class="w-5 h-6 border-2 border-current rounded-sm"></div>
+                        <span class="text-xs font-medium">4:5</span>
+                    </button>
+                    <button onclick="setRatio('16:9')" id="btn-ratio-16-9" class="ratio-btn flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-slate-200 dark:border-zinc-700">
+                        <div class="w-8 h-5 border-2 border-current rounded-sm mt-1 mb-0.5"></div>
+                        <span class="text-xs font-medium">16:9</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="panel-style" class="panel-section space-y-6">
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-400 uppercase">폰트</label>
+                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                        <button onclick="setFont('Noto Serif KR')" class="font-btn flex-shrink-0 px-4 py-2 border rounded-lg text-sm" data-font="Noto Serif KR" style="font-family: 'Noto Serif KR', serif;">명조</button>
+                        <button onclick="setFont('Pretendard')" class="font-btn flex-shrink-0 px-4 py-2 border rounded-lg text-sm" data-font="Pretendard" style="font-family: 'Pretendard', sans-serif;">고딕</button>
+                        <button onclick="setFont('KoPub Batang')" class="font-btn flex-shrink-0 px-4 py-2 border rounded-lg text-sm" data-font="KoPub Batang" style="font-family: 'KoPub Batang', serif;">바탕</button>
+                        <button onclick="setFont('Nanum Myeongjo')" class="font-btn flex-shrink-0 px-4 py-2 border rounded-lg text-sm" data-font="Nanum Myeongjo" style="font-family: 'Nanum Myeongjo', serif;">나눔명조</button>
+                        <button onclick="setFont('Noto Sans KR')" class="font-btn flex-shrink-0 px-4 py-2 border rounded-lg text-sm" data-font="Noto Sans KR" style="font-family: 'Noto Sans KR', sans-serif;">산스</button>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 dark:bg-zinc-900 p-1 rounded-lg flex border border-slate-200 dark:border-zinc-700">
+                    <label class="flex-1 text-center"><input type="radio" name="align" value="left" checked class="peer hidden"><span class="block py-2 text-slate-400 peer-checked:bg-white dark:peer-checked:bg-zinc-700 peer-checked:text-brand-600 rounded shadow-sm"><i class="ph ph-text-align-left text-lg"></i></span></label>
+                    <label class="flex-1 text-center"><input type="radio" name="align" value="center" class="peer hidden"><span class="block py-2 text-slate-400 peer-checked:bg-white dark:peer-checked:bg-zinc-700 peer-checked:text-brand-600 rounded shadow-sm"><i class="ph ph-text-align-center text-lg"></i></span></label>
+                    <label class="flex-1 text-center"><input type="radio" name="align" value="right" class="peer hidden"><span class="block py-2 text-slate-400 peer-checked:bg-white dark:peer-checked:bg-zinc-700 peer-checked:text-brand-600 rounded shadow-sm"><i class="ph ph-text-align-right text-lg"></i></span></label>
+                    <label class="flex-1 text-center"><input type="radio" name="align" value="justify" class="peer hidden"><span class="block py-2 text-slate-400 peer-checked:bg-white dark:peer-checked:bg-zinc-700 peer-checked:text-brand-600 rounded shadow-sm"><i class="ph ph-text-align-justify text-lg"></i></span></label>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs text-slate-500"><span>크기</span><span id="fontSizeValue">42</span></div>
+                        <input type="range" id="fontSize" min="30" max="80" value="42" class="w-full accent-brand-600">
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs text-slate-500"><span>줄 간격</span><span id="lineHeightValue">1.5</span></div>
+                        <input type="range" id="lineHeight" min="1.2" max="2.0" step="0.1" value="1.5" class="w-full accent-brand-600">
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs text-slate-500"><span>여백</span><span id="paddingValue">100</span></div>
+                        <input type="range" id="padding" min="50" max="200" step="10" value="100" class="w-full accent-brand-600">
+                    </div>
+                     <input type="hidden" id="paraSpacing" value="0">
+                    <div class="hidden"><input type="radio" name="linebreak" value="char" checked></div>
+                </div>
+            </div>
+
+            <div id="panel-bg" class="panel-section space-y-6">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-medium">글자 색상</span>
+                    <div class="w-10 h-10 rounded-full border border-slate-200 overflow-hidden"><div id="textColorPicker"></div></div>
+                </div>
+
+                <div class="bg-slate-50 dark:bg-zinc-900 p-1 rounded-lg flex border border-slate-200 dark:border-zinc-700">
+                    <label class="flex-1 text-center cursor-pointer"><input type="radio" name="bgMode" value="gradient" checked class="peer hidden"><span class="block py-2 text-xs font-bold text-slate-500 peer-checked:bg-white dark:peer-checked:bg-zinc-700 peer-checked:text-brand-600 rounded shadow-sm">그라데이션</span></label>
+                    <label class="flex-1 text-center cursor-pointer"><input type="radio" name="bgMode" value="solid" class="peer hidden"><span class="block py-2 text-xs font-bold text-slate-500 peer-checked:bg-white dark:peer-checked:bg-zinc-700 peer-checked:text-brand-600 rounded shadow-sm">단색</span></label>
+                </div>
+
+                <div id="gradientColorPanel" class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <span class="text-xs text-slate-500">시작</span>
+                        <div class="w-full h-10 rounded-lg border border-slate-200 overflow-hidden"><div id="gradStartColorPicker"></div></div>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-xs text-slate-500">끝</span>
+                        <div class="w-full h-10 rounded-lg border border-slate-200 overflow-hidden"><div id="gradEndColorPicker"></div></div>
+                    </div>
+                </div>
+                <div id="solidColorPanel" class="hidden">
+                     <div class="w-full h-10 rounded-lg border border-slate-200 overflow-hidden"><div id="bgColorMainPicker"></div></div>
+                </div>
+
+                <label class="flex flex-col items-center justify-center w-full h-20 border-2 border-dashed border-slate-300 dark:border-zinc-700 rounded-xl hover:border-brand-500 bg-slate-50 dark:bg-zinc-900 cursor-pointer">
+                    <i class="ph ph-image text-2xl text-slate-400"></i>
+                    <span class="text-xs text-slate-500 mt-1">배경 이미지 추가</span>
+                    <input type="file" id="bgImageUpload" accept="image/*" class="hidden">
+                </label>
+                <div id="imageControlPanel" class="hidden space-y-3">
+                     <div class="flex justify-between text-xs"><span>오버레이</span><span id="overlayValueText">원본</span></div>
+                     <input type="range" id="overlayOpacity" min="-80" max="80" value="0" class="w-full accent-brand-600">
+                     <input type="radio" name="imageFit" value="cover" checked class="hidden">
+                     <input type="radio" name="imagePosition" value="middle-center" checked class="hidden">
+                     <input type="range" id="bgImageScale" value="100" class="hidden">
+                </div>
+            </div>
+
+            <div id="panel-logo" class="panel-section space-y-4">
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-400 uppercase">플랫폼 로고</label>
+                    <select id="platformSelect" class="w-full px-4 py-3 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl text-sm focus:outline-none">
+                        <option value="">선택 안함</option>
+                        <option value="dokiChat">도키챗</option>
+                        <option value="luvDuv">러비더비</option>
+                        <option value="reppley">레플리</option>
+                        <option value="rplay">로맨틱플레이</option>
+                        <option value="ropanAI">로판AI</option>
+                        <option value="melting">멜팅</option>
+                        <option value="bloom">블룸</option>
+                        <option value="inkChat">잉크챗</option>
+                        <option value="zeta">제타</option>
+                        <option value="carat">캐럿</option>
+                        <option value="chemi">케밍</option>
+                        <option value="caveDuck">케이브덕</option>
+                        <option value="crack">크랙</option>
+                        <option value="pulse">펄스</option>
+                        <option value="Fizzchat">피즈챗</option>
+                        <option value="whif">WHIF</option> 
+                    </select>
+                </div>
+                <div class="space-y-1">
+                    <div class="flex justify-between text-xs text-slate-500"><span>로고 크기</span><span id="logoSizeValue">80</span></div>
+                    <input type="range" id="logoSize" min="50" max="200" step="10" value="80" class="w-full accent-brand-600">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav id="bottom-nav" class="flex-shrink-0 h-[safe-area-inset-bottom+60px] bg-white dark:bg-dark-panel border-t border-slate-200 dark:border-zinc-800 flex items-start justify-around pb-[safe-area-inset-bottom] z-20">
+        <button onclick="switchTab('text')" class="tab-btn active w-full py-2 flex flex-col items-center gap-1 text-xs font-medium text-slate-400 transition-colors">
+            <i class="ph ph-pencil-simple text-xl mb-0.5"></i>본문
+        </button>
+        <button onclick="switchTab('ratio')" class="tab-btn w-full py-2 flex flex-col items-center gap-1 text-xs font-medium text-slate-400 transition-colors">
+            <i class="ph ph-crop text-xl mb-0.5"></i>비율
+        </button>
+        <button onclick="switchTab('style')" class="tab-btn w-full py-2 flex flex-col items-center gap-1 text-xs font-medium text-slate-400 transition-colors">
+            <i class="ph ph-text-aa text-xl mb-0.5"></i>스타일
+        </button>
+        <button onclick="switchTab('bg')" class="tab-btn w-full py-2 flex flex-col items-center gap-1 text-xs font-medium text-slate-400 transition-colors">
+            <i class="ph ph-paint-bucket text-xl mb-0.5"></i>배경
+        </button>
+        <button onclick="switchTab('logo')" class="tab-btn w-full py-2 flex flex-col items-center gap-1 text-xs font-medium text-slate-400 transition-colors">
+            <i class="ph ph-crown text-xl mb-0.5"></i>로고
+        </button>
+    </nav>
+
+    <div id="info-modal" class="hidden fixed inset-0 z-50">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="toggleInfoModal()"></div>
+        <div class="absolute bottom-0 left-0 right-0 bg-white dark:bg-zinc-900 rounded-t-2xl p-6 shadow-2xl transform transition-transform animate-slideUp">
+            <div class="w-12 h-1.5 bg-slate-200 dark:bg-zinc-700 rounded-full mx-auto mb-6"></div>
+            <h3 class="font-bold text-lg mb-2">발췌 문구 생성기 v1.4.3</h3>
+            <p class="text-xs text-slate-500 mb-4">본 사이트는 어떠한 개인정보도 수집하지 않습니다.</p>
+            <div class="space-y-2 text-xs text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-zinc-800 p-4 rounded-xl leading-relaxed">
+                <p>• 업로드한 이미지 및 텍스트의 저작권과 책임은 사용자에게 있습니다.</p>
+                <p>• 각 플랫폼의 로고는 해당 사의 상표이므로 가이드라인을 준수하세요.</p>
+                <p>• 생성된 이미지는 상업적으로 이용할 수 없습니다.</p>
+            </div>
+            <button onclick="toggleInfoModal()" class="w-full mt-4 py-3 bg-slate-100 dark:bg-zinc-800 font-bold rounded-xl text-sm">닫기</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { drawBackground, drawContent } from './draw.js';
+        import { downloadImage, copyImage, normalizeColor } from './utils.js';
+        import { WELCOME_MESSAGE, LOGO_URLS } from './constants.js';
+
+        // 전역 State 재사용 (Main.js와 유사하지만 모바일에 맞게 경량화)
+        const state = {
+            canvas: document.getElementById('canvas'),
+            ctx: document.getElementById('canvas').getContext('2d'),
+            bgImage: null,
+            logoImages: {},
+            platform: '',
+            bgType: 'gradient',
+            gradDirection: 'to bottom right',
+            canvasRatio: '1:1',
+            fontFamily: 'Noto Serif KR',
+            indentation: false,
+            isCurlyQuotes: false,
+            colors: { text: '#ffffff', bgMain: '#E6E6FA', gradStart: '#ec4447', gradEnd: '#8c5af2' },
+            pickrs: {}
+        };
+
+        // --- 1. 탭 시스템 ---
+        window.switchTab = (tabName) => {
+            // 버튼 활성화
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'text-brand-600', 'dark:text-brand-400'));
+            event.currentTarget.classList.add('active', 'text-brand-600', 'dark:text-brand-400');
+            
+            // 패널 표시
+            document.querySelectorAll('.panel-section').forEach(p => p.classList.remove('active'));
+            document.getElementById(`panel-${tabName}`).classList.add('active');
+        };
+
+        // --- 2. 키보드 대응 (핵심) ---
+        // 입력 요소들이 포커스되면 '키보드 모드' 발동
+        const inputs = document.querySelectorAll('textarea, input[type="text"]');
+        inputs.forEach(el => {
+            el.addEventListener('focus', () => {
+                document.body.classList.add('keyboard-mode');
+                // 입력창으로 스크롤 이동
+                setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+            });
+        });
+
+        window.blurInputs = () => {
+            document.activeElement.blur();
+            document.body.classList.remove('keyboard-mode');
+        };
+
+        // --- 3. UI Toggle Functions ---
+        window.toggleSettings = () => {
+            document.getElementById('settings-popover').classList.toggle('hidden');
+            document.getElementById('settings-backdrop').classList.toggle('hidden');
+        };
+        
+        window.toggleInfoModal = () => {
+            document.getElementById('info-modal').classList.toggle('hidden');
+        };
+
+        window.toggleDarkMode = () => {
+            document.documentElement.classList.toggle('dark');
+        };
+
+        // --- 4. 값 변경 리스너 연결 (기존 로직과 동일하게 캔버스 업데이트) ---
+        function bindEvents() {
+            // Text Inputs
+            ['quote', 'author', 'title'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updateCanvas);
+            });
+
+            // Sliders
+            ['fontSize', 'lineHeight', 'padding', 'logoSize', 'overlayOpacity'].forEach(id => {
+                document.getElementById(id).addEventListener('input', (e) => {
+                    const val = e.target.value;
+                    // 라벨 업데이트
+                    const label = document.getElementById(`${id}Value`);
+                    if(label) label.innerText = val;
+                    if(id === 'overlayOpacity') document.getElementById('overlayValueText').innerText = val == 0 ? "원본" : (val < 0 ? `밝게 ${Math.abs(val)}` : `어둡게 ${val}`);
+                    updateCanvas();
+                });
+            });
+
+            // Radios
+            document.querySelectorAll('input[name="align"], input[name="bgMode"]').forEach(el => {
+                el.addEventListener('change', (e) => {
+                    if(e.target.name === 'bgMode') {
+                        state.bgType = e.target.value;
+                        togglePalette();
+                    }
+                    updateCanvas();
+                });
+            });
+
+            // Select
+            document.getElementById('platformSelect').addEventListener('change', (e) => {
+                state.platform = e.target.value;
+                updateCanvas();
+            });
+
+            // Image Upload
+            document.getElementById('bgImageUpload').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if(!file) return;
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        state.bgImage = img;
+                        document.getElementById('imageControlPanel').classList.remove('hidden');
+                        updateCanvas();
+                    };
+                    img.src = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // --- 5. Helper Functions ---
+        window.setRatio = (ratio) => {
+            state.canvasRatio = ratio;
+            // UI 업데이트
+            document.querySelectorAll('.ratio-btn').forEach(b => b.classList.remove('bg-brand-50', 'dark:bg-zinc-800', 'border-brand-500', 'ring-1'));
+            const map = {'1:1':'btn-ratio-1-1', '4:5':'btn-ratio-4-5', '16:9':'btn-ratio-16-9'};
+            document.getElementById(map[ratio]).classList.add('bg-brand-50', 'dark:bg-zinc-800', 'border-brand-500', 'ring-1');
+            
+            resizeCanvas();
+            updateCanvas();
+        };
+
+        window.setFont = (font) => {
+            state.fontFamily = font;
+            document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('bg-brand-50', 'text-brand-600', 'border-brand-500'));
+            event.target.classList.add('bg-brand-50', 'text-brand-600', 'border-brand-500');
+            
+            // 폰트 로드 트리거
+            document.fonts.load(`20px '${font}'`).then(updateCanvas);
+            updateCanvas();
+        };
+
+        window.toggleIndentation = () => {
+            state.indentation = !state.indentation;
+            const btn = document.getElementById('btn-indent');
+            state.indentation ? btn.classList.add('bg-brand-50', 'text-brand-600', 'border-brand-200') : btn.classList.remove('bg-brand-50', 'text-brand-600', 'border-brand-200');
+            updateCanvas();
+        };
+
+        window.toggleQuoteStyle = () => {
+            // (기존 스마트 따옴표 로직 복사)
+            const ta = document.getElementById('quote');
+            let text = ta.value;
+            if(!state.isCurlyQuotes) {
+                text = text.replace(/(^|[\s\(\[\{])"/g, "$1“").replace(/"/g, "”").replace(/(^|[\s\(\[\{])'/g, "$1‘").replace(/'/g, "’");
+                state.isCurlyQuotes = true;
+                document.getElementById('btn-quote').classList.add('bg-brand-50', 'text-brand-600', 'border-brand-200');
+            } else {
+                text = text.replace(/[“”]/g, '"').replace(/[‘’]/g, "'");
+                state.isCurlyQuotes = false;
+                document.getElementById('btn-quote').classList.remove('bg-brand-50', 'text-brand-600', 'border-brand-200');
+            }
+            ta.value = text;
+            updateCanvas();
+        };
+
+        window.clearQuoteTextOnly = () => {
+            document.getElementById('quote').value = '';
+            updateCanvas();
+        }
+
+        // --- Core & Init ---
+        function updateCanvas() {
+            const width = state.canvas.width;
+            const height = state.canvas.height;
+            state.ctx.clearRect(0,0, width, height);
+            drawBackground(state.ctx, width, height, state);
+            drawContent(state.ctx, width, height, state);
+        }
+
+        function resizeCanvas() {
+            let w = 1080, h = 1080;
+            if(state.canvasRatio === '4:5') h = 1350;
+            if(state.canvasRatio === '16:9') { w = 1920; h = 1080; }
+            state.canvas.width = w; state.canvas.height = h;
+        }
+
+        function togglePalette() {
+            if(state.bgType === 'solid') {
+                document.getElementById('solidColorPanel').classList.remove('hidden');
+                document.getElementById('gradientColorPanel').classList.add('hidden');
+            } else {
+                document.getElementById('solidColorPanel').classList.add('hidden');
+                document.getElementById('gradientColorPanel').classList.remove('hidden');
+            }
+        }
+
+        function initPickrs() {
+            const create = (el, key) => {
+                const p = Pickr.create({
+                    el: el, theme: 'classic', default: state.colors[key],
+                    components: { preview: true, opacity: true, hue: true, interaction: { input: true, save: true } }
+                });
+                p.on('save', (c) => { state.colors[key] = c.toHEXA().toString(); p.hide(); updateCanvas(); });
+                p.on('change', (c) => { state.colors[key] = c.toHEXA().toString(); updateCanvas(); });
+                state.pickrs[key] = p;
+            };
+            create('#textColorPicker', 'text');
+            create('#bgColorMainPicker', 'bgMain');
+            create('#gradStartColorPicker', 'gradStart');
+            create('#gradEndColorPicker', 'gradEnd');
+        }
+
+        // --- Start ---
+        document.addEventListener('DOMContentLoaded', () => {
+            bindEvents();
+            initPickrs();
+            resizeCanvas();
+            
+            // 로고 로드
+            for(const [k, url] of Object.entries(LOGO_URLS)) {
+                const img = new Image(); img.crossOrigin="Anonymous"; img.src = url;
+                state.logoImages[k] = img;
+            }
+            
+            // 초기값 설정
+            document.getElementById('quote').value = WELCOME_MESSAGE;
+            setTimeout(updateCanvas, 500);
+
+            // Export Global for Buttons
+            window.downloadImage = () => downloadImage(state.canvas);
+            window.copyImage = () => copyImage(state.canvas);
+        });
+    </script>
+</body>
+</html>
