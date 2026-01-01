@@ -45,37 +45,31 @@
         .panel-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ★★★ 키보드 모드 스타일 수정 (반창/바텀시트 스타일) ★★★ */
+        /* ★★★ 키보드 모드 스타일 수정 (높이 65%로 확대) ★★★ */
         
-        /* 1. 미리보기 영역: 숨기지 않고 흐리게 유지 */
         body.keyboard-mode #preview-area { 
             display: flex; 
-            filter: blur(2px); /* 블러 처리 */
-            opacity: 0.5;      /* 반투명 */
-            pointer-events: none; /* 클릭 방지 */
+            filter: blur(2px);
+            opacity: 0.5;
+            pointer-events: none;
         }
         
-        /* 2. 하단 탭 메뉴: 숨김 */
         body.keyboard-mode #bottom-nav { display: none !important; }
         
-        /* 3. 편집 영역: 화면 하단에 반만 올라오게 설정 */
         body.keyboard-mode #edit-area { 
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: auto;       /* 높이 자동 (내용물만큼) */
-            min-height: 50%;    /* 최소 화면의 반 */
-            max-height: 80%;    /* 너무 길어지면 스크롤 */
+            height: 65%;        /* ★ 높이를 화면의 65%로 고정 (요청하신 붉은 선 높이) */
             margin-top: 0; 
-            border-radius: 24px 24px 0 0; /* 둥근 모서리 */
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.2); /* 그림자 */
+            border-radius: 24px 24px 0 0;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
             display: flex;
             flex-direction: column;
             z-index: 50;
         }
         
-        /* 배경 딤드(어둡게) 처리 */
         body.keyboard-mode::before {
             content: '';
             position: fixed;
@@ -102,7 +96,7 @@
         body.keyboard-mode #quote {
             flex: 1; 
             height: auto !important;
-            min-height: 150px; /* 최소 높이 확보 */
+            min-height: 150px;
             border: none;
             border-radius: 0;
             background: transparent;
@@ -115,7 +109,6 @@
             display: flex !important; 
         } 
         
-        /* 툴바 버튼 스타일 */
         .tool-btn {
             display: flex;
             align-items: center;
@@ -137,7 +130,6 @@
             border: 1px solid #1d4ed8;
         }
 
-        /* 유리 질감 */
         .glass-btn {
             background: rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(12px);
@@ -183,33 +175,18 @@
             
             <div id="panel-text" class="panel-section active space-y-4 h-full">
                 <div class="input-wrapper relative group">
-                    <textarea id="quote" placeholder="내용을 입력하세요..." class="w-full h-32 p-4 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all text-base leading-relaxed placeholder:text-slate-400"></textarea>
+                    <textarea id="quote" placeholder="내용을 입력하세요..." class="w-full h-32 p-4 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl resize-none focus:outline-none transition-all text-base leading-relaxed placeholder:text-slate-400"></textarea>
                     <div id="input-tip" class="text-[10px] text-slate-400 text-right mt-1 px-1">입력창을 누르면 전체화면으로 바뀝니다</div>
                 </div>
 
                 <div id="keyboard-toolbar" class="hidden w-full h-12 bg-slate-50 dark:bg-zinc-900 border-t border-slate-200 dark:border-zinc-800 items-center justify-between px-2 mt-auto">
-                    
                     <div class="flex items-center gap-1">
-                        <button onclick="clearQuoteTextOnly()" class="tool-btn text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20" title="전체 삭제">
-                            <i class="ph ph-trash text-lg"></i>
-                        </button>
-                        
+                        <button onclick="clearQuoteTextOnly()" class="tool-btn text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20" title="전체 삭제"><i class="ph ph-trash text-lg"></i></button>
                         <div class="w-px h-4 bg-slate-300 dark:bg-zinc-700 mx-1"></div>
-
-                        <button onclick="toggleIndentation()" id="kb-btn-indent" class="tool-btn text-slate-500 dark:text-slate-400">
-                            <i class="ph ph-text-indent text-lg mr-1"></i>
-                            <span class="text-xs">들여쓰기</span>
-                        </button>
-
-                        <button onclick="toggleQuoteStyle()" id="kb-btn-quote" class="tool-btn text-slate-500 dark:text-slate-400">
-                            <i class="ph ph-quotes text-lg mr-1"></i>
-                            <span class="text-xs">따옴표</span>
-                        </button>
+                        <button onclick="toggleIndentation()" id="kb-btn-indent" class="tool-btn text-slate-500 dark:text-slate-400"><i class="ph ph-text-indent text-lg mr-1"></i><span class="text-xs">들여쓰기</span></button>
+                        <button onclick="toggleQuoteStyle()" id="kb-btn-quote" class="tool-btn text-slate-500 dark:text-slate-400"><i class="ph ph-quotes text-lg mr-1"></i><span class="text-xs">따옴표</span></button>
                     </div>
-
-                    <button onclick="blurInputs()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm px-4 py-1.5 rounded-full shadow-sm active:scale-95 transition-transform">
-                        완료
-                    </button>
+                    <button onclick="blurInputs()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm px-4 py-1.5 rounded-full shadow-sm active:scale-95 transition-transform">완료</button>
                 </div>
 
                 <div id="sub-inputs" class="space-y-4">
