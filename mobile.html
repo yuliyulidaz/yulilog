@@ -44,9 +44,13 @@
         .panel-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 키보드 모드 스타일 */
+        /* --- 키보드 모드 스타일 (모달) --- */
         body.keyboard-mode #preview-area { display: flex; filter: blur(2px); opacity: 0.5; pointer-events: none; }
         body.keyboard-mode #bottom-nav { display: none !important; }
+        
+        /* [수정 2] 모달 진입 시 상단 메뉴 숨김 */
+        body.keyboard-mode .top-menu-bar { display: none !important; }
+
         body.keyboard-mode #edit-area { 
             position: fixed; bottom: 0; left: 0; right: 0; 
             height: 60%; min-height: 320px; margin-top: 0; 
@@ -61,14 +65,17 @@
         }
         
         body.keyboard-mode #panel-text { display: flex !important; flex-direction: column; height: 100%; padding: 0 !important; }
-        body.keyboard-mode .input-wrapper { flex: 1; display: flex; flex-direction: column; padding: 24px 20px 0 20px; }
+        body.keyboard-mode .input-wrapper { 
+            flex: 1; display: flex; flex-direction: column; 
+            padding: 24px 20px 0 20px; 
+        }
         body.keyboard-mode #quote { 
             flex: 1; height: auto !important; min-height: 100px; 
             border: none; border-radius: 0; background: transparent; padding: 0; 
             font-size: 1.1rem; line-height: 1.6; 
         }
         
-        /* 키보드 하단 툴바 */
+        /* [수정 1] 하단 메뉴바 디자인 회귀 (깔끔한 스타일) */
         body.keyboard-mode #keyboard-toolbar { 
             display: flex !important; 
             align-items: center; justify-content: space-between; 
@@ -77,35 +84,58 @@
         }
         .dark body.keyboard-mode #keyboard-toolbar { background: #18181b; border-top-color: #27272a; }
 
-        /* 메뉴 버튼 스타일 */
-        .menu-btn { 
-            display: flex; align-items: center; gap: 4px; padding: 8px 12px; 
-            border-radius: 8px; font-size: 12px; font-weight: 500; 
-            color: #64748b; background: #f8fafc; transition: all 0.2s; 
+        /* 하단 툴바 버튼 스타일 (예전 디자인) */
+        .kb-tool-btn {
+            display: flex; align-items: center; justify-content: center;
+            padding: 8px 10px; border-radius: 8px;
+            font-size: 13px; font-weight: 500;
+            color: #64748b; transition: all 0.2s;
         }
-        .dark .menu-btn { background: #27272a; color: #a1a1aa; }
-        .menu-btn.active { background: #eff6ff; color: #2563eb; border: 1px solid #dbeafe; }
-        .dark .menu-btn.active { background: #172554; color: #60a5fa; border-color: #1e40af; }
-
-        .delete-btn { padding: 8px; border-radius: 8px; color: #ef4444; background: #fef2f2; }
-        .dark .delete-btn { background: #450a0a; color: #f87171; }
-
-        .done-btn { 
-            background: #2563eb; color: white; padding: 8px 16px; 
-            border-radius: 8px; font-size: 13px; font-weight: 700; 
-            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2); 
-        }
-
-        .glass-btn { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .dark .glass-btn { background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); color: white; }
+        .dark .kb-tool-btn { color: #a1a1aa; }
         
-        /* ★ 상단 메뉴바 (일반 모드용) ★ */
+        .kb-tool-btn.active {
+            color: #2563eb; background-color: #eff6ff;
+        }
+        .dark .kb-tool-btn.active { color: #60a5fa; background-color: #1e3a8a; }
+
+        /* --- [수정 3] 본문 상단 메뉴 스타일 리파인 --- */
         .top-menu-bar {
-            display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px;
-            /* 스크롤바 숨기기 */
+            display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px;
             -ms-overflow-style: none; scrollbar-width: none;
         }
         .top-menu-bar::-webkit-scrollbar { display: none; }
+
+        .top-menu-btn { 
+            display: flex; align-items: center; gap: 4px; 
+            padding: 6px 10px; /* 높이 줄임 */
+            border-radius: 8px; font-size: 11px; font-weight: 600; 
+            color: #64748b; background: #f1f5f9; 
+            transition: color 0.2s, background-color 0.2s; /* 크기 변화 제거 */
+            flex-shrink: 0;
+        }
+        .dark .top-menu-btn { background: #27272a; color: #a1a1aa; }
+        
+        /* 활성화 시 색상만 변경 (크기 변화 없음) */
+        .top-menu-btn.active { 
+            background: #eff6ff; color: #2563eb; border: 1px solid #dbeafe; 
+        }
+        .dark .top-menu-btn.active { 
+            background: #172554; color: #60a5fa; border-color: #1e40af; 
+        }
+        
+        /* 상단 삭제 버튼 (아이콘만 붉게, 배경 투명) */
+        .top-delete-btn {
+            margin-left: auto;
+            background: transparent !important;
+            color: #ef4444 !important;
+            padding: 6px 8px;
+        }
+        .top-delete-btn:hover { background: #fef2f2 !important; }
+        .dark .top-delete-btn:hover { background: rgba(239, 68, 68, 0.1) !important; }
+
+
+        .glass-btn { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .dark .glass-btn { background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); color: white; }
     </style>
 </head>
 <body class="h-[100dvh] bg-slate-50 dark:bg-black text-slate-900 dark:text-slate-100 flex flex-col overflow-hidden">
@@ -140,16 +170,16 @@
             <div id="panel-text" class="panel-section active space-y-4 h-full">
                 
                 <div class="top-menu-bar">
-                    <button onclick="toggleIndentation()" id="top-btn-indent" class="menu-btn flex-shrink-0">
+                    <button onclick="toggleIndentation()" id="top-btn-indent" class="top-menu-btn">
                         <i class="ph ph-text-indent text-lg"></i><span>들여쓰기</span>
                     </button>
-                    <button onclick="toggleQuoteStyle()" id="top-btn-quote" class="menu-btn flex-shrink-0">
+                    <button onclick="toggleQuoteStyle()" id="top-btn-quote" class="top-menu-btn">
                         <i class="ph ph-quotes text-lg"></i><span>따옴표변경</span>
                     </button>
-                    <button onclick="pasteFromClipboard()" class="menu-btn flex-shrink-0">
+                    <button onclick="pasteFromClipboard()" class="top-menu-btn">
                         <i class="ph ph-clipboard-text text-lg"></i><span>붙여넣기</span>
                     </button>
-                    <button onclick="clearQuoteTextOnly()" class="menu-btn delete-btn flex-shrink-0" style="margin-left: auto;">
+                    <button onclick="clearQuoteTextOnly()" class="top-menu-btn top-delete-btn">
                         <i class="ph ph-trash text-lg"></i><span>전체삭제</span>
                     </button>
                 </div>
@@ -160,14 +190,26 @@
                 </div>
 
                 <div id="keyboard-toolbar" class="hidden w-full">
-                    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
-                        <button onclick="clearQuoteTextOnly()" class="delete-btn flex-shrink-0" title="전체 삭제"><i class="ph ph-trash text-lg"></i></button>
-                        <div class="w-px h-4 bg-slate-200 dark:bg-zinc-700 mx-1 flex-shrink-0"></div>
-                        <button onclick="toggleIndentation()" id="kb-btn-indent" class="menu-btn flex-shrink-0"><i class="ph ph-text-indent text-lg"></i><span>들여쓰기</span></button>
-                        <button onclick="toggleQuoteStyle()" id="kb-btn-quote" class="menu-btn flex-shrink-0"><i class="ph ph-quotes text-lg"></i><span>따옴표</span></button>
-                        <button onclick="pasteFromClipboard()" class="menu-btn flex-shrink-0"><i class="ph ph-clipboard-text text-lg"></i><span>붙여넣기</span></button>
+                    <div class="flex items-center gap-1 overflow-x-auto no-scrollbar">
+                        <button onclick="clearQuoteTextOnly()" class="kb-tool-btn text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 flex-shrink-0" title="전체 삭제">
+                            <i class="ph ph-trash text-lg"></i>
+                        </button>
+                        
+                        <div class="w-px h-4 bg-slate-300 dark:bg-zinc-700 mx-2 flex-shrink-0"></div>
+
+                        <button onclick="toggleIndentation()" id="kb-btn-indent" class="kb-tool-btn flex-shrink-0">
+                            <i class="ph ph-text-indent text-lg mr-1"></i><span class="text-xs">들여쓰기</span>
+                        </button>
+                        
+                        <button onclick="toggleQuoteStyle()" id="kb-btn-quote" class="kb-tool-btn flex-shrink-0">
+                            <i class="ph ph-quotes text-lg mr-1"></i><span class="text-xs">따옴표</span>
+                        </button>
+
+                        <button onclick="pasteFromClipboard()" class="kb-tool-btn flex-shrink-0">
+                            <i class="ph ph-clipboard-text text-lg mr-1"></i><span class="text-xs">붙여넣기</span>
+                        </button>
                     </div>
-                    <button onclick="blurInputs()" class="done-btn flex-shrink-0 ml-3">완료</button>
+                    <button onclick="blurInputs()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm px-4 py-1.5 rounded-full shadow-sm active:scale-95 transition-transform flex-shrink-0 ml-auto">완료</button>
                 </div>
 
                 <div id="sub-inputs" class="space-y-4">
