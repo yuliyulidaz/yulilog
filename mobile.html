@@ -36,58 +36,61 @@
     <link rel="stylesheet" href="style.css?v=2.0">
 
     <style>
-        /* 모바일 전용 스타일 오버라이드 */
-        body { overscroll-behavior: none; } /* 당겨서 새로고침 방지 */
+        body { overscroll-behavior: none; }
         
-        /* 탭 활성화 애니메이션 */
-        .tab-btn.active { color: #2563eb; }
+        .tab-btn.active { 
+            color: #2563eb; 
+            font-weight: 700;
+        }
         .dark .tab-btn.active { color: #60a5fa; }
-        .tab-indicator { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 
-        /* 패널 전환 애니메이션 */
         .panel-section { display: none; animation: fadeIn 0.2s ease-out; }
         .panel-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* 키보드 모드 스타일 */
-        body.keyboard-mode #preview-area { height: 0 !important; overflow: hidden; padding: 0; opacity: 0; }
-        body.keyboard-mode #bottom-nav { display: none !important; }
-        body.keyboard-mode #edit-area { flex: 1; height: 100%; }
-        body.keyboard-mode #keyboard-done-btn { display: flex !important; }
+        body.keyboard-mode #preview-area { display: none; } /* 미리보기 숨김 */
+        body.keyboard-mode #bottom-nav { display: none !important; } /* 하단 메뉴 숨김 */
+        body.keyboard-mode #edit-area { height: 100dvh; margin-top: 0; border-radius: 0; } /* 편집 영역 확장 */
+        body.keyboard-mode #keyboard-toolbar { display: flex !important; } /* 완료 바 표시 */
         
         /* 유리 질감 */
         .glass-btn {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
         .dark .glass-btn {
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
         }
     </style>
 </head>
 <body class="h-[100dvh] bg-slate-50 dark:bg-black text-slate-900 dark:text-slate-100 flex flex-col overflow-hidden">
 
-    <div id="preview-area" class="relative w-full h-[55%] flex-shrink-0 bg-slate-100 dark:bg-[#09090b] pattern-grid flex items-center justify-center transition-all duration-300 p-6">
+    <div id="preview-area" class="relative w-full h-[45%] flex-shrink-0 bg-slate-100 dark:bg-[#09090b] pattern-grid flex items-center justify-center p-6 transition-all duration-300">
         
-        <button onclick="toggleSettings()" class="glass-btn absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center text-slate-700 dark:text-slate-200 z-20 active:scale-95 transition-transform">
-            <i class="ph ph-gear text-xl"></i>
-        </button>
-
-        <div id="settings-popover" class="hidden absolute top-16 left-4 bg-white/90 dark:bg-zinc-800/90 backdrop-blur rounded-2xl shadow-xl border border-slate-200 dark:border-zinc-700 p-2 z-30 w-48 space-y-1 transform origin-top-left transition-all">
-            <button onclick="toggleDarkMode()" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-zinc-700 flex items-center gap-2 text-sm font-medium">
-                <i class="ph ph-moon"></i> 다크 모드
+        <div class="absolute top-4 left-4 z-30 flex flex-col gap-3">
+            <button onclick="toggleSettings()" class="glass-btn w-10 h-10 rounded-full flex items-center justify-center text-slate-700 dark:text-slate-200 active:scale-95 transition-transform z-40">
+                <i class="ph ph-gear text-xl"></i>
             </button>
-            <a href="https://yuliyulidaz.github.io/yulipage/" target="_blank" class="block w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-zinc-700 flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-200">
-                <i class="ph ph-file-text"></i> 내지 생성기
-            </a>
-            <button onclick="toggleInfoModal()" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-zinc-700 flex items-center gap-2 text-sm font-medium text-slate-500">
-                <i class="ph ph-info"></i> 정보 및 저작권
-            </button>
+            
+            <div id="settings-menu" class="hidden flex flex-col gap-3 animate-slideDown origin-top">
+                <button onclick="toggleDarkMode()" id="theme-toggle-btn" class="glass-btn w-10 h-10 rounded-full flex items-center justify-center text-slate-700 dark:text-slate-200 active:scale-95 transition-transform">
+                    <i class="ph ph-moon text-xl" id="theme-icon"></i>
+                </button>
+                <a href="https://yuliyulidaz.github.io/yulipage/" target="_blank" class="glass-btn w-10 h-10 rounded-full flex items-center justify-center text-slate-700 dark:text-slate-200 active:scale-95 transition-transform">
+                    <i class="ph ph-file-text text-xl"></i>
+                </a>
+                <button onclick="toggleInfoModal()" class="glass-btn w-10 h-10 rounded-full flex items-center justify-center text-slate-700 dark:text-slate-200 active:scale-95 transition-transform">
+                    <i class="ph ph-info text-xl"></i>
+                </button>
+            </div>
         </div>
+        
         <div id="settings-backdrop" onclick="toggleSettings()" class="hidden fixed inset-0 z-20"></div>
 
         <div class="absolute top-4 right-4 flex gap-2 z-20">
@@ -100,14 +103,15 @@
         </div>
 
         <div class="relative shadow-2xl transition-all duration-300" style="max-height: 100%; max-width: 100%;">
-            <canvas id="canvas" class="max-w-full max-h-full object-contain bg-white rounded-sm" style="max-height: 50vh;"></canvas>
+            <canvas id="canvas" class="max-w-full max-h-full object-contain bg-white rounded-sm" style="max-height: 40vh;"></canvas>
         </div>
     </div>
 
-    <div id="edit-area" class="flex-1 bg-white dark:bg-dark-panel relative flex flex-col min-h-0 border-t border-slate-100 dark:border-zinc-800 rounded-t-2xl -mt-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-10">
+    <div id="edit-area" class="flex-1 bg-white dark:bg-dark-panel relative flex flex-col min-h-0 border-t border-slate-100 dark:border-zinc-800 rounded-t-2xl -mt-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-10 transition-all duration-300">
         
-        <div id="keyboard-done-btn" class="hidden absolute top-0 left-0 w-full h-12 bg-white dark:bg-zinc-900 border-b border-slate-100 dark:border-zinc-800 items-center justify-end px-4 z-50">
-            <button onclick="blurInputs()" class="text-brand-600 font-bold text-sm">완료</button>
+        <div id="keyboard-toolbar" class="hidden sticky top-0 left-0 w-full h-12 bg-white/95 dark:bg-zinc-900/95 backdrop-blur border-b border-slate-100 dark:border-zinc-800 items-center justify-between px-4 z-50">
+             <span class="text-xs font-bold text-slate-400">내용 입력</span>
+            <button onclick="blurInputs()" class="text-brand-600 dark:text-brand-400 font-bold text-sm px-2 py-1">완료</button>
         </div>
 
         <div class="flex-1 overflow-y-auto custom-scrollbar p-5 pb-20">
@@ -121,7 +125,7 @@
                     <input type="text" id="author" placeholder="제작자" class="w-full px-4 py-3 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
                     <input type="text" id="title" placeholder="캐릭터/제목" class="w-full px-4 py-3 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
                 </div>
-                <div class="flex gap-2 overflow-x-auto py-1 no-scrollbar">
+                 <div class="flex gap-2 overflow-x-auto py-1 no-scrollbar">
                     <button onclick="toggleIndentation()" id="btn-indent" class="flex-shrink-0 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-zinc-700 text-xs text-slate-500">들여쓰기</button>
                     <button onclick="toggleQuoteStyle()" id="btn-quote" class="flex-shrink-0 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-zinc-700 text-xs text-slate-500">“따옴표” 변환</button>
                     <button onclick="clearQuoteTextOnly()" class="flex-shrink-0 px-3 py-1.5 rounded-lg border border-red-200 bg-red-50 text-xs text-red-500">지우기</button>
@@ -177,7 +181,7 @@
                         <div class="flex justify-between text-xs text-slate-500"><span>여백</span><span id="paddingValue">100</span></div>
                         <input type="range" id="padding" min="50" max="200" step="10" value="100" class="w-full accent-brand-600">
                     </div>
-                     <input type="hidden" id="paraSpacing" value="0">
+                    <input type="hidden" id="paraSpacing" value="0">
                     <div class="hidden"><input type="radio" name="linebreak" value="char" checked></div>
                 </div>
             </div>
@@ -188,7 +192,7 @@
                     <div class="w-10 h-10 rounded-full border border-slate-200 overflow-hidden"><div id="textColorPicker"></div></div>
                 </div>
 
-                <div class="bg-slate-50 dark:bg-zinc-900 p-1 rounded-lg flex border border-slate-200 dark:border-zinc-700">
+                 <div class="bg-slate-50 dark:bg-zinc-900 p-1 rounded-lg flex border border-slate-200 dark:border-zinc-700">
                     <label class="flex-1 text-center cursor-pointer"><input type="radio" name="bgMode" value="gradient" checked class="peer hidden"><span class="block py-2 text-xs font-bold text-slate-500 peer-checked:bg-white dark:peer-checked:bg-zinc-700 peer-checked:text-brand-600 rounded shadow-sm">그라데이션</span></label>
                     <label class="flex-1 text-center cursor-pointer"><input type="radio" name="bgMode" value="solid" class="peer hidden"><span class="block py-2 text-xs font-bold text-slate-500 peer-checked:bg-white dark:peer-checked:bg-zinc-700 peer-checked:text-brand-600 rounded shadow-sm">단색</span></label>
                 </div>
@@ -252,22 +256,12 @@
         </div>
     </div>
 
-    <nav id="bottom-nav" class="flex-shrink-0 h-[safe-area-inset-bottom+60px] bg-white dark:bg-dark-panel border-t border-slate-200 dark:border-zinc-800 flex items-start justify-around pb-[safe-area-inset-bottom] z-20">
-        <button onclick="switchTab('text')" class="tab-btn active w-full py-2 flex flex-col items-center gap-1 text-xs font-medium text-slate-400 transition-colors">
-            <i class="ph ph-pencil-simple text-xl mb-0.5"></i>본문
-        </button>
-        <button onclick="switchTab('ratio')" class="tab-btn w-full py-2 flex flex-col items-center gap-1 text-xs font-medium text-slate-400 transition-colors">
-            <i class="ph ph-crop text-xl mb-0.5"></i>비율
-        </button>
-        <button onclick="switchTab('style')" class="tab-btn w-full py-2 flex flex-col items-center gap-1 text-xs font-medium text-slate-400 transition-colors">
-            <i class="ph ph-text-aa text-xl mb-0.5"></i>스타일
-        </button>
-        <button onclick="switchTab('bg')" class="tab-btn w-full py-2 flex flex-col items-center gap-1 text-xs font-medium text-slate-400 transition-colors">
-            <i class="ph ph-paint-bucket text-xl mb-0.5"></i>배경
-        </button>
-        <button onclick="switchTab('logo')" class="tab-btn w-full py-2 flex flex-col items-center gap-1 text-xs font-medium text-slate-400 transition-colors">
-            <i class="ph ph-crown text-xl mb-0.5"></i>로고
-        </button>
+    <nav id="bottom-nav" class="flex-shrink-0 h-[48px] bg-white dark:bg-dark-panel border-t border-slate-200 dark:border-zinc-800 flex items-center justify-around z-20 pb-[safe-area-inset-bottom]">
+        <button onclick="switchTab('text')" class="tab-btn active w-full h-full text-xs text-slate-400 transition-colors">본문</button>
+        <button onclick="switchTab('ratio')" class="tab-btn w-full h-full text-xs text-slate-400 transition-colors">비율</button>
+        <button onclick="switchTab('style')" class="tab-btn w-full h-full text-xs text-slate-400 transition-colors">스타일</button>
+        <button onclick="switchTab('bg')" class="tab-btn w-full h-full text-xs text-slate-400 transition-colors">배경</button>
+        <button onclick="switchTab('logo')" class="tab-btn w-full h-full text-xs text-slate-400 transition-colors">로고</button>
     </nav>
 
     <div id="info-modal" class="hidden fixed inset-0 z-50">
@@ -290,7 +284,6 @@
         import { downloadImage, copyImage, normalizeColor } from './utils.js';
         import { WELCOME_MESSAGE, LOGO_URLS } from './constants.js';
 
-        // 전역 State 재사용 (Main.js와 유사하지만 모바일에 맞게 경량화)
         const state = {
             canvas: document.getElementById('canvas'),
             ctx: document.getElementById('canvas').getContext('2d'),
@@ -307,25 +300,22 @@
             pickrs: {}
         };
 
-        // --- 1. 탭 시스템 ---
         window.switchTab = (tabName) => {
-            // 버튼 활성화
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'text-brand-600', 'dark:text-brand-400'));
             event.currentTarget.classList.add('active', 'text-brand-600', 'dark:text-brand-400');
             
-            // 패널 표시
             document.querySelectorAll('.panel-section').forEach(p => p.classList.remove('active'));
             document.getElementById(`panel-${tabName}`).classList.add('active');
         };
 
-        // --- 2. 키보드 대응 (핵심) ---
-        // 입력 요소들이 포커스되면 '키보드 모드' 발동
         const inputs = document.querySelectorAll('textarea, input[type="text"]');
         inputs.forEach(el => {
             el.addEventListener('focus', () => {
                 document.body.classList.add('keyboard-mode');
-                // 입력창으로 스크롤 이동
-                setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+                // 포커스 시 약간의 지연 후 스크롤 맞춤
+                setTimeout(() => {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
             });
         });
 
@@ -334,9 +324,8 @@
             document.body.classList.remove('keyboard-mode');
         };
 
-        // --- 3. UI Toggle Functions ---
         window.toggleSettings = () => {
-            document.getElementById('settings-popover').classList.toggle('hidden');
+            document.getElementById('settings-menu').classList.toggle('hidden');
             document.getElementById('settings-backdrop').classList.toggle('hidden');
         };
         
@@ -346,20 +335,26 @@
 
         window.toggleDarkMode = () => {
             document.documentElement.classList.toggle('dark');
+            updateThemeIcon();
+            // 로컬 스토리지 저장이 필요하면 추가
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
         };
 
-        // --- 4. 값 변경 리스너 연결 (기존 로직과 동일하게 캔버스 업데이트) ---
+        function updateThemeIcon() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const icon = document.getElementById('theme-icon');
+            // 다크모드면 '해' 아이콘(라이트로 가기), 아니면 '달' 아이콘
+            icon.className = isDark ? 'ph ph-sun text-xl text-yellow-400' : 'ph ph-moon text-xl';
+        }
+
         function bindEvents() {
-            // Text Inputs
             ['quote', 'author', 'title'].forEach(id => {
                 document.getElementById(id).addEventListener('input', updateCanvas);
             });
 
-            // Sliders
             ['fontSize', 'lineHeight', 'padding', 'logoSize', 'overlayOpacity'].forEach(id => {
                 document.getElementById(id).addEventListener('input', (e) => {
                     const val = e.target.value;
-                    // 라벨 업데이트
                     const label = document.getElementById(`${id}Value`);
                     if(label) label.innerText = val;
                     if(id === 'overlayOpacity') document.getElementById('overlayValueText').innerText = val == 0 ? "원본" : (val < 0 ? `밝게 ${Math.abs(val)}` : `어둡게 ${val}`);
@@ -367,7 +362,6 @@
                 });
             });
 
-            // Radios
             document.querySelectorAll('input[name="align"], input[name="bgMode"]').forEach(el => {
                 el.addEventListener('change', (e) => {
                     if(e.target.name === 'bgMode') {
@@ -378,13 +372,11 @@
                 });
             });
 
-            // Select
             document.getElementById('platformSelect').addEventListener('change', (e) => {
                 state.platform = e.target.value;
                 updateCanvas();
             });
 
-            // Image Upload
             document.getElementById('bgImageUpload').addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if(!file) return;
@@ -402,14 +394,11 @@
             });
         }
 
-        // --- 5. Helper Functions ---
         window.setRatio = (ratio) => {
             state.canvasRatio = ratio;
-            // UI 업데이트
             document.querySelectorAll('.ratio-btn').forEach(b => b.classList.remove('bg-brand-50', 'dark:bg-zinc-800', 'border-brand-500', 'ring-1'));
             const map = {'1:1':'btn-ratio-1-1', '4:5':'btn-ratio-4-5', '16:9':'btn-ratio-16-9'};
             document.getElementById(map[ratio]).classList.add('bg-brand-50', 'dark:bg-zinc-800', 'border-brand-500', 'ring-1');
-            
             resizeCanvas();
             updateCanvas();
         };
@@ -418,8 +407,6 @@
             state.fontFamily = font;
             document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('bg-brand-50', 'text-brand-600', 'border-brand-500'));
             event.target.classList.add('bg-brand-50', 'text-brand-600', 'border-brand-500');
-            
-            // 폰트 로드 트리거
             document.fonts.load(`20px '${font}'`).then(updateCanvas);
             updateCanvas();
         };
@@ -432,7 +419,6 @@
         };
 
         window.toggleQuoteStyle = () => {
-            // (기존 스마트 따옴표 로직 복사)
             const ta = document.getElementById('quote');
             let text = ta.value;
             if(!state.isCurlyQuotes) {
@@ -453,7 +439,6 @@
             updateCanvas();
         }
 
-        // --- Core & Init ---
         function updateCanvas() {
             const width = state.canvas.width;
             const height = state.canvas.height;
@@ -495,23 +480,25 @@
             create('#gradEndColorPicker', 'gradEnd');
         }
 
-        // --- Start ---
         document.addEventListener('DOMContentLoaded', () => {
+            // 초기 테마 아이콘 설정
+            if(localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)){
+                document.documentElement.classList.add('dark');
+            }
+            updateThemeIcon();
+
             bindEvents();
             initPickrs();
             resizeCanvas();
             
-            // 로고 로드
             for(const [k, url] of Object.entries(LOGO_URLS)) {
                 const img = new Image(); img.crossOrigin="Anonymous"; img.src = url;
                 state.logoImages[k] = img;
             }
             
-            // 초기값 설정
             document.getElementById('quote').value = WELCOME_MESSAGE;
             setTimeout(updateCanvas, 500);
 
-            // Export Global for Buttons
             window.downloadImage = () => downloadImage(state.canvas);
             window.copyImage = () => copyImage(state.canvas);
         });
